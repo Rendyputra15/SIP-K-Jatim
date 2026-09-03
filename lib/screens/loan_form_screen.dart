@@ -1,0 +1,519 @@
+import 'package:flutter/material.dart';
+import 'package:simodis_jatim/models/vehicle_model.dart';
+import 'package:simodis_jatim/models/loan_model.dart';
+
+class LoanFormScreen extends StatefulWidget {
+  final List<Vehicle> vehicles;
+  final Vehicle? preselectedVehicle;
+  final Function(LoanRequest) onSubmit;
+
+  const LoanFormScreen({
+    super.key,
+    required this.vehicles,
+    this.preselectedVehicle,
+    required this.onSubmit,
+  });
+
+  @override
+  State<LoanFormScreen> createState() => _LoanFormScreenState();
+}
+
+class _LoanFormScreenState extends State<LoanFormScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _departmentController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
+  DateTimeRange? _selectedDateRange;
+  Vehicle? _selectedVehicle;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedVehicle = widget.preselectedVehicle;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _departmentController.dispose();
+    _destinationController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  // Cek apakah step 1-3 sudah terisi untuk membuka pemilihan kendaraan
+  bool get _isStepDetailsComplete {
+    return _nameController.text.trim().isNotEmpty &&
+        _departmentController.text.trim().isNotEmpty &&
+        _selectedDateRange != null &&
+        _destinationController.text.trim().isNotEmpty &&
+        _addressController.text.trim().isNotEmpty;
+  }
+
+  Future<void> _pickDateRange() async {
+    final now = DateTime.now();
+    // Minimal H+1 peminjaman
+    final firstAllowedDate = DateTime(now.year, now.month, now.day).add(const Duration(days: 1));
+    // Batas kalender terbuka 7 hari ke depan
+    final lastAllowedDate = firstAllowedDate.add(const Duration(days: 7));
+
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: firstAllowedDate,
+      lastDate: lastAllowedDate,
+      initialDateRange: _selectedDateRange ??
+          DateTimeRange(
+            start: firstAllowedDate,
+            end: firstAllowedDate,
+          ),
+      helpText: 'PILIH RENTANG TANGGAL PEMINJAMAN',
+      saveText: 'PILIH',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF24487A),
+              onPrimary: Colors.white,
+              onSurface: Color(0xFF1E293B),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDateRange = picked;
+      });
+    }
+  }
+
+  String _formatDate(DateTime d) {
+    return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+  }
+
+  void _handleSubmit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedDateRange == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan tentukan tanggal peminjaman terlebih dahulu.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (_selectedVehicle == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan pilih salah satu armada yang tersedia.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final newLoan = LoanRequest(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      borrowerName: _nameController.text.trim(),
+      department: _departmentController.text.trim(),
+      vehicleId: _selectedVehicle!.id,
+      vehicleName: _selectedVehicle!.name,
+      destination: _destinationController.text.trim(),
+      destinationAddress: _addressController.text.trim(),
+      startDate: _selectedDateRange!.start,
+      endDate: _selectedDateRange!.end,
+      officialNoteNumber: 'Diproses saat SPK',
+      status: LoanStatus.menunggu,
+      submittedAt: DateTime.now(),
+    );
+
+    widget.onSubmit(newLoan);
+    Navigator.pop(context); // Kembali dari form
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      // HEADER DENGAN TEMA ABU MUDA
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(76.0),
+        child: Container(
+          color: const Color(0xFFF1F5F9),
+          padding: const EdgeInsets.fromLTRB(10, 10, 20, 8),
+          alignment: Alignment.centerLeft,
+          child: SafeArea(
+            bottom: false,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1E293B)),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const SizedBox(width: 4),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Formulir Permohonan',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Pengajuan pinjam kendaraan dinas',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF64748B),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Form(
+        key: _formKey,
+        onChanged: () => setState(() {}),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 90),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. DATA IDENTITAS PEGAWAI
+              _buildSectionTitle('1. Identitas Pemohon', Icons.person_pin_rounded),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: _cardBoxDecoration(),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      controller: _nameController,
+                      label: 'Nama Lengkap Pegawai',
+                      hint: 'Masukkan nama pegawai peminjam',
+                      icon: Icons.person_outline_rounded,
+                      validator: (val) => val == null || val.isEmpty ? 'Nama wajib diisi' : null,
+                    ),
+                    const SizedBox(height: 14),
+                    _buildTextField(
+                      controller: _departmentController,
+                      label: 'Bidang / Seksi / Sub Bagian',
+                      hint: 'Contoh: Bidang Perlindungan Jaminan Sosial',
+                      icon: Icons.business_rounded,
+                      validator: (val) => val == null || val.isEmpty ? 'Bidang/Seksi wajib diisi' : null,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. TANGGAL PEMINJAMAN (H+1 SAMPAI H+7)
+              _buildSectionTitle('2. Jadwal Peminjaman', Icons.date_range_rounded),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: _cardBoxDecoration(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Pilih Rentang Tanggal (Min. H+1 s/d H+7)',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: _pickDateRange,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFCBD5E1)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.calendar_today_rounded, size: 18, color: Color(0xFF24487A)),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _selectedDateRange == null
+                                    ? 'Klik untuk memilih rentang tanggal'
+                                    : '${_formatDate(_selectedDateRange!.start)} - ${_formatDate(_selectedDateRange!.end)} (${_selectedDateRange!.duration.inDays + 1} Hari)',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: _selectedDateRange == null ? const Color(0xFF94A3B8) : const Color(0xFF1E293B),
+                                ),
+                              ),
+                            ),
+                            const Icon(Icons.arrow_drop_down, color: Color(0xFF64748B)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 3. TUJUAN & ALAMAT KEDINASAN
+              _buildSectionTitle('3. Destinasi Penugasan', Icons.location_on_rounded),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: _cardBoxDecoration(),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      controller: _destinationController,
+                      label: 'Tujuan Kedinasan',
+                      hint: 'Contoh: Kantor UPT Dinsos Madiun / Rapat Bakorwil',
+                      icon: Icons.domain_rounded,
+                      validator: (val) => val == null || val.isEmpty ? 'Tujuan wajib diisi' : null,
+                    ),
+                    const SizedBox(height: 14),
+                    _buildTextField(
+                      controller: _addressController,
+                      label: 'Alamat Tujuan Lengkap',
+                      hint: 'Masukkan alamat lokasi dinas yang dituju',
+                      icon: Icons.map_outlined,
+                      maxLines: 2,
+                      validator: (val) => val == null || val.isEmpty ? 'Alamat tujuan wajib diisi' : null,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 4. PILIH KENDARAAN (TERBUKA SETELAH DATA 1-3 LENGKAP)
+              _buildSectionTitle('4. Unit Armada yang Dipinjam', Icons.directions_car_rounded),
+              const SizedBox(height: 10),
+              if (!_isStepDetailsComplete)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.lock_clock_rounded, color: Color(0xFF64748B), size: 24),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Lengkapi identitas, jadwal tanggal, dan tujuan di atas terlebih dahulu untuk melihat daftar kendaraan yang tersedia.',
+                          style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Column(
+                  children: widget.vehicles.map((v) {
+                    final isSelected = _selectedVehicle?.id == v.id;
+                    final isReady = v.status == VehicleStatus.tersedia;
+
+                    return GestureDetector(
+                      onTap: isReady
+                          ? () {
+                              setState(() {
+                                _selectedVehicle = v;
+                              });
+                            }
+                          : null,
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isSelected ? const Color(0xFF24487A) : const Color(0xFFE2E8F0),
+                            width: isSelected ? 1.8 : 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                width: 68,
+                                height: 56,
+                                color: const Color(0xFFF1F5F9),
+                                child: Image.network(
+                                  v.imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (ctx, err, stack) => Icon(
+                                    v.type == VehicleType.mobil ? Icons.directions_car : Icons.two_wheeler,
+                                    color: const Color(0xFF24487A),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    v.name,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E293B)),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    v.plateNumber,
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontFamily: 'monospace'),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${v.fuelDisplay} • ${v.capacity} Penumpang',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF0369A1)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (!isReady)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFEE2E2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'Terpakai',
+                                  style: TextStyle(fontSize: 10, color: Color(0xFFDC2626), fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            else
+                              Icon(
+                                isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                                color: isSelected ? const Color(0xFF24487A) : const Color(0xFF94A3B8),
+                                size: 22,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
+        ),
+      ),
+      bottomSheet: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _isStepDetailsComplete && _selectedVehicle != null ? _handleSubmit : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF24487A),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Kirim Pengajuan Permohonan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: const Color(0xFF24487A)),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+        ),
+      ],
+    );
+  }
+
+  BoxDecoration _cardBoxDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: const Color(0xFFE2E8F0)),
+      boxShadow: [
+        BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+        ),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          validator: validator,
+          style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+            prefixIcon: Icon(icon, size: 18, color: const Color(0xFF64748B)),
+            filled: true,
+            fillColor: const Color(0xFFF1F5F9),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+          ),
+        ),
+      ],
+    );
+  }
+}
