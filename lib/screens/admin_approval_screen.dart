@@ -44,17 +44,20 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
   int _requestSubTabIndex = 0; // 0: Menunggu, 1: Aktif, 2: Riwayat
   String _userSearchQuery = '';
   String _vehicleSearchQuery = '';
+  bool _isSidebarExpanded = true; // State untuk hide/show sidebar
 
   bool get _isSuperAdmin => widget.currentUser?.isSuperAdmin ?? false;
 
-  @override
+
+    @override
   void initState() {
     super.initState();
     _mainTabController = TabController(
-      length: _isSuperAdmin ? 4 : 2,
+      length: _isSuperAdmin ? 5 : 3, // Tambah 1 untuk Dashboard (Index 0)
       vsync: this,
     );
   }
+
 
   @override
   void dispose() {
@@ -496,12 +499,13 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
   }
 
   // DIALOG USER FORM
-  void _showUserFormDialog({AppUser? userToEdit, required UserRole defaultRole}) {
+    void _showUserFormDialog({AppUser? userToEdit, required UserRole defaultRole}) {
     final isEdit = userToEdit != null;
     final nameCtrl = TextEditingController(text: userToEdit?.name ?? '');
     final nipCtrl = TextEditingController(text: userToEdit?.nip ?? '');
     final deptCtrl = TextEditingController(text: userToEdit?.department ?? '');
     final emailCtrl = TextEditingController(text: userToEdit?.email ?? '');
+    final passwordCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
     final roleLabel = defaultRole == UserRole.admin ? 'Admin (Kasubag)' : 'Pegawai (User)';
@@ -529,6 +533,23 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                   _buildFormInput(deptCtrl, 'Bidang Dinas', 'Bidang Linjamsos'),
                   const SizedBox(height: 10),
                   _buildFormInput(emailCtrl, 'Email', 'nama@dinsos.jatimprov.go.id'),
+                  const SizedBox(height: 10),
+                  
+                  // Hanya munculkan field password jika User Baru atau jika yang mengedit adalah Superadmin
+                  if (!isEdit || _isSuperAdmin) ...[
+                    _buildFormInput(
+                      passwordCtrl, 
+                      isEdit ? 'Ganti Password (Kosongkan jika tidak diubah)' : 'Password', 
+                      '********',
+                      isPassword: true,
+                      validator: (val) {
+                        if (!isEdit && (val == null || val.isEmpty)) return 'Password wajib diisi';
+                        return null;
+                      }
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
@@ -540,6 +561,10 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                             userToEdit.nip = nipCtrl.text.trim();
                             userToEdit.department = deptCtrl.text.trim();
                             userToEdit.email = emailCtrl.text.trim();
+                            // Jika superadmin mengisi password baru, update (Hanya Mockup Logic)
+                            if (_isSuperAdmin && passwordCtrl.text.isNotEmpty) {
+                              // userToEdit.password = passwordCtrl.text; // Jika ada field password di model
+                            }
                             widget.onUpdateUser?.call(userToEdit);
                           } else {
                             final newUser = AppUser(
@@ -574,7 +599,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
     );
   }
 
-  Widget _buildFormInput(TextEditingController ctrl, String label, String hint, {bool isNumber = false}) {
+  Widget _buildFormInput(TextEditingController ctrl, String label, String hint, {bool isNumber = false, bool isPassword = false, String? Function(String?)? validator}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -583,6 +608,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
         TextFormField(
           controller: ctrl,
           keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+          obscureText: isPassword,
           style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             hintText: hint,
@@ -593,11 +619,12 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
           ),
-          validator: (val) => val == null || val.trim().isEmpty ? 'Wajib diisi' : null,
+          validator: validator ?? ((val) => val == null || val.trim().isEmpty ? 'Wajib diisi' : null),
         ),
       ],
     );
   }
+
 
   // DIALOG BAST KEMBALI
   void _showReturnDialog(BuildContext context, LoanRequest loan) {
@@ -668,7 +695,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
     );
   }
 
-  @override
+    @override
   Widget build(BuildContext context) {
     final pendingCount = widget.requests.where((r) => r.status == LoanStatus.menunggu || r.status == LoanStatus.pending).length;
     final activeCount = widget.requests.where((r) => r.status == LoanStatus.disetujui || r.status == LoanStatus.approved).length;
@@ -679,160 +706,277 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
     final adminList = allUsers.where((u) => u.isAdmin).toList();
     final userList = allUsers.where((u) => !u.isSuperAdmin && !u.isAdmin).toList();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: Column(
-        children: [
-          // 1. BANNER HEADER DASHBOARD
-          Container(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: _isSuperAdmin
-                    ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
-                    : [const Color(0xFF24487A), const Color(0xFF1E3A8A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            _isSuperAdmin ? Icons.shield_rounded : Icons.admin_panel_settings_rounded,
-                            color: _isSuperAdmin ? const Color(0xFFFBBF24) : Colors.white,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        return Scaffold(
+          backgroundColor: const Color(0xFFF8FAFC),
+          body: Row(
+            children: [
+              // 1. SIDEBAR (VERTICAL NAVIGATION) - ANIMATED
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                width: _isSidebarExpanded ? 200 : 70,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: _isSuperAdmin
+                        ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                        : [const Color(0xFF24487A), const Color(0xFF1E3A8A)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 10,
+                      offset: const Offset(2, 0),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      // Header Sidebar: Ikon & Tombol Toggle
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Row(
+                          mainAxisAlignment: _isSidebarExpanded ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
                           children: [
-                            Text(
-                              _isSuperAdmin ? 'SUPERADMINISTRATOR' : 'KASUBAG UMUM & ASET',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                letterSpacing: 0.8,
+                            if (_isSidebarExpanded)
+                              const Text(
+                                'SIP-K DINSOS',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 1),
                               ),
-                            ),
-                            Text(
-                              widget.currentUser?.name ?? 'Admin SIP-K Dinsos',
-                              style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                            GestureDetector(
+                              onTap: () => setState(() => _isSidebarExpanded = !_isSidebarExpanded),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  _isSidebarExpanded ? Icons.menu_open_rounded : Icons.menu_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _isSuperAdmin ? const Color(0xFFB45309).withValues(alpha: 0.3) : const Color(0xFF1E40AF).withValues(alpha: 0.4),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: _isSuperAdmin ? const Color(0xFFFBBF24) : const Color(0xFF60A5FA),
-                          width: 0.8,
+                      ),
+                      const SizedBox(height: 30),
+                  
+                      // Menu Items
+                      _buildSidebarItem(0, Icons.grid_view_rounded, 'Dashboard'),
+                      _buildSidebarItem(1, Icons.description_rounded, 'Berkas Loan'),
+                      if (_isSuperAdmin) _buildSidebarItem(2, Icons.directions_car_rounded, 'Katalog Armada'),
+                      if (_isSuperAdmin) _buildSidebarItem(3, Icons.manage_accounts_rounded, 'Kelola Admin'),
+                      _buildSidebarItem(_isSuperAdmin ? 4 : 2, Icons.people_alt_rounded, 'Daftar Pegawai'),
+                  
+                      const Spacer(),
+                      // User Profile Mini
+                      Container(
+                        margin: const EdgeInsets.all(12),
+                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: _isSidebarExpanded ? 12 : 0),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 14,
+                              backgroundColor: _isSuperAdmin ? const Color(0xFFFBBF24) : Colors.white,
+                              child: Icon(Icons.person, size: 16, color: _isSuperAdmin ? Colors.black : const Color(0xFF24487A)),
+                            ),
+                            if (_isSidebarExpanded) ...[
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      widget.currentUser?.name.split(' ')[0] ?? 'Admin',
+                                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      _isSuperAdmin ? 'Superadmin' : 'Kasubag',
+                                      style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                      child: Text(
-                        _isSuperAdmin ? 'Full Privilege' : 'Branch Admin',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: _isSuperAdmin ? const Color(0xFFFDE68A) : const Color(0xFFDBEAFE),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                // Quick KPI Indicators
-                Row(
-                  children: [
-                    _buildTopKpi('Menunggu', pendingCount.toString(), const Color(0xFFF59E0B)),
-                    const SizedBox(width: 8),
-                    _buildTopKpi('Sedang Dinas', activeCount.toString(), const Color(0xFF10B981)),
-                    const SizedBox(width: 8),
-                    _buildTopKpi('BAST Selesai', completedCount.toString(), const Color(0xFF38BDF8)),
-                    if (_isSuperAdmin) ...[
-                      const SizedBox(width: 8),
-                      _buildTopKpi('Total Armada', allVehicles.length.toString(), const Color(0xFFF472B6)),
                     ],
+                  ),
+                ),
+              ),
+
+              // 2. MAIN CONTENT AREA
+              Expanded(
+                child: Column(
+                  children: [
+                    // Header Banner
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                      color: Colors.white,
+                      child: Row(
+                        children: [
+                          if (!_isSidebarExpanded) ...[
+                            const Text(
+                              'SIP-K',
+                              style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF24487A), fontSize: 16),
+                            ),
+                            const SizedBox(width: 16),
+                            const SizedBox(height: 24, child: VerticalDivider(width: 1, color: Color(0xFFE2E8F0))),
+                            const SizedBox(width: 16),
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _isSuperAdmin ? 'SISTEM INFORMASI KENDARAAN (SUPER)' : 'MANAJEMEN ARMADA DINSOS',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF1E293B),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                Text(
+                                  'UPT Dinas Sosial Provinsi Jawa Timur',
+                                  style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF64748B), size: 22),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                
+                    // Content Switcher
+                    Expanded(
+                      child: TabBarView(
+                        controller: _mainTabController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          _buildDashboardView(pendingCount, activeCount, completedCount, allVehicles.length),
+                          _buildArmadaSection(),
+                          if (_isSuperAdmin) _buildVehicleManagementView(allVehicles),
+                          if (_isSuperAdmin)
+                            _buildUserManagementView(
+                              targetRole: UserRole.admin,
+                              title: 'Daftar Admin (Kasubag & Tim Aset)',
+                              subtitle: 'Akun pengelola verifikasi armada.',
+                              userList: adminList,
+                            ),
+                          _buildUserManagementView(
+                            targetRole: UserRole.user,
+                            title: 'Daftar Pegawai (User Pemohon)',
+                            subtitle: 'Akun pegawai yang berhak mengajukan.',
+                            userList: userList,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        );
 
-          // 2. TAB NAVIGASI RATA KIRI & PAS 4 STRUKTUR TAB (TIDAK MENGAMBANG)
+  }
+
+  Widget _buildDashboardView(int pending, int active, int completed, int totalVehicles) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Ringkasan Operasional',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+          ),
+          const SizedBox(height: 16),
+          
+          // Row 1: Status Pengajuan
+          Row(
+            children: [
+              _buildModernStatCard(
+                'Antrean Masuk', 
+                pending.toString(), 
+                'Butuh Verifikasi', 
+                Icons.hourglass_empty_rounded, 
+                const Color(0xFFF59E0B)
+              ),
+              const SizedBox(width: 16),
+              _buildModernStatCard(
+                'Armada Jalan', 
+                active.toString(), 
+                'Sedang Bertugas', 
+                Icons.local_shipping_rounded, 
+                const Color(0xFF10B981)
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Row 2: Riwayat & Total
+          Row(
+            children: [
+              _buildModernStatCard(
+                'BAST Selesai', 
+                completed.toString(), 
+                'Total Riwayat', 
+                Icons.assignment_turned_in_rounded, 
+                const Color(0xFF3B82F6)
+              ),
+              const SizedBox(width: 16),
+              _buildModernStatCard(
+                'Total Armada', 
+                totalVehicles.toString(), 
+                'Unit Terdaftar', 
+                Icons.directions_car_rounded, 
+                const Color(0xFF6366F1)
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          const Text(
+            'Log Aktivitas Terakhir',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+          ),
+          const SizedBox(height: 12),
+          
+          // Mock Log Aktivitas agar dashboard menarik
           Container(
-            color: Colors.white,
-            alignment: Alignment.centerLeft,
-            child: TabBar(
-              controller: _mainTabController,
-              isScrollable: false, // Membagi 4 kolom pas secara merata di layar
-              labelColor: const Color(0xFF24487A),
-              unselectedLabelColor: const Color(0xFF64748B),
-              indicatorColor: const Color(0xFF24487A),
-              indicatorWeight: 3,
-              labelPadding: EdgeInsets.zero,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
-              tabs: [
-                const Tab(
-                  icon: Icon(Icons.description_outlined, size: 17),
-                  text: 'Armada & Berkas',
-                ),
-                if (_isSuperAdmin)
-                  Tab(
-                    icon: const Icon(Icons.directions_car_rounded, size: 17),
-                    text: 'Katalog (${allVehicles.length})',
-                  ),
-                if (_isSuperAdmin)
-                  Tab(
-                    icon: const Icon(Icons.manage_accounts_rounded, size: 17),
-                    text: 'Admin (${adminList.length})',
-                  ),
-                Tab(
-                  icon: const Icon(Icons.people_alt_rounded, size: 17),
-                  text: 'User (${userList.length})',
-                ),
-              ],
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-          ),
-
-          // 3. TAB CONTENT
-          Expanded(
-            child: TabBarView(
-              controller: _mainTabController,
+            child: Column(
               children: [
-                _buildArmadaSection(),
-                if (_isSuperAdmin) _buildVehicleManagementView(allVehicles),
-                if (_isSuperAdmin)
-                  _buildUserManagementView(
-                    targetRole: UserRole.admin,
-                    title: 'Daftar Admin (Kasubag & Tim Aset)',
-                    subtitle: 'Akun pengelola yang berhak memverifikasi peminjaman armada.',
-                    userList: adminList,
-                  ),
-                _buildUserManagementView(
-                  targetRole: UserRole.user,
-                  title: 'Daftar Pegawai (User Pemohon)',
-                  subtitle: 'Akun pegawai Dinsos Jatim yang berhak mengajukan peminjaman.',
-                  userList: userList,
-                ),
+                _buildLogItem('Persetujuan Peminjaman', 'Admin menyetujui Toyota Innova (L 1023 SP)', '10 Menit lalu', Icons.check_circle_outline, Colors.green),
+                const Divider(height: 24),
+                _buildLogItem('BAST Masuk', 'Pengembalian Unit Mitsubishi Pajero (L 4444 AS)', '1 Jam lalu', Icons.assignment_returned_outlined, Colors.blue),
+                const Divider(height: 24),
+                _buildLogItem('User Baru', 'Penambahan Akun Pegawai: Rendy Cahyono', '3 Jam lalu', Icons.person_add_outlined, Colors.orange),
               ],
             ),
           ),
@@ -840,6 +984,130 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
       ),
     );
   }
+
+  Widget _buildModernStatCard(String title, String value, String sub, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(color: color.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: color),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            Text(sub, style: const TextStyle(fontSize: 10, color: Color(0xFF64748B))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogItem(String title, String desc, String time, IconData icon, Color color) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+          child: Icon(icon, color: color, size: 16),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+              Text(desc, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+            ],
+          ),
+        ),
+        Text(time, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+      ],
+    );
+  }
+
+
+    Widget _buildSidebarItem(int index, IconData icon, String label) {
+    final isSelected = _mainTabController.index == index;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _mainTabController.animateTo(index);
+        });
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white.withValues(alpha: 0.12) : Colors.transparent,
+        ),
+        child: Row(
+          mainAxisAlignment: _isSidebarExpanded ? MainAxisAlignment.start : MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected 
+                ? (_isSuperAdmin ? const Color(0xFFFBBF24) : Colors.white) 
+                : Colors.white.withValues(alpha: 0.4),
+              size: 20,
+            ),
+            if (_isSidebarExpanded) ...[
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.4),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (isSelected)
+                Container(
+                  width: 4,
+                  height: 4,
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildHeaderStat(String value, String label, Color color) {
+    return Column(
+      children: [
+        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
+        Text(label, style: const TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
 
   Widget _buildTopKpi(String label, String value, Color accent) {
     return Expanded(

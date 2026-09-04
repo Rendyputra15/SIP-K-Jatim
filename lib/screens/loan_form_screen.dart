@@ -60,7 +60,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     // Batas kalender terbuka 7 hari ke depan
     final lastAllowedDate = firstAllowedDate.add(const Duration(days: 7));
 
-    final picked = await showDateRangePicker(
+        final picked = await showDateRangePicker(
       context: context,
       firstDate: firstAllowedDate,
       lastDate: lastAllowedDate,
@@ -69,7 +69,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
             start: firstAllowedDate,
             end: firstAllowedDate,
           ),
-      helpText: 'PILIH RENTANG TANGGAL PEMINJAMAN',
+      helpText: 'PILIH RENTANG TANGGAL',
       saveText: 'PILIH',
       builder: (context, child) {
         return Theme(
@@ -77,13 +77,20 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF24487A),
               onPrimary: Colors.white,
+              surface: Colors.white,
               onSurface: Color(0xFF1E293B),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF24487A),
+              foregroundColor: Colors.white,
+              elevation: 0,
             ),
           ),
           child: child!,
         );
       },
     );
+
 
     if (picked != null) {
       setState(() {
@@ -92,9 +99,14 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     }
   }
 
-  String _formatDate(DateTime d) {
-    return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+    String _formatDate(DateTime d) {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+      'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
+
 
   void _handleSubmit() {
     if (!_formKey.currentState!.validate()) return;
@@ -225,7 +237,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
               const SizedBox(height: 20),
 
               // 2. TANGGAL PEMINJAMAN (H+1 SAMPAI H+7)
-              _buildSectionTitle('2. Jadwal Peminjaman', Icons.date_range_rounded),
+                            _buildSectionTitle('2. Jadwal Peminjaman', Icons.calendar_month_rounded),
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(16),
@@ -237,41 +249,59 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       'Pilih Rentang Tanggal (Min. H+1 s/d H+7)',
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
                     ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _pickDateRange,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildDateBox(
+                            label: 'MULAI',
+                            date: _selectedDateRange?.start,
+                            onTap: _pickDateRange,
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFFCBD5E1)),
+                        ),
+                        Expanded(
+                          child: _buildDateBox(
+                            label: 'SELESAI',
+                            date: _selectedDateRange?.end,
+                            onTap: _pickDateRange,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_selectedDateRange != null) ...[
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFFCBD5E1)),
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFDBEAFE)),
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.calendar_today_rounded, size: 18, color: Color(0xFF24487A)),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                _selectedDateRange == null
-                                    ? 'Klik untuk memilih rentang tanggal'
-                                    : '${_formatDate(_selectedDateRange!.start)} - ${_formatDate(_selectedDateRange!.end)} (${_selectedDateRange!.duration.inDays + 1} Hari)',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: _selectedDateRange == null ? const Color(0xFF94A3B8) : const Color(0xFF1E293B),
-                                ),
+                            const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF24487A)),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Durasi Peminjaman: ${_selectedDateRange!.duration.inDays + 1} Hari',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF24487A),
                               ),
                             ),
-                            const Icon(Icons.arrow_drop_down, color: Color(0xFF64748B)),
                           ],
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
+
 
               const SizedBox(height: 20),
 
@@ -458,7 +488,53 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     );
   }
 
+    Widget _buildDateBox({
+    required String label,
+    required DateTime? date,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Color(0xFF64748B), letterSpacing: 0.5),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.calendar_today_rounded, size: 14, color: Color(0xFF24487A)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    date != null ? _formatDate(date) : 'Pilih...',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: date != null ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSectionTitle(String title, IconData icon) {
+
     return Row(
       children: [
         Icon(icon, size: 18, color: const Color(0xFF24487A)),
