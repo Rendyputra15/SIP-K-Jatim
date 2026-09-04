@@ -1,10 +1,11 @@
 enum LoanStatus {
   menunggu,
-  pending,      // Alias untuk menunggu
+  pending, // Alias untuk menunggu
   disetujui,
-  approved,     // Alias untuk disetujui
+  approved, // Alias untuk disetujui
   ditolak,
-  rejected,     // Alias untuk ditolak
+  rejected, // Alias untuk ditolak
+  dibatalkan,
   selesai,
 }
 
@@ -16,16 +17,18 @@ class LoanRequest {
   final String vehicleName;
   final String destination;
   final String destinationAddress;
+  final String purposeDescription;
   final DateTime startDate;
   final DateTime endDate;
   final String officialNoteNumber;
+  final String? simPhotoPath;
   LoanStatus status;
   final DateTime submittedAt;
   String? spkNumber;
 
   // Properti untuk proses pengembalian unit (BAST)
   dynamic returnOdometer; // Mendukung int maupun String
-  dynamic returnFuel;     // Mendukung String ("Full", "75%") maupun int
+  dynamic returnFuel; // Mendukung String ("Full", "75%") maupun int
   String? returnNotes;
 
   LoanRequest({
@@ -36,9 +39,11 @@ class LoanRequest {
     required this.vehicleName,
     required this.destination,
     this.destinationAddress = '',
+    this.purposeDescription = '',
     required this.startDate,
     required this.endDate,
     this.officialNoteNumber = '-',
+    this.simPhotoPath,
     this.status = LoanStatus.menunggu,
     required this.submittedAt,
     this.spkNumber,

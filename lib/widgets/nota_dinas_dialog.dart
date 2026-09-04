@@ -48,7 +48,11 @@ class NotaDinasDialog extends StatelessWidget {
                         color: Color(0xFFF1F5F9),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close_rounded, size: 18, color: Color(0xFF64748B)),
+                      child: const Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: Color(0xFF64748B),
+                      ),
                     ),
                   ),
                 ],
@@ -72,15 +76,26 @@ class NotaDinasDialog extends StatelessWidget {
                         children: [
                           const Text(
                             'PEMERINTAH PROVINSI JAWA TIMUR',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                           const Text(
                             'DINAS SOSIAL',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1,
+                            ),
                           ),
                           const Text(
                             'Jl. Gayung Kebonsari No.56, Surabaya, Jawa Timur 60235',
-                            style: TextStyle(fontSize: 9, color: Color(0xFF475569)),
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Color(0xFF475569),
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Container(height: 2, color: Colors.black),
@@ -95,22 +110,44 @@ class NotaDinasDialog extends StatelessWidget {
                     const Center(
                       child: Text(
                         'NOTA DINAS / IZIN PENGGUNAAN KENDARAAN',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                     Center(
                       child: Text(
                         'Nomor: $regNumber',
-                        style: const TextStyle(fontSize: 10, color: Color(0xFF334155), fontFamily: 'monospace'),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Color(0xFF334155),
+                          fontFamily: 'monospace',
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
 
                     // ISI SURAT KEDINASAN
-                    _buildRowText('Kepada', 'Kasubag Tata Usaha & Pengelola Kendaraan'),
-                    _buildRowText('Dari', loan.department.isEmpty ? 'Staf Pemohon Dinas' : loan.department),
-                    _buildRowText('Tanggal Terbit', _formatDate(DateTime.now())),
-                    _buildRowText('Perihal', 'Izin Pemakaian Kendaraan Operasional Dinas'),
+                    _buildRowText(
+                      'Kepada',
+                      'Kasubag Tata Usaha & Pengelola Kendaraan',
+                    ),
+                    _buildRowText(
+                      'Dari',
+                      loan.department.isEmpty
+                          ? 'Staf Pemohon Dinas'
+                          : loan.department,
+                    ),
+                    _buildRowText(
+                      'Tanggal Terbit',
+                      _formatDate(DateTime.now()),
+                    ),
+                    _buildRowText(
+                      'Perihal',
+                      'Izin Pemakaian Kendaraan Operasional Dinas',
+                    ),
 
                     const SizedBox(height: 10),
                     const Divider(height: 1, color: Color(0xFFE2E8F0)),
@@ -118,17 +155,32 @@ class NotaDinasDialog extends StatelessWidget {
 
                     const Text(
                       'Diberikan persetujuan pemakaian armada dinas dengan rincian data sebagai berikut:',
-                      style: TextStyle(fontSize: 11, color: Color(0xFF334155)),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color.fromARGB(255, 51, 77, 85),
+                      ),
                     ),
                     const SizedBox(height: 8),
 
-                    _buildFieldBox('Nama Pemohon / Pengemudi', loan.borrowerName),
+                    _buildFieldBox(
+                      'Nama Pemohon / Pengemudi',
+                      loan.borrowerName,
+                    ),
                     _buildFieldBox('Armada Kendaraan', loan.vehicleName),
-                    _buildFieldBox('Jadwal Pelaksanaan Tugas', '${_formatDate(loan.startDate)} s/d ${_formatDate(loan.endDate)}'),
+                    _buildFieldBox(
+                      'Jadwal Pelaksanaan Tugas',
+                      '${_formatDate(loan.startDate)} s/d ${_formatDate(loan.endDate)}',
+                    ),
                     _buildFieldBox('Tujuan Dinas', loan.destination),
                     if (loan.destinationAddress.isNotEmpty)
-                      _buildFieldBox('Alamat Lokasi Tujuan', loan.destinationAddress),
-                    _buildFieldBox('Status Verifikasi', 'DISETUJUI / DISAHKAN OLEH KASUBAG UMUM'),
+                      _buildFieldBox(
+                        'Alamat Lokasi Tujuan',
+                        loan.destinationAddress,
+                      ),
+                    _buildFieldBox(
+                      'Status Verifikasi',
+                      'DISETUJUI / DISAHKAN OLEH KASUBAG UMUM',
+                    ),
 
                     const SizedBox(height: 16),
 
@@ -147,8 +199,18 @@ class NotaDinasDialog extends StatelessWidget {
                           ),
                           child: const Column(
                             children: [
-                              Icon(Icons.qr_code_2_rounded, size: 48, color: Color(0xFF1E293B)),
-                              Text('Validasi SIP-K', style: TextStyle(fontSize: 8, color: Color(0xFF64748B))),
+                              Icon(
+                                Icons.qr_code_2_rounded,
+                                size: 48,
+                                color: Color(0xFF1E293B),
+                              ),
+                              Text(
+                                'Validasi SIP-K',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -157,13 +219,26 @@ class NotaDinasDialog extends StatelessWidget {
                         const Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text('Surabaya, Kasubag Umum', style: TextStyle(fontSize: 10)),
+                            Text(
+                              'Surabaya, Kasubag Umum',
+                              style: TextStyle(fontSize: 10),
+                            ),
                             SizedBox(height: 34), // Ruang Tanda Tangan
                             Text(
                               'Drs. H. PENGELOLA ASET, M.Si',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
-                            Text('NIP. 19780512 200501 1 004', style: TextStyle(fontSize: 9, color: Color(0xFF64748B))),
+                            Text(
+                              'NIP. 19780512 200501 1 004',
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Color(0xFF64748B),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -183,19 +258,29 @@ class NotaDinasDialog extends StatelessWidget {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Berkas softfile Nota Dinas disimpan ke folder Unduhan (PDF).'),
+                            content: Text(
+                              'Berkas softfile Nota Dinas disimpan ke folder Unduhan (PDF).',
+                            ),
                             behavior: SnackBarBehavior.floating,
                             backgroundColor: Color(0xFF24487A),
                           ),
                         );
                       },
                       icon: const Icon(Icons.download_rounded, size: 16),
-                      label: const Text('Unduh PDF', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      label: const Text(
+                        'Unduh PDF',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFF24487A),
                         side: const BorderSide(color: Color(0xFF24487A)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
@@ -206,19 +291,29 @@ class NotaDinasDialog extends StatelessWidget {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Mengirim dokumen ke printer kantor... Silakan serahkan cetakan ke Kasubag TU.'),
+                            content: Text(
+                              'Mengirim dokumen ke printer kantor... Silakan serahkan cetakan ke Kasubag TU.',
+                            ),
                             behavior: SnackBarBehavior.floating,
                             backgroundColor: Color(0xFF16A34A),
                           ),
                         );
                       },
                       icon: const Icon(Icons.print_rounded, size: 16),
-                      label: const Text('Cetak Berkas', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      label: const Text(
+                        'Cetak Berkas',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF16A34A),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
@@ -239,11 +334,24 @@ class NotaDinasDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: 85,
-            child: Text(label, style: const TextStyle(fontSize: 10, color: Color(0xFF475569))),
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 10, color: Color(0xFF475569)),
+            ),
           ),
-          const Text(': ', style: TextStyle(fontSize: 10, color: Color(0xFF475569))),
+          const Text(
+            ': ',
+            style: TextStyle(fontSize: 10, color: Color(0xFF475569)),
+          ),
           Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF1E293B))),
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1E293B),
+              ),
+            ),
           ),
         ],
       ),
@@ -258,11 +366,24 @@ class NotaDinasDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: 125,
-            child: Text('• $label', style: const TextStyle(fontSize: 10, color: Color(0xFF64748B))),
+            child: Text(
+              '• $label',
+              style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+            ),
           ),
-          const Text(': ', style: TextStyle(fontSize: 10, color: Color(0xFF64748B))),
+          const Text(
+            ': ',
+            style: TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+          ),
           Expanded(
-            child: Text(val, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            child: Text(
+              val,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B),
+              ),
+            ),
           ),
         ],
       ),
