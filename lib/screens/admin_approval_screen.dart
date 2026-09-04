@@ -1042,6 +1042,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 700;
     final pendingCount = widget.requests
         .where(
           (r) =>
@@ -1073,163 +1074,167 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+      drawer: isMobile ? Drawer(child: _buildMobileDrawer()) : null,
       body: Row(
         children: [
           // 1. SIDEBAR (VERTICAL NAVIGATION) - ANIMATED
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            width: _isSidebarExpanded ? 200 : 70,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: _isSuperAdmin
-                    ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
-                    : [const Color(0xFF24487A), const Color(0xFF1E3A8A)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 10,
-                  offset: const Offset(2, 0),
+          if (!isMobile)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              width: _isSidebarExpanded ? 200 : 70,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: _isSuperAdmin
+                      ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                      : [const Color(0xFF24487A), const Color(0xFF1E3A8A)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
-              ],
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  // Header Sidebar: Ikon & Tombol Toggle
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      mainAxisAlignment: _isSidebarExpanded
-                          ? MainAxisAlignment.spaceBetween
-                          : MainAxisAlignment.center,
-                      children: [
-                        if (_isSidebarExpanded)
-                          const Text(
-                            'SIP-K DINSOS',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 12,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        GestureDetector(
-                          onTap: () => setState(
-                            () => _isSidebarExpanded = !_isSidebarExpanded,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              _isSidebarExpanded
-                                  ? Icons.menu_open_rounded
-                                  : Icons.menu_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Menu Items
-                  _buildSidebarItem(0, Icons.grid_view_rounded, 'Dashboard'),
-                  _buildSidebarItem(
-                    1,
-                    Icons.description_rounded,
-                    'Berkas Loan',
-                  ),
-                  if (_isSuperAdmin)
-                    _buildSidebarItem(
-                      2,
-                      Icons.directions_car_rounded,
-                      'Katalog Armada',
-                    ),
-                  if (_isSuperAdmin)
-                    _buildSidebarItem(
-                      3,
-                      Icons.manage_accounts_rounded,
-                      'Kelola Admin',
-                    ),
-                  _buildSidebarItem(
-                    _isSuperAdmin ? 4 : 2,
-                    Icons.people_alt_rounded,
-                    'Daftar Pegawai',
-                  ),
-
-                  const Spacer(),
-                  // User Profile Mini
-                  Container(
-                    margin: const EdgeInsets.all(12),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: _isSidebarExpanded ? 12 : 0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: 14,
-                          backgroundColor: _isSuperAdmin
-                              ? const Color(0xFFFBBF24)
-                              : Colors.white,
-                          child: Icon(
-                            Icons.person,
-                            size: 16,
-                            color: _isSuperAdmin
-                                ? Colors.black
-                                : const Color(0xFF24487A),
-                          ),
-                        ),
-                        if (_isSidebarExpanded) ...[
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  widget.currentUser?.name.split(' ')[0] ??
-                                      'Admin',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  _isSuperAdmin ? 'Superadmin' : 'Kasubag',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.5),
-                                    fontSize: 9,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 10,
+                    offset: const Offset(2, 0),
                   ),
                 ],
               ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    // Header Sidebar: Ikon & Tombol Toggle
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        mainAxisAlignment: _isSidebarExpanded
+                            ? MainAxisAlignment.spaceBetween
+                            : MainAxisAlignment.center,
+                        children: [
+                          if (_isSidebarExpanded)
+                            const Text(
+                              'SIP-K DINSOS',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          GestureDetector(
+                            onTap: () => setState(
+                              () => _isSidebarExpanded = !_isSidebarExpanded,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                _isSidebarExpanded
+                                    ? Icons.menu_open_rounded
+                                    : Icons.menu_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    // Menu Items
+                    _buildSidebarItem(0, Icons.grid_view_rounded, 'Dashboard'),
+                    _buildSidebarItem(
+                      1,
+                      Icons.description_rounded,
+                      'Berkas Loan',
+                    ),
+                    if (_isSuperAdmin)
+                      _buildSidebarItem(
+                        2,
+                        Icons.directions_car_rounded,
+                        'Katalog Armada',
+                      ),
+                    if (_isSuperAdmin)
+                      _buildSidebarItem(
+                        3,
+                        Icons.manage_accounts_rounded,
+                        'Kelola Admin',
+                      ),
+                    _buildSidebarItem(
+                      _isSuperAdmin ? 4 : 2,
+                      Icons.people_alt_rounded,
+                      'Daftar Pegawai',
+                    ),
+
+                    const Spacer(),
+                    // User Profile Mini
+                    Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: _isSidebarExpanded ? 12 : 0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 14,
+                            backgroundColor: _isSuperAdmin
+                                ? const Color(0xFFFBBF24)
+                                : Colors.white,
+                            child: Icon(
+                              Icons.person,
+                              size: 16,
+                              color: _isSuperAdmin
+                                  ? Colors.black
+                                  : const Color(0xFF24487A),
+                            ),
+                          ),
+                          if (_isSidebarExpanded) ...[
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    widget.currentUser?.name.split(' ')[0] ??
+                                        'Admin',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    _isSuperAdmin ? 'Superadmin' : 'Kasubag',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                      fontSize: 9,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
 
           // 2. MAIN CONTENT AREA
           Expanded(
@@ -1237,11 +1242,20 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
               children: [
                 // Header Banner
                 Container(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                  padding: EdgeInsets.fromLTRB(isMobile ? 8 : 20, 16, 20, 16),
                   color: Colors.white,
                   child: Row(
                     children: [
-                      if (!_isSidebarExpanded) ...[
+                      if (isMobile)
+                        Builder(
+                          builder: (context) => IconButton(
+                            tooltip: 'Buka menu',
+                            onPressed: () => Scaffold.of(context).openDrawer(),
+                            icon: const Icon(Icons.menu_rounded),
+                            color: const Color(0xFF24487A),
+                          ),
+                        )
+                      else if (!_isSidebarExpanded) ...[
                         const Text(
                           'SIP-K',
                           style: TextStyle(
@@ -1360,46 +1374,78 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
           const SizedBox(height: 16),
 
           // Row 1: Status Pengajuan
-          Row(
-            children: [
-              _buildModernStatCard(
-                'Antrean Masuk',
-                pending.toString(),
-                'Butuh Verifikasi',
-                Icons.hourglass_empty_rounded,
-                const Color(0xFFF59E0B),
-              ),
-              const SizedBox(width: 16),
-              _buildModernStatCard(
-                'Armada Jalan',
-                active.toString(),
-                'Sedang Bertugas',
-                Icons.local_shipping_rounded,
-                const Color(0xFF10B981),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final cards = [
+                _buildModernStatCard(
+                  'Antrean Masuk',
+                  pending.toString(),
+                  'Butuh Verifikasi',
+                  Icons.hourglass_empty_rounded,
+                  const Color(0xFFF59E0B),
+                ),
+                _buildModernStatCard(
+                  'Armada Jalan',
+                  active.toString(),
+                  'Sedang Bertugas',
+                  Icons.local_shipping_rounded,
+                  const Color(0xFF10B981),
+                ),
+              ];
+              return constraints.maxWidth < 560
+                  ? Column(
+                      children: [
+                        cards[0],
+                        const SizedBox(height: 12),
+                        cards[1],
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(child: cards[0]),
+                        const SizedBox(width: 16),
+                        Expanded(child: cards[1]),
+                      ],
+                    );
+            },
           ),
           const SizedBox(height: 16),
 
           // Row 2: Riwayat & Total
-          Row(
-            children: [
-              _buildModernStatCard(
-                'BAST Selesai',
-                completed.toString(),
-                'Total Riwayat',
-                Icons.assignment_turned_in_rounded,
-                const Color(0xFF3B82F6),
-              ),
-              const SizedBox(width: 16),
-              _buildModernStatCard(
-                'Total Armada',
-                totalVehicles.toString(),
-                'Unit Terdaftar',
-                Icons.directions_car_rounded,
-                const Color(0xFF6366F1),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final cards = [
+                _buildModernStatCard(
+                  'BAST Selesai',
+                  completed.toString(),
+                  'Total Riwayat',
+                  Icons.assignment_turned_in_rounded,
+                  const Color(0xFF3B82F6),
+                ),
+                _buildModernStatCard(
+                  'Total Armada',
+                  totalVehicles.toString(),
+                  'Unit Terdaftar',
+                  Icons.directions_car_rounded,
+                  const Color(0xFF6366F1),
+                ),
+              ];
+              return constraints.maxWidth < 560
+                  ? Column(
+                      children: [
+                        cards[0],
+                        const SizedBox(height: 12),
+                        cards[1],
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(child: cards[0]),
+                        const SizedBox(width: 16),
+                        Expanded(child: cards[1]),
+                      ],
+                    );
+            },
           ),
 
           const SizedBox(height: 24),
@@ -1461,60 +1507,58 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
     IconData icon,
     Color color,
   ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: color, size: 20),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: color,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+                child: Icon(icon, color: color, size: 20),
               ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1E293B),
             ),
-            Text(
-              sub,
-              style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
-            ),
-          ],
-        ),
+          ),
+          Text(
+            sub,
+            style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+          ),
+        ],
       ),
     );
   }
@@ -1561,6 +1605,110 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
           style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
         ),
       ],
+    );
+  }
+
+  Widget _buildMobileDrawer() {
+    final items = <(int, IconData, String)>[
+      (0, Icons.grid_view_rounded, 'Dashboard'),
+      (1, Icons.description_rounded, 'Berkas Loan'),
+      if (_isSuperAdmin) (2, Icons.directions_car_rounded, 'Katalog Armada'),
+      if (_isSuperAdmin) (3, Icons.manage_accounts_rounded, 'Kelola Admin'),
+      (_isSuperAdmin ? 4 : 2, Icons.people_alt_rounded, 'Daftar Pegawai'),
+    ];
+
+    return SafeArea(
+      child: Container(
+        color: _isSuperAdmin
+            ? const Color(0xFF0F172A)
+            : const Color(0xFF1E3A8A),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 12, 24),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'SIP-K DINSOS',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Tutup menu',
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1, color: Colors.white24),
+            const SizedBox(height: 12),
+            for (final item in items)
+              _buildMobileDrawerItem(item.$1, item.$2, item.$3),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: _isSuperAdmin
+                        ? const Color(0xFFFBBF24)
+                        : Colors.white,
+                    child: Icon(
+                      Icons.person,
+                      color: _isSuperAdmin
+                          ? Colors.black
+                          : const Color(0xFF24487A),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      widget.currentUser?.name ?? 'Administrator',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileDrawerItem(int index, IconData icon, String label) {
+    final isSelected = _mainTabController.index == index;
+    return ListTile(
+      selected: isSelected,
+      selectedTileColor: Colors.white.withValues(alpha: 0.12),
+      leading: Icon(
+        icon,
+        color: isSelected ? const Color(0xFFFBBF24) : Colors.white70,
+      ),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.white70,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+        ),
+      ),
+      onTap: () {
+        _mainTabController.animateTo(index);
+        Navigator.pop(context);
+        setState(() {});
+      },
     );
   }
 
