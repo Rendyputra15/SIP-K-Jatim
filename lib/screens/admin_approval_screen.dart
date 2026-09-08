@@ -1487,7 +1487,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                 const Divider(height: 24),
                 _buildLogItem(
                   'User Baru',
-                  'Penambahan Akun Pegawai: Rendy Cahyono',
+                  'Penambahan Akun Pegawai: Alamsyah',
                   '3 Jam lalu',
                   Icons.person_add_outlined,
                   Colors.orange,

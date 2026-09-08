@@ -62,7 +62,7 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
   }
 
   List<LoanRequest> _loansForTab(int tabIndex) {
-    return widget.loans.where((loan) {
+    final filteredLoans = widget.loans.where((loan) {
       if (!_matchesSelectedMonth(loan)) return false;
       switch (tabIndex) {
         case 0:
@@ -78,6 +78,11 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
           return loan.status == LoanStatus.dibatalkan;
       }
     }).toList();
+
+    filteredLoans.sort(
+      (first, second) => second.submittedAt.compareTo(first.submittedAt),
+    );
+    return filteredLoans;
   }
 
   String _formatDate(DateTime date) {
@@ -238,7 +243,13 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
         : const Color(0xFFB45309);
 
     return InkWell(
-      onTap: widget.onLoanTap == null ? null : () => widget.onLoanTap!(loan),
+      onTap: () {
+        if (widget.onLoanTap != null) {
+          widget.onLoanTap!(loan);
+        } else {
+          _showLoanDetailDialog(loan);
+        }
+      },
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -341,6 +352,202 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  void _showLoanDetailDialog(LoanRequest loan) {
+    final isApproved = _isApproved(loan.status);
+    final isCompleted = loan.status == LoanStatus.selesai;
+    final isRejected =
+        loan.status == LoanStatus.ditolak || loan.status == LoanStatus.rejected;
+    final isCancelled = loan.status == LoanStatus.dibatalkan;
+    final statusLabel = isCompleted
+        ? 'SELESAI'
+        : isApproved
+        ? 'DISETUJUI'
+        : isRejected
+        ? 'DITOLAK'
+        : isCancelled
+        ? 'DIBATALKAN'
+        : 'MENUNGGU VERIFIKASI';
+    final statusColor = isCompleted
+        ? const Color(0xFF1D4ED8)
+        : isApproved
+        ? const Color(0xFF15803D)
+        : isRejected
+        ? const Color(0xFFB91C1C)
+        : isCancelled
+        ? const Color(0xFF475569)
+        : const Color(0xFFB45309);
+    final statusBackground = isCompleted
+        ? const Color(0xFFDBEAFE)
+        : isApproved
+        ? const Color(0xFFDCFCE7)
+        : isRejected
+        ? const Color(0xFFFEE2E2)
+        : isCancelled
+        ? const Color(0xFFE2E8F0)
+        : const Color(0xFFFEF3C7);
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusBackground,
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      child: Text(
+                        statusLabel,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      icon: const Icon(Icons.close_rounded),
+                      color: const Color(0xFF64748B),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  loan.vehicleName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'ID Permohonan: #${loan.id.length > 8 ? loan.id.substring(loan.id.length - 8) : loan.id}',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF94A3B8),
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                const SizedBox(height: 14),
+                _buildDetailRow(
+                  Icons.person_outline_rounded,
+                  'Peminjam',
+                  loan.borrowerName,
+                ),
+                _buildDetailRow(
+                  Icons.business_rounded,
+                  'Bidang / Seksi',
+                  loan.department,
+                ),
+                _buildDetailRow(
+                  Icons.calendar_month_rounded,
+                  'Jadwal Tugas',
+                  '${_formatDate(loan.startDate)} - ${_formatDate(loan.endDate)}',
+                ),
+                _buildDetailRow(
+                  Icons.near_me_rounded,
+                  'Tujuan Instansi',
+                  loan.destination,
+                ),
+                _buildDetailRow(
+                  Icons.location_on_outlined,
+                  'Alamat Tujuan',
+                  loan.destinationAddress.isEmpty
+                      ? '-'
+                      : loan.destinationAddress,
+                ),
+                _buildDetailRow(
+                  Icons.description_outlined,
+                  'Keperluan Dinas',
+                  loan.purposeDescription.isEmpty
+                      ? '-'
+                      : loan.purposeDescription,
+                ),
+                if (loan.spkNumber != null)
+                  _buildDetailRow(
+                    Icons.badge_outlined,
+                    'Nomor SPK',
+                    loan.spkNumber!,
+                  ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF24487A),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      'Tutup',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 17, color: const Color(0xFF64748B)),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 105,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+            ),
+          ),
+          const Text(
+            ': ',
+            style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

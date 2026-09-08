@@ -885,7 +885,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Rendy Cahyono Putra',
+                    'Alamsyah',
                     style: TextStyle(
                       fontSize: nameFontSize,
                       fontWeight: FontWeight.bold,

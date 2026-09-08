@@ -100,7 +100,7 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
                     _buildTextField(
                       nameController,
                       'Nama Lengkap & Gelar',
-                      'Contoh: Rendy Cahyono, S.Kom',
+                      'Contoh: Alamsyah, S.Kom',
                     ),
                     const SizedBox(height: 12),
 

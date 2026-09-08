@@ -330,7 +330,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Selamat Datang, Rendy Cahyono Putra',
+                                  'Selamat Datang, Saya',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,

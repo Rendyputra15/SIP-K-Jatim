@@ -8,6 +8,7 @@ import 'package:simodis_jatim/screens/catalog_screen.dart';
 import 'package:simodis_jatim/screens/loan_flow_screen.dart';
 import 'package:simodis_jatim/screens/notification_screen.dart';
 import 'package:simodis_jatim/screens/admin_approval_screen.dart';
+import 'package:simodis_jatim/screens/loan_history_screen.dart';
 import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/screens/login_screen.dart';
 import 'package:simodis_jatim/screens/profile_screen.dart';
@@ -16,11 +17,7 @@ class HomeScreen extends StatefulWidget {
   final String role;
   final bool showLoading;
 
-  const HomeScreen({
-    super.key,
-    this.role = 'user',
-    this.showLoading = true,
-  });
+  const HomeScreen({super.key, this.role = 'user', this.showLoading = true});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -288,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
       id: '1',
       title: 'Selamat Datang di SIP-K Dinsos Jatim',
       message:
-          'Akun pegawai atas nama Rendy Cahyono Putra telah aktif dan siap digunakan untuk peminjaman kendaraan.',
+          'Akun pegawai atas nama Alamsyah telah aktif dan siap digunakan untuk peminjaman kendaraan.',
       time: '14:05 WIB',
       fullDate: '01 September 2026, 14:05 WIB',
       createdAt: DateTime(2026, 9, 1, 14, 5),
@@ -447,8 +444,20 @@ class _HomeScreenState extends State<HomeScreen> {
           type: NotificationType.submitted,
         ),
       );
+      _currentIndex = 0;
+    });
 
-      _currentIndex = 3;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LoanHistoryScreen(
+            loans: _loans,
+            onLoanCancelled: (_) => setState(() {}),
+          ),
+        ),
+      );
     });
   }
 
@@ -557,15 +566,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 32,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF24487A)),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xFF24487A),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   isAdmin
                       ? (isSuper
-                          ? 'Menyiapkan Panel Superadministrator...'
-                          : 'Menyiapkan Panel Kasubag Admin...')
+                            ? 'Menyiapkan Panel Superadministrator...'
+                            : 'Menyiapkan Panel Kasubag Admin...')
                       : 'Memuat Dashboard SIP-K Jatim...',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
@@ -578,10 +589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Text(
                   'Sinkronisasi armada dinas & status peminjaman...',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF64748B),
-                  ),
+                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                 ),
                 const SizedBox(height: 18),
                 SizedBox(
@@ -591,7 +599,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const LinearProgressIndicator(
                       minHeight: 4,
                       backgroundColor: Color(0xFFE2E8F0),
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFFF59E0B),
+                      ),
                     ),
                   ),
                 ),

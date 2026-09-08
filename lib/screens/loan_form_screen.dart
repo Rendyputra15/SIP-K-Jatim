@@ -234,8 +234,8 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
       submittedAt: DateTime.now(),
     );
 
-    widget.onSubmit(newLoan);
     Navigator.pop(context); // Kembali dari form
+    widget.onSubmit(newLoan);
   }
 
   @override
