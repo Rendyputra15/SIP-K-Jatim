@@ -7,7 +7,8 @@ class AppNotification {
   final String time;           // Format ringkas (misal: "08:30 WIB", "Kemarin", "27 Ags 2026")
   final String fullDate;       // Format lengkap (misal: "01 September 2026, 08:30 WIB")
   final String detailContent;   // Penjelasan detail untuk dialog pop-up
-  final String referenceNumber; // Nomor referensi / SPK / Nota
+    final String referenceNumber; // Nomor referensi / SPK / Nota
+  final DateTime createdAt;    // Tanggal pembuatan untuk filter
   final NotificationType type;
   bool isRead;
 
@@ -19,6 +20,7 @@ class AppNotification {
     required this.fullDate,
     required this.detailContent,
     required this.referenceNumber,
+    required this.createdAt,
     required this.type,
     this.isRead = false,
   });

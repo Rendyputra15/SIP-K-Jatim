@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
+import 'package:simodis_jatim/widgets/app_image.dart';
 
 class LoanFormScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -115,6 +116,17 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     );
 
     if (pickedPhoto == null) return;
+
+    if (!isSupportedImageFile(pickedPhoto.name)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pilih file dengan format PNG, JPG, atau JPEG.'),
+          ),
+        );
+      }
+      return;
+    }
 
     final bytes = await pickedPhoto.readAsBytes();
     if (!mounted) return;
@@ -632,10 +644,10 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                                 width: 68,
                                 height: 56,
                                 color: const Color(0xFFF1F5F9),
-                                child: Image.network(
-                                  v.imageUrl,
+                                child: AppImage(
+                                  source: v.imageUrl,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (ctx, err, stack) => Icon(
+                                  placeholder: Icon(
                                     v.type == VehicleType.mobil
                                         ? Icons.directions_car
                                         : Icons.two_wheeler,

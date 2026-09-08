@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/screens/loan_history_screen.dart';
 import 'package:simodis_jatim/screens/login_screen.dart';
+import 'package:simodis_jatim/screens/settings_screen.dart';
 import 'package:simodis_jatim/widgets/nota_dinas_dialog.dart';
+import 'package:simodis_jatim/widgets/app_image.dart';
 
 class ProfileScreen extends StatefulWidget {
   final List<LoanRequest> loans;
@@ -27,21 +30,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // State Foto Profil
   String? _profileImageUrl;
 
+  Widget _buildEmployeeAvatar({
+    required String avatarId,
+    required Color backgroundColor,
+    required Color iconColor,
+    double radius = 28,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.94, end: 1),
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.easeOutBack,
+        builder: (context, scale, child) => Transform.scale(
+          scale: scale,
+          child: CircleAvatar(
+            radius: radius,
+            backgroundColor: backgroundColor,
+            child: Icon(
+              avatarId == 'pegawai-2'
+                  ? Icons.support_agent_rounded
+                  : Icons.badge_rounded,
+              color: iconColor,
+              size: radius * 1.15,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrentAvatar() {
+    final imageSource = _profileImageUrl;
+    if (imageSource == null) {
+      return const Icon(Icons.person, size: 42, color: Color(0xFF55758D));
+    }
+    if (imageSource == 'avatar:pegawai-1') {
+      return _buildEmployeeAvatar(
+        avatarId: 'pegawai-1',
+        backgroundColor: const Color(0xFFDCEBE8),
+        iconColor: const Color(0xFF5D8E86),
+        radius: 38,
+      );
+    }
+    if (imageSource == 'avatar:pegawai-2') {
+      return _buildEmployeeAvatar(
+        avatarId: 'pegawai-2',
+        backgroundColor: const Color(0xFFE6E1F0),
+        iconColor: const Color(0xFF7D719C),
+        radius: 38,
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
   String _formatDate(DateTime d) {
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 
   // DIALOG GANTI FOTO PROFIL
   void _showChangePhotoDialog(BuildContext context) {
-    final urlController = TextEditingController();
-
-    final List<String> presetAvatars = [
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80',
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
-    ];
-
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
@@ -75,69 +124,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Pilih foto karakter instansi atau masukkan tautan gambar baru:',
+                'Gunakan file PNG, JPG, atau JPEG dari perangkat Anda:',
                 style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 14),
-
-              // Pilihan Avatar Cepat
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: presetAvatars.map((avatarUrl) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() => _profileImageUrl = avatarUrl);
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Foto profil berhasil diperbarui.'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                    child: CircleAvatar(
-                      radius: 26,
-                      backgroundColor: const Color(0xFF24487A),
-                      backgroundImage: NetworkImage(avatarUrl),
-                    ),
-                  );
-                }).toList(),
+              const Text(
+                'Pilih avatar pegawai',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF334A5C),
+                ),
               ),
-
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildEmployeeAvatar(
+                    avatarId: 'pegawai-1',
+                    backgroundColor: const Color(0xFFDCEBE8),
+                    iconColor: const Color(0xFF5D8E86),
+                    onTap: () {
+                      setState(() => _profileImageUrl = 'avatar:pegawai-1');
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                  _buildEmployeeAvatar(
+                    avatarId: 'pegawai-2',
+                    backgroundColor: const Color(0xFFE6E1F0),
+                    iconColor: const Color(0xFF7D719C),
+                    onTap: () {
+                      setState(() => _profileImageUrl = 'avatar:pegawai-2');
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               const Divider(height: 1, color: Color(0xFFE2E8F0)),
               const SizedBox(height: 14),
-
-              // Input URL Mandiri
-              TextField(
-                controller: urlController,
-                style: const TextStyle(fontSize: 12),
-                decoration: InputDecoration(
-                  hintText: 'https://link-gambar.com/foto.jpg',
-                  labelText: 'URL Gambar Kustom',
-                  labelStyle: const TextStyle(fontSize: 12),
-                  prefixIcon: const Icon(Icons.link_rounded, size: 18),
-                  filled: true,
-                  fillColor: const Color(0xFFF1F5F9),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final picked = await ImagePicker().pickImage(
+                      source: ImageSource.gallery,
+                    );
+                    if (picked == null) return;
+                    if (!isSupportedImageFile(picked.name)) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Pilih file dengan format PNG, JPG, atau JPEG.',
+                            ),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    final bytes = await picked.readAsBytes();
+                    if (!context.mounted) return;
+                    setState(
+                      () => _profileImageUrl = imageDataUri(picked.name, bytes),
+                    );
+                    Navigator.pop(ctx);
+                  },
+                  icon: const Icon(Icons.upload_file_rounded),
+                  label: const Text('Pilih File Gambar'),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        setState(
-                          () => _profileImageUrl = null,
-                        ); // Reset ke inisial
+                        setState(() => _profileImageUrl = null);
                         Navigator.pop(ctx);
                       },
                       style: OutlinedButton.styleFrom(
@@ -146,7 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Reset',
+                        'Hapus Foto',
                         style: TextStyle(fontSize: 12, color: Colors.red),
                       ),
                     ),
@@ -154,14 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (urlController.text.trim().isNotEmpty) {
-                          setState(
-                            () => _profileImageUrl = urlController.text.trim(),
-                          );
-                        }
-                        Navigator.pop(ctx);
-                      },
+                      onPressed: () => Navigator.pop(ctx),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF24487A),
                         foregroundColor: Colors.white,
@@ -189,6 +245,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // MODAL PENGATURAN LENGKAP DENGAN MODE AKSESIBILITAS
   void _showSettingsModal(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    );
+    return;
+
+    // Kept below temporarily for backwards compatibility with the old flow.
     final oldPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
     final formPasswordKey = GlobalKey<FormState>();
@@ -1096,26 +1159,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: CircleAvatar(
                           radius: 38,
                           backgroundColor: const Color(0xFFF1F5F9),
-                          backgroundImage: _profileImageUrl != null
-                              ? NetworkImage(_profileImageUrl!)
-                              : null,
-                          onBackgroundImageError: _profileImageUrl != null
-                              ? (exception, stackTrace) {
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    if (mounted) {
-                                      setState(() => _profileImageUrl = null);
-                                    }
-                                  });
-                                }
-                              : null,
-                          child: _profileImageUrl == null
-                              ? const Icon(
-                                  Icons.person,
-                                  size: 42,
-                                  color: Color(0xFF24487A),
-                                )
+                          backgroundImage: _profileImageUrl == null
+                              ? null
+                              : imageProviderFromSource(_profileImageUrl!),
+                          child:
+                              imageProviderFromSource(_profileImageUrl ?? '') ==
+                                  null
+                              ? _buildCurrentAvatar()
                               : null,
                         ),
                       ),

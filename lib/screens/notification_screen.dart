@@ -16,6 +16,48 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  DateTime? _selectedMonth;
+
+  static const _monthNames = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+
+  String _monthLabel(DateTime month) =>
+      '${_monthNames[month.month - 1]} ${month.year}';
+
+  List<DateTime> get _availableMonths {
+    final months = <String, DateTime>{};
+    for (final notification in widget.notifications) {
+      final month = DateTime(
+        notification.createdAt.year,
+        notification.createdAt.month,
+      );
+      months['${month.year}-${month.month}'] = month;
+    }
+    final result = months.values.toList()..sort((a, b) => b.compareTo(a));
+    return result;
+  }
+
+  List<AppNotification> _filteredNotifications() {
+    final selectedMonth = _selectedMonth;
+    if (selectedMonth == null) return widget.notifications;
+    return widget.notifications.where((notification) {
+      return notification.createdAt.year == selectedMonth.year &&
+          notification.createdAt.month == selectedMonth.month;
+    }).toList();
+  }
+
   void _showNotificationDetail(AppNotification item) {
     // Tandai langsung sudah dibaca saat dibuka
     setState(() {
@@ -29,121 +71,188 @@ class _NotificationScreenState extends State<NotificationScreen> {
         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Padding(
           padding: const EdgeInsets.all(22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Dialog + Tombol Tutup Silang
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      _getTagLabel(item.type),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2563EB),
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => Navigator.pop(ctx),
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF1F5F9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.close_rounded, size: 18, color: Color(0xFF64748B)),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // Judul Notifikasi
-              Text(
-                item.title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Detail Informasi Tanggal & Referensi
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Dialog + Tombol Tutup Silang
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_month_rounded, size: 14, color: Color(0xFF64748B)),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Waktu: ${item.fullDate}',
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w600),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        _getTagLabel(item.type),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2563EB),
                         ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.receipt_long_rounded, size: 14, color: Color(0xFF64748B)),
-                        const SizedBox(width: 6),
-                        Text(
-                          'No. Ref: ${item.referenceNumber}',
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontFamily: 'monospace'),
+                    InkWell(
+                      onTap: () => Navigator.pop(ctx),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF1F5F9),
+                          shape: BoxShape.circle,
                         ),
-                      ],
+                        child: const Icon(
+                          Icons.close_rounded,
+                          size: 18,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 14),
 
-              const SizedBox(height: 14),
-
-              // Isi Deskripsi Lengkap
-              Text(
-                item.detailContent,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF334155),
-                  height: 1.45,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Tombol Konfirmasi Bawah
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF24487A),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                // Judul Notifikasi
+                Text(
+                  item.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
                   ),
-                  child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+
+                // Detail Informasi Tanggal & Referensi
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.calendar_month_rounded,
+                            size: 14,
+                            color: Color(0xFF64748B),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Waktu: ${item.fullDate}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF475569),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.label_outline_rounded,
+                            size: 14,
+                            color: Color(0xFF64748B),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Status: ${_getTagLabel(item.type)}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF475569),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.receipt_long_rounded,
+                            size: 14,
+                            color: Color(0xFF64748B),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'No. Ref: ${item.referenceNumber}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF475569),
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                // Isi Deskripsi Lengkap
+                Text(
+                  item.detailContent,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF334155),
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  'Ringkasan notifikasi',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF334155),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  item.message,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF64748B),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Tombol Konfirmasi Bawah
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF24487A),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      'Mengerti',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -170,25 +279,41 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     final unreadCount = widget.notifications.where((n) => !n.isRead).length;
+    final filteredNotifications = _filteredNotifications();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
+        preferredSize: const Size.fromHeight(78.0),
         child: Container(
           color: const Color(0xFFF1F5F9),
           padding: const EdgeInsets.symmetric(horizontal: 20),
           alignment: Alignment.centerLeft,
           child: const SafeArea(
             bottom: false,
-            child: Text(
-              'Notifikasi',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF1E293B),
-                letterSpacing: 0.2,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Notifikasi',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1E293B),
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Informasi terbaru tentang pengajuan dan aktivitas akun Anda',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Color(0xFF64748B),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -224,7 +349,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 24),
+                  child: const Icon(
+                    Icons.notifications_active_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -233,12 +362,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     children: [
                       const Text(
                         'Pusat Aktivitas & Status',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '$unreadCount notifikasi baru belum dibaca',
-                        style: const TextStyle(fontSize: 11, color: Colors.white70),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.white70,
+                        ),
                       ),
                     ],
                   ),
@@ -247,16 +383,56 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           ),
 
-          // Baris Judul & Tombol "Tandai Telah Dibaca"
+          // Filter bulan dan aksi baca
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Daftar Notifikasi',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                Expanded(
+                  child: DropdownButtonFormField<DateTime?>(
+                    initialValue: _selectedMonth,
+                    isDense: true,
+                    decoration: InputDecoration(
+                      labelText: 'Filter bulan',
+                      labelStyle: const TextStyle(fontSize: 11),
+                      prefixIcon: const Icon(
+                        Icons.calendar_month_rounded,
+                        size: 18,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      ),
+                    ),
+                    items: [
+                      const DropdownMenuItem<DateTime?>(
+                        value: null,
+                        child: Text(
+                          'Semua bulan',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      ..._availableMonths.map(
+                        (month) => DropdownMenuItem<DateTime?>(
+                          value: month,
+                          child: Text(
+                            _monthLabel(month),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                    onChanged: (month) =>
+                        setState(() => _selectedMonth = month),
+                  ),
                 ),
+                const SizedBox(width: 10),
                 if (unreadCount > 0)
                   InkWell(
                     onTap: () {
@@ -268,11 +444,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                       child: Row(
                         children: [
-                          Icon(Icons.done_all_rounded, size: 14, color: Color(0xFF2563EB)),
+                          Icon(
+                            Icons.done_all_rounded,
+                            size: 14,
+                            color: Color(0xFF2563EB),
+                          ),
                           SizedBox(width: 4),
                           Text(
                             'Tandai Telah Dibaca',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2563EB),
+                            ),
                           ),
                         ],
                       ),
@@ -284,15 +468,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
           // List 10 Notifikasi
           Expanded(
-            child: widget.notifications.isEmpty
+            child: filteredNotifications.isEmpty
                 ? const Center(
-                    child: Text('Belum ada notifikasi', style: TextStyle(color: Color(0xFF94A3B8))),
+                    child: Text(
+                      'Belum ada notifikasi',
+                      style: TextStyle(color: Color(0xFF94A3B8)),
+                    ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 2, 16, 20),
-                    itemCount: widget.notifications.length,
+                    itemCount: filteredNotifications.length,
                     itemBuilder: (context, index) {
-                      final item = widget.notifications[index];
+                      final item = filteredNotifications[index];
                       return _buildNotificationCard(item);
                     },
                   ),
@@ -366,12 +553,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(11),
         decoration: BoxDecoration(
           color: item.isRead ? Colors.white : const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: item.isRead ? const Color(0xFFE2E8F0) : const Color(0xFF93C5FD),
+            color: item.isRead
+                ? const Color(0xFFE2E8F0)
+                : const Color(0xFF93C5FD),
             width: item.isRead ? 1 : 1.3,
           ),
           boxShadow: [
@@ -386,11 +575,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
               child: Icon(icon, color: iconColor, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,19 +588,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: tagBg,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           tagLabel,
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: tagTextColor),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: tagTextColor,
+                          ),
                         ),
                       ),
                       Row(
                         children: [
-                          Text(item.time, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                          Text(
+                            item.time,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Color(0xFF94A3B8),
+                            ),
+                          ),
                           if (!item.isRead) ...[
                             const SizedBox(width: 6),
                             Container(
@@ -427,11 +629,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     item.title,
                     style: TextStyle(
-                      fontWeight: item.isRead ? FontWeight.w600 : FontWeight.bold,
+                      fontWeight: item.isRead
+                          ? FontWeight.w600
+                          : FontWeight.bold,
                       fontSize: 13,
                       color: const Color(0xFF1E293B),
                     ),
@@ -439,9 +643,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   const SizedBox(height: 4),
                   Text(
                     item.message,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.3),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF64748B),
+                      height: 1.3,
+                    ),
                   ),
                 ],
               ),

@@ -1,4 +1,5 @@
 enum VehicleType { mobil, motor }
+
 enum VehicleStatus { tersedia, digunakan, pemeliharaan }
 
 class Vehicle {
@@ -11,11 +12,12 @@ class Vehicle {
   final int capacity;
   final String transmission;
   final int currentOdometer;
-  final int fuelPercent;      // 0 - 100
-  final String fuelType;       // Pertalite, Pertamax, Dexlite, Solar
+  final int fuelPercent; // 0 - 100
+  final String fuelType; // Pertalite, Pertamax, Dexlite, Solar
   final String conditionNote;
-  final String imageUrl;       // Gambar cover utama
-  final List<String> galleryImages; // Galeri foto tambahan (bebas diubah/ditambah)
+  final String imageUrl; // Gambar cover utama
+  final List<String>
+  galleryImages; // Galeri foto tambahan (bebas diubah/ditambah)
   VehicleStatus status;
 
   Vehicle({
@@ -36,14 +38,23 @@ class Vehicle {
     this.status = VehicleStatus.tersedia,
   });
 
-  String get fuelDisplay => fuelPercent >= 100 ? 'Full (100%)' : '$fuelPercent%';
+  String get fuelDisplay =>
+      fuelPercent >= 100 ? 'Full (100%)' : '$fuelPercent%';
 
-  // Menggabungkan foto utama dan foto-foto galeri
+  // Menjamin setiap detail kendaraan memiliki empat slot foto.
   List<String> get allImages {
-    if (galleryImages.isEmpty) return [imageUrl];
-    if (!galleryImages.contains(imageUrl)) {
-      return [imageUrl, ...galleryImages];
+    final availableImages = <String>[
+      imageUrl,
+      ...galleryImages.where((image) => image.isNotEmpty && image != imageUrl),
+    ];
+
+    if (availableImages.isEmpty) {
+      return List<String>.filled(4, 'assets/images/logo_sipk.png');
     }
-    return galleryImages;
+
+    return List<String>.generate(
+      4,
+      (index) => availableImages[index % availableImages.length],
+    );
   }
 }

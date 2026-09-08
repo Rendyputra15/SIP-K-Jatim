@@ -18,22 +18,60 @@ class LoanHistoryScreen extends StatefulWidget {
 }
 
 class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
+  DateTime? _selectedMonth;
+
+  static const _monthNames = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+
   bool _isWaiting(LoanStatus status) =>
       status == LoanStatus.menunggu || status == LoanStatus.pending;
 
   bool _isApproved(LoanStatus status) =>
-      status == LoanStatus.disetujui ||
-      status == LoanStatus.approved ||
-      status == LoanStatus.selesai;
+      status == LoanStatus.disetujui || status == LoanStatus.approved;
+
+  String _monthLabel(DateTime month) =>
+      '${_monthNames[month.month - 1]} ${month.year}';
+
+  List<DateTime> get _availableMonths {
+    final months = <String, DateTime>{};
+    for (final loan in widget.loans) {
+      final month = DateTime(loan.startDate.year, loan.startDate.month);
+      months['${month.year}-${month.month}'] = month;
+    }
+    final result = months.values.toList()..sort((a, b) => b.compareTo(a));
+    return result;
+  }
+
+  bool _matchesSelectedMonth(LoanRequest loan) {
+    final selectedMonth = _selectedMonth;
+    return selectedMonth == null ||
+        (loan.startDate.year == selectedMonth.year &&
+            loan.startDate.month == selectedMonth.month);
+  }
 
   List<LoanRequest> _loansForTab(int tabIndex) {
     return widget.loans.where((loan) {
+      if (!_matchesSelectedMonth(loan)) return false;
       switch (tabIndex) {
         case 0:
           return _isWaiting(loan.status);
         case 1:
           return _isApproved(loan.status);
         case 2:
+          return loan.status == LoanStatus.selesai;
+        case 3:
           return loan.status == LoanStatus.ditolak ||
               loan.status == LoanStatus.rejected;
         default:
@@ -49,7 +87,7 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         appBar: AppBar(
@@ -61,12 +99,14 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           bottom: const TabBar(
+            isScrollable: true,
             labelColor: Color(0xFF24487A),
             unselectedLabelColor: Color(0xFF64748B),
             indicatorColor: Color(0xFF24487A),
             tabs: [
               Tab(text: 'Menunggu'),
               Tab(text: 'Disetujui'),
+              Tab(text: 'Selesai'),
               Tab(text: 'Ditolak'),
               Tab(text: 'Dibatalkan'),
             ],
@@ -82,6 +122,47 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
                 style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: DropdownButtonFormField<DateTime?>(
+                initialValue: _selectedMonth,
+                isDense: true,
+                decoration: InputDecoration(
+                  labelText: 'Filter bulan peminjaman',
+                  labelStyle: const TextStyle(fontSize: 11),
+                  prefixIcon: const Icon(
+                    Icons.calendar_month_rounded,
+                    size: 18,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+                ),
+                items: [
+                  const DropdownMenuItem<DateTime?>(
+                    value: null,
+                    child: Text('Semua bulan', style: TextStyle(fontSize: 12)),
+                  ),
+                  ..._availableMonths.map(
+                    (month) => DropdownMenuItem<DateTime?>(
+                      value: month,
+                      child: Text(
+                        _monthLabel(month),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (month) => setState(() => _selectedMonth = month),
+              ),
+            ),
             Expanded(
               child: TabBarView(
                 children: [
@@ -89,6 +170,7 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
                   _buildLoanList(1),
                   _buildLoanList(2),
                   _buildLoanList(3),
+                  _buildLoanList(4),
                 ],
               ),
             ),
@@ -123,24 +205,31 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
 
   Widget _buildLoanCard(BuildContext context, LoanRequest loan) {
     final isApproved = _isApproved(loan.status);
+    final isCompleted = loan.status == LoanStatus.selesai;
     final isRejected =
         loan.status == LoanStatus.ditolak || loan.status == LoanStatus.rejected;
     final isCancelled = loan.status == LoanStatus.dibatalkan;
-    final statusLabel = isApproved
+    final statusLabel = isCompleted
+        ? 'SELESAI'
+        : isApproved
         ? 'DISETUJUI'
         : isRejected
         ? 'DITOLAK'
         : isCancelled
         ? 'DIBATALKAN'
         : 'MENUNGGU';
-    final statusBackground = isApproved
+    final statusBackground = isCompleted
+        ? const Color(0xFFDBEAFE)
+        : isApproved
         ? const Color(0xFFDCFCE7)
         : isRejected
         ? const Color(0xFFFEE2E2)
         : isCancelled
         ? const Color(0xFFE2E8F0)
         : const Color(0xFFFEF3C7);
-    final statusForeground = isApproved
+    final statusForeground = isCompleted
+        ? const Color(0xFF1D4ED8)
+        : isApproved
         ? const Color(0xFF15803D)
         : isRejected
         ? const Color(0xFFB91C1C)

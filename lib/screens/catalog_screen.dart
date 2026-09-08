@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/vehicle_detail_screen.dart';
+import 'package:simodis_jatim/widgets/app_image.dart';
 
 class CatalogScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -20,24 +21,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
   String _wheelFilter = 'Semua';
 
   Widget _buildVehicleImage(String imageUrl, VehicleType type) {
-    if (imageUrl.startsWith('assets/')) {
-      return Image.asset(
-        imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (ctx, err, stack) => _buildPlaceholderIcon(type),
-      );
-    }
-    return Image.network(
-      imageUrl,
+    return AppImage(
+      source: imageUrl,
       fit: BoxFit.cover,
-      errorBuilder: (ctx, err, stack) => _buildPlaceholderIcon(type),
+      placeholder: _buildPlaceholderIcon(type),
     );
   }
 
   Widget _buildPlaceholderIcon(VehicleType type) {
     return Center(
       child: Icon(
-        type == VehicleType.mobil ? Icons.directions_car_filled : Icons.two_wheeler_rounded,
+        type == VehicleType.mobil
+            ? Icons.directions_car_filled
+            : Icons.two_wheeler_rounded,
         size: 36,
         color: const Color(0xFF24487A),
       ),
@@ -117,14 +113,23 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _wheelFilter,
-                      icon: const Icon(Icons.filter_list_rounded, color: Color(0xFF24487A), size: 18),
+                      icon: const Icon(
+                        Icons.filter_list_rounded,
+                        color: Color(0xFF24487A),
+                        size: 18,
+                      ),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF24487A),
                       ),
                       items: ['Semua', 'Roda 2', 'Roda 4']
-                          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+                          .map(
+                            (item) => DropdownMenuItem(
+                              value: item,
+                              child: Text(item),
+                            ),
+                          )
                           .toList(),
                       onChanged: (val) {
                         if (val != null) setState(() => _wheelFilter = val);
@@ -179,13 +184,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       width: 84,
                                       height: 74,
                                       color: const Color(0xFFEFF6FF),
-                                      child: _buildVehicleImage(item.imageUrl, item.type),
+                                      child: _buildVehicleImage(
+                                        item.imageUrl,
+                                        item.type,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           item.name,
@@ -215,7 +224,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
-                                            const Text(' • ', style: TextStyle(color: Colors.grey)),
+                                            const Text(
+                                              ' • ',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                             Text(
                                               '${item.currentOdometer} KM',
                                               style: const TextStyle(
@@ -232,10 +246,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
                               decoration: const BoxDecoration(
                                 color: Color(0xFFF8FAFC),
-                                borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+                                borderRadius: BorderRadius.vertical(
+                                  bottom: Radius.circular(16),
+                                ),
                               ),
                               child: Row(
                                 children: [
@@ -253,33 +272,51 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         );
                                       },
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: const Color(0xFF24487A),
-                                        side: const BorderSide(color: Color(0xFFCBD5E1)),
+                                        foregroundColor: const Color(
+                                          0xFF24487A,
+                                        ),
+                                        side: const BorderSide(
+                                          color: Color(0xFFCBD5E1),
+                                        ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                       ),
                                       child: const Text(
                                         'Detail',
-                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: ElevatedButton(
-                                      onPressed: isAvailable ? () => widget.onSelectVehicle(item) : null,
+                                      onPressed: isAvailable
+                                          ? () => widget.onSelectVehicle(item)
+                                          : null,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF24487A),
+                                        backgroundColor: const Color(
+                                          0xFF24487A,
+                                        ),
                                         foregroundColor: Colors.white,
                                         elevation: 0,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                       ),
                                       child: const Text(
                                         'Pinjam',
-                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
+import 'package:simodis_jatim/widgets/app_image.dart';
 
 class AdminApprovalScreen extends StatefulWidget {
   final List<LoanRequest> requests;
@@ -98,7 +100,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: Color(0xFF334A5C),
                       ),
                     ),
                     InkWell(
@@ -432,11 +434,8 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
     final odoCtrl = TextEditingController(
       text: vehicleToEdit?.currentOdometer.toString() ?? '10000',
     );
-    final imgUrlCtrl = TextEditingController(
-      text:
-          vehicleToEdit?.imageUrl ??
-          'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&q=80',
-    );
+    String selectedImageSource =
+        vehicleToEdit?.imageUrl ?? 'assets/images/logo_sipk.png';
     final noteCtrl = TextEditingController(
       text:
           vehicleToEdit?.conditionNote ??
@@ -623,10 +622,56 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                     ),
                     const SizedBox(height: 10),
 
-                    _buildFormInput(
-                      imgUrlCtrl,
-                      'URL Gambar Armada',
-                      'https://...',
+                    const Text(
+                      'Gambar Armada (PNG, JPG, JPEG)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF334155),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final picked = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                        );
+                        if (picked == null) return;
+                        if (!isSupportedImageFile(picked.name)) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Pilih file dengan format PNG, JPG, atau JPEG.',
+                                ),
+                              ),
+                            );
+                          }
+                          return;
+                        }
+                        final bytes = await picked.readAsBytes();
+                        setModalState(
+                          () => selectedImageSource = imageDataUri(
+                            picked.name,
+                            bytes,
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.upload_file_rounded, size: 18),
+                      label: const Text('Pilih File Gambar'),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 90,
+                      width: double.infinity,
+                      child: AppImage(
+                        source: selectedImageSource,
+                        fit: BoxFit.contain,
+                        placeholder: const Icon(
+                          Icons.image_not_supported_outlined,
+                          color: Color(0xFF94A3B8),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     _buildFormInput(
@@ -660,11 +705,11 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                                 fuelPercent: vehicleToEdit.fuelPercent,
                                 fuelType: fuelTypeCtrl.text.trim(),
                                 conditionNote: noteCtrl.text.trim(),
-                                imageUrl: imgUrlCtrl.text.trim(),
+                                imageUrl: selectedImageSource,
                                 galleryImages:
                                     vehicleToEdit.galleryImages.isNotEmpty
                                     ? vehicleToEdit.galleryImages
-                                    : [imgUrlCtrl.text.trim()],
+                                    : [selectedImageSource],
                               );
                               widget.onUpdateVehicle?.call(updatedVehicle);
                             } else {
@@ -683,8 +728,8 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                                 fuelPercent: 100,
                                 fuelType: fuelTypeCtrl.text.trim(),
                                 conditionNote: noteCtrl.text.trim(),
-                                imageUrl: imgUrlCtrl.text.trim(),
-                                galleryImages: [imgUrlCtrl.text.trim()],
+                                imageUrl: selectedImageSource,
+                                galleryImages: [selectedImageSource],
                               );
                               widget.onAddVehicle?.call(newVehicle);
                             }
@@ -738,10 +783,19 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
     required UserRole defaultRole,
   }) {
     final isEdit = userToEdit != null;
+    final usernameCtrl = TextEditingController(
+      text: userToEdit?.username ?? '',
+    );
     final nameCtrl = TextEditingController(text: userToEdit?.name ?? '');
     final nipCtrl = TextEditingController(text: userToEdit?.nip ?? '');
-    final deptCtrl = TextEditingController(text: userToEdit?.department ?? '');
-    final emailCtrl = TextEditingController(text: userToEdit?.email ?? '');
+    String selectedDepartment = userToEdit?.department ?? '';
+    const departments = [
+      'Sekretariat',
+      'Rehabilitasi',
+      'Pemberdayaan Sosial',
+      'Pelaksana Teknis',
+      'Penanganan Bencana',
+    ];
     final passwordCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
@@ -751,108 +805,142 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
 
     showDialog(
       context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isEdit ? 'Edit $roleLabel' : 'Tambah $roleLabel',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 20,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(22),
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isEdit ? 'Edit $roleLabel' : 'Tambah $roleLabel',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const Divider(height: 20),
-                  _buildFormInput(
-                    nameCtrl,
-                    'Nama Lengkap',
-                    'Ahmad Fauzi, S.ST',
-                  ),
-                  const SizedBox(height: 10),
-                  _buildFormInput(nipCtrl, 'NIP', '198501012010011001'),
-                  const SizedBox(height: 10),
-                  _buildFormInput(deptCtrl, 'Bidang Dinas', 'Bidang Linjamsos'),
-                  const SizedBox(height: 10),
-                  _buildFormInput(
-                    emailCtrl,
-                    'Email',
-                    'nama@dinsos.jatimprov.go.id',
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Hanya munculkan field password jika User Baru atau jika yang mengedit adalah Superadmin
-                  if (!isEdit || _isSuperAdmin) ...[
+                    const Divider(height: 20),
                     _buildFormInput(
-                      passwordCtrl,
-                      isEdit
-                          ? 'Ganti Password (Kosongkan jika tidak diubah)'
-                          : 'Password',
-                      '********',
-                      isPassword: true,
-                      validator: (val) {
-                        if (!isEdit && (val == null || val.isEmpty)) {
-                          return 'Password wajib diisi';
-                        }
-                        return null;
-                      },
+                      usernameCtrl,
+                      'Username Login',
+                      'contoh: rendy.cahyono',
                     ),
                     const SizedBox(height: 10),
-                  ],
-
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          if (isEdit) {
-                            userToEdit.name = nameCtrl.text.trim();
-                            userToEdit.nip = nipCtrl.text.trim();
-                            userToEdit.department = deptCtrl.text.trim();
-                            userToEdit.email = emailCtrl.text.trim();
-                            // Jika superadmin mengisi password baru, update (Hanya Mockup Logic)
-                            if (_isSuperAdmin && passwordCtrl.text.isNotEmpty) {
-                              // userToEdit.password = passwordCtrl.text; // Jika ada field password di model
-                            }
-                            widget.onUpdateUser?.call(userToEdit);
-                          } else {
-                            final newUser = AppUser(
-                              id: 'USR-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-                              name: nameCtrl.text.trim(),
-                              nip: nipCtrl.text.trim(),
-                              department: deptCtrl.text.trim(),
-                              email: emailCtrl.text.trim(),
-                              role: defaultRole,
-                            );
-                            widget.onAddUser?.call(newUser);
-                          }
-                          Navigator.pop(ctx);
-                          setState(() {});
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF24487A),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    _buildFormInput(
+                      nameCtrl,
+                      'Nama Lengkap',
+                      'Ahmad Fauzi, S.ST',
+                    ),
+                    const SizedBox(height: 10),
+                    _buildFormInput(nipCtrl, 'NIP', '198501012010011001'),
+                    const SizedBox(height: 10),
+                    DropdownButtonFormField<String>(
+                      initialValue: departments.contains(selectedDepartment)
+                          ? selectedDepartment
+                          : null,
+                      isExpanded: true,
+                      decoration: _inputDecoration().copyWith(
+                        labelText: 'Bidang Dinas',
+                        prefixIcon: const Icon(
+                          Icons.business_rounded,
+                          size: 18,
                         ),
                       ),
-                      child: Text(
-                        isEdit ? 'Simpan' : 'Tambahkan Akun',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      items: departments
+                          .map(
+                            (department) => DropdownMenuItem<String>(
+                              value: department,
+                              child: Text(department),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) =>
+                          setModalState(() => selectedDepartment = value ?? ''),
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Bidang dinas wajib dipilih'
+                          : null,
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Hanya munculkan field password jika User Baru atau jika yang mengedit adalah Superadmin
+                    if (!isEdit || _isSuperAdmin) ...[
+                      _buildFormInput(
+                        passwordCtrl,
+                        isEdit
+                            ? 'Ganti Password (Kosongkan jika tidak diubah)'
+                            : 'Password',
+                        '********',
+                        isPassword: true,
+                        validator: (val) {
+                          if (!isEdit && (val == null || val.isEmpty)) {
+                            return 'Password wajib diisi';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            if (isEdit) {
+                              userToEdit.name = nameCtrl.text.trim();
+                              userToEdit.nip = nipCtrl.text.trim();
+                              userToEdit.username = usernameCtrl.text.trim();
+                              userToEdit.department = selectedDepartment;
+                              // Jika superadmin mengisi password baru, update (Hanya Mockup Logic)
+                              if (_isSuperAdmin &&
+                                  passwordCtrl.text.isNotEmpty) {
+                                // userToEdit.password = passwordCtrl.text; // Jika ada field password di model
+                              }
+                              widget.onUpdateUser?.call(userToEdit);
+                            } else {
+                              final newUser = AppUser(
+                                id: 'USR-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+                                username: usernameCtrl.text.trim(),
+                                name: nameCtrl.text.trim(),
+                                nip: nipCtrl.text.trim(),
+                                department: selectedDepartment,
+                                email: '',
+                                role: defaultRole,
+                              );
+                              widget.onAddUser?.call(newUser);
+                            }
+                            Navigator.pop(ctx);
+                            setState(() {});
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF24487A),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          isEdit ? 'Simpan' : 'Tambahkan Akun',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -1072,8 +1160,8 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
         .where((u) => !u.isSuperAdmin && !u.isAdmin)
         .toList();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+        return Scaffold(
+      backgroundColor: const Color(0xFFF4F7FA),
       drawer: isMobile ? Drawer(child: _buildMobileDrawer()) : null,
       body: Row(
         children: [
@@ -1085,15 +1173,13 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
               width: _isSidebarExpanded ? 200 : 70,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: _isSuperAdmin
-                      ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
-                      : [const Color(0xFF24487A), const Color(0xFF1E3A8A)],
+                  colors: const [Color(0xFF8BA8BB), Color(0xFF6F91A8)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
+                    color: const Color(0xFF3D5668).withValues(alpha: 0.12),
                     blurRadius: 10,
                     offset: const Offset(2, 0),
                   ),
@@ -1128,7 +1214,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color: Colors.white.withValues(alpha: 0.18),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
@@ -1179,7 +1265,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                         horizontal: _isSidebarExpanded ? 12 : 0,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -1219,7 +1305,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                                     _isSuperAdmin ? 'Superadmin' : 'Kasubag',
                                     style: TextStyle(
                                       color: Colors.white.withValues(
-                                        alpha: 0.5,
+                                        alpha: 0.72,
                                       ),
                                       fontSize: 9,
                                     ),
@@ -1252,7 +1338,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                             tooltip: 'Buka menu',
                             onPressed: () => Scaffold.of(context).openDrawer(),
                             icon: const Icon(Icons.menu_rounded),
-                            color: const Color(0xFF24487A),
+                            color: const Color(0xFF55758D),
                           ),
                         )
                       else if (!_isSidebarExpanded) ...[
@@ -1260,7 +1346,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                           'SIP-K',
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF24487A),
+                            color: Color(0xFF55758D),
                             fontSize: 16,
                           ),
                         ),
@@ -1285,7 +1371,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF1E293B),
+                                color: Color(0xFF334A5C),
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -1363,12 +1449,56 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEAF1F5),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFD6E2E9)),
+            ),
+            child: const Row(
+              children: [
+                Icon(
+                  Icons.insights_rounded,
+                  color: Color(0xFF55758D),
+                  size: 24,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Selamat datang di ruang kendali',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF334A5C),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Pantau pengajuan, armada, dan aktivitas layanan dalam satu tampilan.',
+                        style: TextStyle(
+                          fontSize: 11,
+                          height: 1.35,
+                          color: Color(0xFF6D8190),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
           const Text(
             'Ringkasan Operasional',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1E293B),
+              color: Color(0xFF334A5C),
             ),
           ),
           const SizedBox(height: 16),
@@ -1382,14 +1512,14 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                   pending.toString(),
                   'Butuh Verifikasi',
                   Icons.hourglass_empty_rounded,
-                  const Color(0xFFF59E0B),
+                  const Color(0xFFC69A58),
                 ),
                 _buildModernStatCard(
                   'Armada Jalan',
                   active.toString(),
                   'Sedang Bertugas',
                   Icons.local_shipping_rounded,
-                  const Color(0xFF10B981),
+                  const Color(0xFF6F9F89),
                 ),
               ];
               return constraints.maxWidth < 560
@@ -1420,14 +1550,14 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                   completed.toString(),
                   'Total Riwayat',
                   Icons.assignment_turned_in_rounded,
-                  const Color(0xFF3B82F6),
+                  const Color(0xFF7298B5),
                 ),
                 _buildModernStatCard(
                   'Total Armada',
                   totalVehicles.toString(),
                   'Unit Terdaftar',
                   Icons.directions_car_rounded,
-                  const Color(0xFF6366F1),
+                  const Color(0xFF8792B0),
                 ),
               ];
               return constraints.maxWidth < 560
@@ -1454,7 +1584,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1E293B),
+              color: Color(0xFF334A5C),
             ),
           ),
           const SizedBox(height: 12),
@@ -1474,7 +1604,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                   'Admin menyetujui Toyota Innova (L 1023 SP)',
                   '10 Menit lalu',
                   Icons.check_circle_outline,
-                  Colors.green,
+                  const Color(0xFF6F9F89),
                 ),
                 const Divider(height: 24),
                 _buildLogItem(
@@ -1482,7 +1612,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                   'Pengembalian Unit Mitsubishi Pajero (L 4444 AS)',
                   '1 Jam lalu',
                   Icons.assignment_returned_outlined,
-                  Colors.blue,
+                  const Color(0xFF7298B5),
                 ),
                 const Divider(height: 24),
                 _buildLogItem(
@@ -1490,7 +1620,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                   'Penambahan Akun Pegawai: Rendy Cahyono',
                   '3 Jam lalu',
                   Icons.person_add_outlined,
-                  Colors.orange,
+                  const Color(0xFFC69A58),
                 ),
               ],
             ),
@@ -1619,9 +1749,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
 
     return SafeArea(
       child: Container(
-        color: _isSuperAdmin
-            ? const Color(0xFF0F172A)
-            : const Color(0xFF1E3A8A),
+        color: const Color(0xFF6F91A8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1909,10 +2037,10 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                               width: 95,
                               height: 95,
                               color: const Color(0xFFEFF6FF),
-                              child: Image.network(
-                                item.imageUrl,
+                              child: AppImage(
+                                source: item.imageUrl,
                                 fit: BoxFit.cover,
-                                errorBuilder: (c, e, s) => Center(
+                                placeholder: Center(
                                   child: Icon(
                                     item.type == VehicleType.mobil
                                         ? Icons.directions_car
@@ -2126,6 +2254,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
     final filtered = userList.where((u) {
       final q = _userSearchQuery.toLowerCase();
       return u.name.toLowerCase().contains(q) ||
+          u.username.toLowerCase().contains(q) ||
           u.nip.contains(q) ||
           u.department.toLowerCase().contains(q);
     }).toList();
@@ -2205,7 +2334,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                 onChanged: (val) => setState(() => _userSearchQuery = val),
                 style: const TextStyle(fontSize: 12),
                 decoration: InputDecoration(
-                  hintText: 'Cari berdasarkan nama, NIP, atau bidang...',
+                  hintText: 'Cari username, nama, NIP, atau bidang...',
                   hintStyle: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF94A3B8),
@@ -2285,7 +2414,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'NIP. ${user.nip}',
+                                  '@${user.username.isEmpty ? user.nip : user.username}',
                                   style: const TextStyle(
                                     fontSize: 11,
                                     color: Color(0xFF64748B),
@@ -2293,7 +2422,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                                   ),
                                 ),
                                 Text(
-                                  '${user.department} • ${user.email}',
+                                  user.department,
                                   style: const TextStyle(
                                     fontSize: 10,
                                     color: Color(0xFF94A3B8),

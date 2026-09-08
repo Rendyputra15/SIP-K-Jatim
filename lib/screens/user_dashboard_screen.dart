@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/vehicle_detail_screen.dart';
+import 'package:simodis_jatim/widgets/app_image.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -30,8 +31,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       'desc':
           'Seluruh kendaraan dinas siap untuk penugasan luar kota dengan kondisi prima. Pemeriksaan mencakup sistem pengereman, oli mesin, dan kelayakan ban operasional.',
       'date': '01 Sep 2026',
-      'image':
-          'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600&q=80',
+      'image': 'assets/images/logo_sipk.png',
     },
     {
       'tag': 'OPERASIONAL',
@@ -39,8 +39,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       'desc':
           'Harap mengisi catatan angka odometer dan level sisa BBM saat pengembalian unit ke pool dinas demi ketertiban administrasi aset kendaraan dinas.',
       'date': '28 Ags 2026',
-      'image':
-          'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=600&q=80',
+      'image': 'assets/images/logo_sipk.png',
     },
     {
       'tag': 'KEGIATAN',
@@ -48,8 +47,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       'desc':
           'Armada minibus dan truk satgas Linjamsos standby 24 jam untuk kesiapsiagaan operasional bantuan tanggap bencana di seluruh wilayah Jawa Timur.',
       'date': '25 Ags 2026',
-      'image':
-          'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&q=80',
+      'image': 'assets/images/logo_sipk.png',
     },
     {
       'tag': 'KEBIJAKAN',
@@ -57,8 +55,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       'desc':
           'Pastikan telah mengunggah scan Nota Dinas resmi yang telah ditandatangani Kepala Bidang sebelum mengajukan peminjaman armada ke Kasubag Umum.',
       'date': '20 Ags 2026',
-      'image':
-          'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80',
+      'image': 'assets/images/logo_sipk.png',
     },
     {
       'tag': 'PEMELIHARAAN',
@@ -66,8 +63,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       'desc':
           'Bagi pemegang unit sepeda motor dinas operasional diimbau membawa unit ke bengkel rekanan resmi Dinsos sesuai jadwal per semester.',
       'date': '15 Ags 2026',
-      'image':
-          'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&q=80',
+      'image': 'assets/images/logo_sipk.png',
     },
     {
       'tag': 'KESELAMATAN',
@@ -75,8 +71,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       'desc':
           'Seluruh staf dan pengemudi dinas diwajibkan memeriksa kelengkapan P3K, segitiga pengaman, dan tekanan angin ban sebelum perjalanan dinas antar kota.',
       'date': '10 Ags 2026',
-      'image':
-          'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80',
+      'image': 'assets/images/logo_sipk.png',
     },
   ];
 
@@ -106,17 +101,16 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       height: 190,
                       width: double.infinity,
                       color: const Color(0xFFEFF6FF),
-                      child: Image.network(
-                        item['image']!,
+                      child: AppImage(
+                        source: item['image']!,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Center(
-                              child: Icon(
-                                Icons.newspaper_rounded,
-                                size: 50,
-                                color: Color(0xFF24487A),
-                              ),
-                            ),
+                        placeholder: const Center(
+                          child: Icon(
+                            Icons.newspaper_rounded,
+                            size: 50,
+                            color: Color(0xFF24487A),
+                          ),
+                        ),
                       ),
                     ),
                     Positioned(
@@ -480,17 +474,16 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                           height: 105,
                                           width: double.infinity,
                                           color: const Color(0xFFEFF6FF),
-                                          child: Image.network(
-                                            item['image']!,
+                                          child: AppImage(
+                                            source: item['image']!,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (ctx, err, stack) =>
-                                                const Center(
-                                                  child: Icon(
-                                                    Icons.newspaper_rounded,
-                                                    color: Color(0xFF24487A),
-                                                    size: 36,
-                                                  ),
-                                                ),
+                                            placeholder: const Center(
+                                              child: Icon(
+                                                Icons.newspaper_rounded,
+                                                color: Color(0xFF24487A),
+                                                size: 36,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -741,10 +734,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                     height: 95,
                                     width: double.infinity,
                                     color: const Color(0xFFEFF6FF),
-                                    child: Image.network(
-                                      item.imageUrl,
+                                    child: AppImage(
+                                      source: item.imageUrl,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (ctx, err, stack) => Center(
+                                      placeholder: Center(
                                         child: Icon(
                                           item.type == VehicleType.mobil
                                               ? Icons.directions_car_filled

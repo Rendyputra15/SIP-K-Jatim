@@ -40,14 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
       fuelType: 'Dexlite / Solar',
       conditionNote:
           'AC dingin double blower, toolkit lengkap, ban tebal, siap operasional dinas luar kota.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&q=80',
-      galleryImages: [
-        'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&q=80',
-        'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
-        'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80',
-        'https://images.unsplash.com/photo-1563720223185-11003d516935?w=800&q=80',
-      ],
+      imageUrl: 'assets/images/logo_sipk.png',
+      galleryImages: ['assets/images/logo_sipk.png'],
     ),
     Vehicle(
       id: '2',
@@ -63,13 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
       fuelType: 'Pertalite / Pertamax',
       conditionNote:
           'Kondisi mesin terawat, body mulus, rem baru diservis, kelengkapan surat lengkap.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80',
-      galleryImages: [
-        'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80',
-        'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&q=80',
-        'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
-      ],
+      imageUrl: 'assets/images/logo_sipk.png',
+      galleryImages: ['assets/images/logo_sipk.png'],
     ),
     Vehicle(
       id: '3',
@@ -85,12 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
       fuelType: 'Solar Subsidi / Dexlite',
       conditionNote:
           'Khusus penugasan rombongan satgas linjamsos & dropping logistik sosial.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80',
-      galleryImages: [
-        'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80',
-        'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80',
-      ],
+      imageUrl: 'assets/images/logo_sipk.png',
+      galleryImages: ['assets/images/logo_sipk.png'],
     ),
     Vehicle(
       id: '4',
@@ -106,12 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
       fuelType: 'Pertamax',
       conditionNote:
           'Unit responsif dan lincah, khusus kurir dokumen dan dinas dalam kota Surabaya.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80',
-      galleryImages: [
-        'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80',
-        'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&q=80',
-      ],
+      imageUrl: 'assets/images/logo_sipk.png',
+      galleryImages: ['assets/images/logo_sipk.png'],
     ),
     Vehicle(
       id: '5',
@@ -127,12 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
       fuelType: 'Pertamax',
       conditionNote:
           'Kondisi ban depan belakang baru, rem ABS responsif, bagasi lega untuk jas hujan dan helm.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&q=80',
-      galleryImages: [
-        'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&q=80',
-        'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80',
-      ],
+      imageUrl: 'assets/images/logo_sipk.png',
+      galleryImages: ['assets/images/logo_sipk.png'],
     ),
     Vehicle(
       id: '6',
@@ -148,11 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
       fuelType: 'Pertalite',
       conditionNote:
           'Sangat irit bahan bakar, cocok untuk tugas operasional kurir surat dinas harian.',
-      imageUrl:
-          'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=800&q=80',
-      galleryImages: [
-        'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=800&q=80',
-      ],
+      imageUrl: 'assets/images/logo_sipk.png',
+      galleryImages: ['assets/images/logo_sipk.png'],
     ),
   ];
 
@@ -262,6 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<AppUser> _appUsers = [
     AppUser(
       id: 'ROOT-001',
+      username: 'superadmin',
       name: 'Administrator Pusat',
       nip: '19700101 199003 1 001',
       department: 'Dinas Sosial Provinsi Jawa Timur',
@@ -270,6 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     AppUser(
       id: 'ADM-002',
+      username: 'kasubag.aset',
       name: 'Drs. H. Kasubag Aset, M.Si',
       nip: '19780512 200501 1 004',
       department: 'Subbag Tata Usaha & Pengelolaan Aset',
@@ -278,6 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     AppUser(
       id: 'USR-003',
+      username: 'rendy.cahyono',
       name: 'Rendy Cahyono Putra',
       nip: '19950315 202012 1 002',
       department: 'Subbag Penyusunan Program & Anggaran',
@@ -294,6 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Akun pegawai atas nama Rendy Cahyono Putra telah aktif dan siap digunakan untuk peminjaman kendaraan.',
       time: '14:05 WIB',
       fullDate: '01 September 2026, 14:05 WIB',
+      createdAt: DateTime(2026, 9, 1, 14, 5),
       detailContent:
           'Sistem Informasi Pengelolaan Kendaraan (SIP-K) Dinas Sosial Provinsi Jawa Timur memfasilitasi kebutuhan kendaraan operasional dinas secara transparan dan akuntabel. Harap selalu menjaga kebersihan dan kelengkapan armada yang dipinjam.',
       referenceNumber: 'USR-2026-0901',
@@ -307,6 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Permohonan Toyota Innova Reborn (L 1023 SP) untuk perjalanan dinas ke Bakorwil Madiun berhasil diajukan.',
       time: '11:20 WIB',
       fullDate: '01 September 2026, 11:20 WIB',
+      createdAt: DateTime(2026, 9, 1, 11, 20),
       detailContent:
           'Pengajuan Anda telah masuk ke dalam antrean verifikasi Sub Bagian Umum Dinsos Jatim. Surat Perintah Kerja (SPK) akan diterbitkan setelah disetujui oleh Kasubag.',
       referenceNumber: 'REQ/DINSOS/2026/09/0089',
@@ -320,6 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Permohonan Isuzu Elf Minibus untuk kunjungan lapangan UPT Dinsos Malang telah disetujui.',
       time: '08:45 WIB',
       fullDate: '01 September 2026, 08:45 WIB',
+      createdAt: DateTime(2026, 9, 1, 8, 45),
       detailContent:
           'Kasubag Umum telah menyetujui permohonan kendaraan dinas Anda. Silakan mengambil kunci kontak dan STNK asli di loket pengelola aset Gedung A dengan menunjukkan nomor SPK.',
       referenceNumber: 'SPK-5521/DINSOS/2026',
@@ -333,6 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Permohonan Toyota Avanza Veloz (L 1455 EP) ditolak karena belum melampirkan Nota Dinas.',
       time: 'Kemarin',
       fullDate: '31 Agustus 2026, 16:15 WIB',
+      createdAt: DateTime(2026, 8, 31, 16, 15),
       detailContent:
           'Catatan Kasubag: "Harap mengunggah kembali dokumen SPT atau Nota Dinas resmi yang sudah ditandatangani Kepala Bidang sebelum diverifikasi ulang."',
       referenceNumber: 'REJ-2026-0831-01',
@@ -346,6 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Unit Honda Vario 160 (L 3341 DS) harus dikembalikan ke Pool Dinas paling lambat pukul 17.00 WIB hari ini.',
       time: 'Kemarin',
       fullDate: '31 Agustus 2026, 13:00 WIB',
+      createdAt: DateTime(2026, 8, 31, 13),
       detailContent:
           'Mohon pastikan tangki bahan bakar telah terisi sesuai kondisi saat pengambilan awal dan catat odometer terakhir pada formulir BAST pengembalian.',
       referenceNumber: 'REM-2026/08/3341',
@@ -359,6 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Unit Yamaha NMAX 155 (L 4910 OS) sedang dalam jadwal servis berkala di bengkel rekanan.',
       time: '30 Ags 2026',
       fullDate: '30 Agustus 2026, 10:00 WIB',
+      createdAt: DateTime(2026, 8, 30, 10),
       detailContent:
           'Unit tidak tersedia untuk peminjaman selama 2 hari kerja dalam rangka penggantian ban luar dan pelumas mesin berkala.',
       referenceNumber: 'MNT-NMAX-082026',
@@ -372,6 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Pengembalian Toyota Innova Reborn (L 1023 SP) telah diverifikasi oleh petugas pool kendaraan.',
       time: '29 Ags 2026',
       fullDate: '29 Agustus 2026, 17:30 WIB',
+      createdAt: DateTime(2026, 8, 29, 17, 30),
       detailContent:
           'Kondisi fisik unit dinilai lengkap, tangki BBM penuh, dan odometer akhir tercatat 45.200 KM. Riwayat transaksi peminjaman telah berstatus Selesai.',
       referenceNumber: 'BAST-2026-0829-04',
@@ -385,6 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Pengajuan armada untuk Satgas Bencana Linjamsos mendapatkan prioritas penugasan darurat.',
       time: '28 Ags 2026',
       fullDate: '28 Agustus 2026, 09:10 WIB',
+      createdAt: DateTime(2026, 8, 28, 9, 10),
       detailContent:
           'Penugasan darurat logistik bantuan bencana telah diverifikasi secara langsung oleh Tim Pengelola Aset Provinsi.',
       referenceNumber: 'EMG-DINSOS-2026-08',
@@ -398,6 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Mulai 1 September 2026, pengisian BBM kendaraan roda empat wajib menggunakan kartu voucher dinas resmi.',
       time: '26 Ags 2026',
       fullDate: '26 Agustus 2026, 14:00 WIB',
+      createdAt: DateTime(2026, 8, 26, 14),
       detailContent:
           'Penggantian struk tunai secara mandiri ditiadakan kecuali dalam kondisi luar kota yang tidak memiliki SPBU mitra resmi.',
       referenceNumber: 'SE-KADIS-BBM-2026',
@@ -411,6 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Permohonan peminjaman kedaluwarsa karena tidak ada konfirmasi selama 2x24 jam kerja.',
       time: '24 Ags 2026',
       fullDate: '24 Agustus 2026, 18:00 WIB',
+      createdAt: DateTime(2026, 8, 24, 18),
       detailContent:
           'Sistem secara otomatis membatalkan antrean peminjaman kendaraan yang tidak dilengkapi berkas Nota Dinas dalam batas waktu yang ditentukan.',
       referenceNumber: 'EXP-DINSOS-2026-0824',
@@ -432,6 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'Permohonan armada ${request.vehicleName} tujuan ${request.destination} sedang diproses oleh Kasubag Umum.',
           time: 'Baru saja',
           fullDate: '01 September 2026, 14:15 WIB',
+          createdAt: DateTime.now(),
           detailContent:
               'Pengajuan armada ${request.vehicleName} dengan Nota Dinas ${request.officialNoteNumber} telah dikirim ke Kasubag Umum untuk proses verifikasi persetujuan SPK.',
           referenceNumber:
@@ -462,6 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Permohonan armada ${loan.vehicleName} telah disetujui. Softfile Nota Dinas resmi telah tersedia untuk dicetak dan diserahkan ke Kasubag TU.',
             time: 'Hari ini',
             fullDate: '02 September 2026, 14:15 WIB',
+            createdAt: DateTime.now(),
             detailContent:
                 'Pengajuan peminjaman telah disahkan Kasubag Umum dengan Nomor Registrasi: ${loan.spkNumber}. Silakan cetak lembar Nota Dinas dari menu Riwayat atau Profil untuk diserahkan ke loket Kasubag TU saat pengambilan kunci kontak dan STNK unit armada.',
             referenceNumber: loan.spkNumber ?? '-',
@@ -480,6 +469,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Permohonan ${loan.vehicleName} ditolak. Silakan periksa kelengkapan administrasi atau pilih jadwal armada lain.',
             time: 'Hari ini',
             fullDate: '02 September 2026, 14:15 WIB',
+            createdAt: DateTime.now(),
             detailContent:
                 'Pengajuan ditolak oleh Kasubag Umum. Periksa kembali kelengkapan surat usulan atau silakan ajukan armada pengganti.',
             referenceNumber:
