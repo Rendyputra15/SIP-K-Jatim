@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/screens/loan_form_screen.dart';
+import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
 
 class LoanFlowScreen extends StatelessWidget {
   final List<Vehicle> vehicles;
   final Vehicle? preselectedVehicle;
   final Function(LoanRequest) onSubmitLoan;
+  final Function(int)? onNavigateTab;
 
   const LoanFlowScreen({
     super.key,
     required this.vehicles,
     this.preselectedVehicle,
     required this.onSubmitLoan,
+    this.onNavigateTab,
   });
 
   void _navigateToForm(BuildContext context) {
@@ -36,31 +39,39 @@ class LoanFlowScreen extends StatelessWidget {
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
           color: const Color(0xFFF1F5F9),
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
-          alignment: Alignment.centerLeft,
-          child: const SafeArea(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SafeArea(
             bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Prosedur Peminjaman',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E293B),
-                    letterSpacing: 0.2,
-                  ),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Prosedur Peminjaman',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Panduan alur operasional armada dinas',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF64748B),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 2),
-                Text(
-                  'Panduan alur operasional armada dinas',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w600,
-                  ),
+                AppHeaderProfileAvatar(
+                  onTap: () => onNavigateTab?.call(4),
                 ),
               ],
             ),

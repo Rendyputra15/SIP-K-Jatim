@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/vehicle_detail_screen.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
+import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
 
 class CatalogScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
   final Function(Vehicle) onSelectVehicle;
+  final Function(int)? onNavigateTab;
 
   const CatalogScreen({
     super.key,
     required this.vehicles,
     required this.onSelectVehicle,
+    this.onNavigateTab,
   });
 
   @override
@@ -55,31 +58,39 @@ class _CatalogScreenState extends State<CatalogScreen> {
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
           color: const Color(0xFFF1F5F9),
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
-          alignment: Alignment.centerLeft,
-          child: const SafeArea(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SafeArea(
             bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Katalog Armada',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E293B),
-                    letterSpacing: 0.2,
-                  ),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Katalog Armada',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Pilih unit operasional dinas',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF64748B),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 2),
-                Text(
-                  'Pilih unit operasional dinas',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w600,
-                  ),
+                AppHeaderProfileAvatar(
+                  onTap: () => widget.onNavigateTab?.call(4),
                 ),
               ],
             ),

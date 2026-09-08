@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/notification_model.dart';
+import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
+import 'package:simodis_jatim/screens/notification_detail_screen.dart';
 
 class NotificationScreen extends StatefulWidget {
   final List<AppNotification> notifications;
   final VoidCallback onClearAll;
+  final Function(int)? onNavigateTab;
 
   const NotificationScreen({
     super.key,
     required this.notifications,
     required this.onClearAll,
+    this.onNavigateTab,
   });
 
   @override
@@ -58,222 +62,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }).toList();
   }
 
-  void _showNotificationDetail(AppNotification item) {
-    // Tandai langsung sudah dibaca saat dibuka
+  void _navigateToNotificationDetail(AppNotification item) {
     setState(() {
       item.isRead = true;
     });
 
-    showDialog(
-      context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header Dialog + Tombol Tutup Silang
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        _getTagLabel(item.type),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2563EB),
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => Navigator.pop(ctx),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF1F5F9),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close_rounded,
-                          size: 18,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                // Judul Notifikasi
-                Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Detail Informasi Tanggal & Referensi
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_month_rounded,
-                            size: 14,
-                            color: Color(0xFF64748B),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Waktu: ${item.fullDate}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF475569),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.label_outline_rounded,
-                            size: 14,
-                            color: Color(0xFF64748B),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Status: ${_getTagLabel(item.type)}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF475569),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.receipt_long_rounded,
-                            size: 14,
-                            color: Color(0xFF64748B),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'No. Ref: ${item.referenceNumber}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF475569),
-                              fontFamily: 'monospace',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // Isi Deskripsi Lengkap
-                Text(
-                  item.detailContent,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF334155),
-                    height: 1.45,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                const Text(
-                  'Ringkasan notifikasi',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF334155),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item.message,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF64748B),
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Tombol Konfirmasi Bawah
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF24487A),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text(
-                      'Mengerti',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NotificationDetailScreen(notification: item),
       ),
-    );
-  }
-
-  String _getTagLabel(NotificationType type) {
-    switch (type) {
-      case NotificationType.welcome:
-        return 'Informasi Akun';
-      case NotificationType.submitted:
-        return 'Menunggu Verifikasi';
-      case NotificationType.approved:
-        return 'Disetujui Kasubag';
-      case NotificationType.rejected:
-        return 'Pengajuan Ditolak';
-      case NotificationType.maintenance:
-        return 'Info Pemeliharaan';
-      case NotificationType.reminder:
-        return 'Pengingat Dinas';
-    }
+    ).then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -284,34 +87,47 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(78.0),
+        preferredSize: const Size.fromHeight(76.0),
         child: Container(
           color: const Color(0xFFF1F5F9),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          alignment: Alignment.centerLeft,
-          child: const SafeArea(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SafeArea(
             bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Notifikasi',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E293B),
-                    letterSpacing: 0.2,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Notifikasi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1E293B),
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Informasi terbaru aktivitas akun Anda',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF64748B),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  'Informasi terbaru tentang pengajuan dan aktivitas akun Anda',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w600,
-                  ),
+                const SizedBox(width: 8),
+                AppHeaderProfileAvatar(
+                  onTap: () => widget.onNavigateTab?.call(4),
                 ),
               ],
             ),
@@ -549,7 +365,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
     return InkWell(
-      onTap: () => _showNotificationDetail(item),
+      onTap: () => _navigateToNotificationDetail(item),
       borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),

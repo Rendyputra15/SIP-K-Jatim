@@ -14,16 +14,36 @@ import 'package:simodis_jatim/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String role;
+  final bool showLoading;
 
-  const HomeScreen({super.key, this.role = 'user'});
+  const HomeScreen({
+    super.key,
+    this.role = 'user',
+    this.showLoading = true,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isLoadingDashboard = true;
   int _currentIndex = 0;
   Vehicle? _selectedUnitForForm;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showLoading) {
+      Future.delayed(const Duration(milliseconds: 700), () {
+        if (mounted) {
+          setState(() => _isLoadingDashboard = false);
+        }
+      });
+    } else {
+      _isLoadingDashboard = false;
+    }
+  }
 
   final List<Vehicle> _vehicles = [
     Vehicle(
@@ -493,8 +513,102 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Widget _buildLoadingDashboard() {
+    final bool isSuper = widget.role == 'superadmin';
+    final bool isAdmin = widget.role == 'admin' || isSuper;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 88,
+                  height: 88,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF24487A).withValues(alpha: 0.12),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(
+                    'assets/images/logo_sipk.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.directions_car_rounded,
+                      size: 46,
+                      color: Color(0xFF24487A),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF24487A)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  isAdmin
+                      ? (isSuper
+                          ? 'Menyiapkan Panel Superadministrator...'
+                          : 'Menyiapkan Panel Kasubag Admin...')
+                      : 'Memuat Dashboard SIP-K Jatim...',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Sinkronisasi armada dinas & status peminjaman...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: 140,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: const LinearProgressIndicator(
+                      minHeight: 4,
+                      backgroundColor: Color(0xFFE2E8F0),
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingDashboard) {
+      return _buildLoadingDashboard();
+    }
+
     final List<Widget> userPages = [
       UserDashboardScreen(
         vehicles: _vehicles,
@@ -514,11 +628,13 @@ class _HomeScreenState extends State<HomeScreen> {
             _currentIndex = 2;
           });
         },
+        onNavigateTab: (idx) => setState(() => _currentIndex = idx),
       ),
       LoanFlowScreen(
         vehicles: _vehicles,
         preselectedVehicle: _selectedUnitForForm,
         onSubmitLoan: _handleCreateLoan,
+        onNavigateTab: (idx) => setState(() => _currentIndex = idx),
       ),
       NotificationScreen(
         notifications: _notifications,
@@ -529,6 +645,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           });
         },
+        onNavigateTab: (idx) => setState(() => _currentIndex = idx),
       ),
       ProfileScreen(
         loans: _loans,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/vehicle_detail_screen.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
+import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -271,30 +272,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           ),
                         ],
                       ),
-                      GestureDetector(
+                      AppHeaderProfileAvatar(
                         onTap: () => widget.onNavigateTab(4),
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFF24487A),
-                              width: 1.5,
-                            ),
-                          ),
-                          child: const CircleAvatar(
-                            radius: 17,
-                            backgroundColor: Color(0xFF24487A),
-                            child: Text(
-                              'RC',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),

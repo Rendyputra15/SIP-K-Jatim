@@ -23,48 +23,41 @@ class _LoginScreenState extends State<LoginScreen> {
       final identifier = _identifierController.text.trim().toLowerCase();
       final password = _passwordController.text;
 
-      Future.delayed(const Duration(milliseconds: 600), () {
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (!mounted) return;
-        setState(() => _isLoading = false);
+
+        String? targetRole;
+        String roleLabel = '';
 
         // 1. LOGIN SEBAGAI SUPERADMIN (ADMINISTRATOR PUSAT)
         if ((identifier == 'superadmin' ||
                 identifier == '197001011990031001' ||
                 identifier == 'administrator@dinsos.jatimprov.go.id') &&
             password == 'password') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const HomeScreen(role: 'superadmin'),
-            ),
-          );
+          targetRole = 'superadmin';
+          roleLabel = 'Superadministrator Pusat';
         }
         // 2. LOGIN SEBAGAI ADMIN (KASUBAG UMUM / ASET)
         else if ((identifier == 'admin' ||
                 identifier == '197805122005011004' ||
                 identifier == '198501012010011001') &&
             password == 'password') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const HomeScreen(role: 'admin'),
-            ),
-          );
+          targetRole = 'admin';
+          roleLabel = 'Kasubag Tata Usaha & Aset';
         }
         // 3. LOGIN SEBAGAI PEGAWAI (USER PEMOHON)
         else if ((identifier == 'pegawai' ||
                 identifier == 'user' ||
                 identifier == '199503152020121002') &&
             password == 'password') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const HomeScreen(role: 'user'),
-            ),
-          );
+          targetRole = 'user';
+          roleLabel = 'Pegawai / Pemohon';
         }
-        // KREDENSIAL SALAH
-        else {
+
+        if (targetRole != null) {
+          _showLoginSuccessLoading(targetRole, roleLabel);
+        } else {
+          setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               behavior: SnackBarBehavior.floating,
@@ -86,6 +79,116 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       });
     }
+  }
+
+  void _showLoginSuccessLoading(String targetRole, String roleLabel) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => PopScope(
+        canPop: false,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 26),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.16),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Animated Spinner with Checkmark Icon
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 64,
+                        height: 64,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5B9E)),
+                          backgroundColor: Color(0xFFE2E8F0),
+                        ),
+                      ),
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEFF6FF),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.check_circle_rounded,
+                          color: Color(0xFF16A34A),
+                          size: 28,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Login Berhasil!',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Menyiapkan dashboard $roleLabel...',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: const SizedBox(
+                      width: 140,
+                      child: LinearProgressIndicator(
+                        minHeight: 4,
+                        backgroundColor: Color(0xFFF1F5F9),
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.pushAndRemoveUntil(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(role: targetRole),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 350),
+        ),
+        (route) => false,
+      );
+    });
   }
 
   // Quick fill untuk mempermudah testing saat demo/pengembangan
