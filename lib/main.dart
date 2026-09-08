@@ -11,7 +11,7 @@ class SimodisJatimApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SIMODIS JATIM - Dinsos Jatim',
+      title: 'SIP-K',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2563EB)),

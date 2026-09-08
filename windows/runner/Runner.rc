@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "simodis_jatim" "\0"
+            VALUE "FileDescription", "SIP-K" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "simodis_jatim" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "simodis_jatim.exe" "\0"
-            VALUE "ProductName", "simodis_jatim" "\0"
+            VALUE "ProductName", "SIP-K" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="simodis_jatim"
+        android:label="SIP-K"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
