@@ -4,6 +4,7 @@ import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/screens/loan_history_screen.dart';
 import 'package:simodis_jatim/screens/login_screen.dart';
 import 'package:simodis_jatim/screens/settings_screen.dart';
+import 'package:simodis_jatim/screens/user_information_screen.dart';
 import 'package:simodis_jatim/widgets/nota_dinas_dialog.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
 
@@ -924,6 +925,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Column(
                 children: [
+                  _buildMenuItem(
+                    icon: Icons.account_circle_outlined,
+                    iconBg: const Color(0xFFEFF6FF),
+                    iconColor: const Color(0xFF24487A),
+                    title: 'Informasi Pengguna',
+                    subtitle: 'Lihat nama, NIP, jabatan, dan bidang',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const UserInformationScreen(
+                            name: 'Alamsyah',
+                            nip: '199503152020121002',
+                            position: 'Staf Pelaksana',
+                            department: 'Dinas Sosial Jawa Timur',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(
+                    height: 1,
+                    indent: 64,
+                    color: Color(0xFFF1F5F9),
+                  ),
                   _buildMenuItem(
                     icon: Icons.history_rounded,
                     iconBg: const Color(0xFFFEE2E2),
