@@ -8,12 +8,14 @@ class UserDashboardScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
   final Function(int) onNavigateTab;
   final Function(Vehicle) onSelectVehicle;
+  final String userName;
 
   const UserDashboardScreen({
     super.key,
     required this.vehicles,
     required this.onNavigateTab,
     required this.onSelectVehicle,
+    this.userName = 'Alamsyah',
   });
 
   @override
@@ -273,6 +275,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         ],
                       ),
                       AppHeaderProfileAvatar(
+                        initials: widget.userName.trim().isNotEmpty
+                            ? (widget.userName.trim().split(' ').length > 1
+                                ? '${widget.userName.trim().split(' ')[0][0]}${widget.userName.trim().split(' ')[1][0]}'
+                                : widget.userName.trim().substring(0, widget.userName.trim().length >= 2 ? 2 : 1))
+                            : 'AL',
                         onTap: () => widget.onNavigateTab(4),
                       ),
                     ],
@@ -329,9 +336,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Selamat Datang, Saya',
-                                  style: TextStyle(
+                                Text(
+                                  'Selamat Datang, ${widget.userName}',
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFFBAE6FD),

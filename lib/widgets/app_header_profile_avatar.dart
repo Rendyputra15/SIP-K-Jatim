@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class AppHeaderProfileAvatar extends StatelessWidget {
   final VoidCallback? onTap;
+  final String initials;
 
-  const AppHeaderProfileAvatar({super.key, this.onTap});
+  const AppHeaderProfileAvatar({
+    super.key,
+    this.onTap,
+    this.initials = 'AL',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +23,12 @@ class AppHeaderProfileAvatar extends StatelessWidget {
             width: 1.5,
           ),
         ),
-        child: const CircleAvatar(
+        child: CircleAvatar(
           radius: 17,
-          backgroundColor: Color(0xFF24487A),
+          backgroundColor: const Color(0xFF24487A),
           child: Text(
-            'RC',
-            style: TextStyle(
+            initials.toUpperCase(),
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
               color: Colors.white,

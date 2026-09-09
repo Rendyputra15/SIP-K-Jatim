@@ -28,6 +28,15 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   Vehicle? _selectedUnitForForm;
 
+  UserProfile _currentUserProfile = UserProfile(
+    name: 'Alamsyah',
+    nip: '199503152020121002',
+    position: 'Staf Pelaksana',
+    department: 'Dinas Sosial Jawa Timur',
+    email: 'alamsyah@dinsos.jatimprov.go.id',
+    phone: '0812-3456-7890',
+  );
+
   @override
   void initState() {
     super.initState();
@@ -621,6 +630,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final List<Widget> userPages = [
       UserDashboardScreen(
+        userName: _currentUserProfile.name,
         vehicles: _vehicles,
         onNavigateTab: (idx) => setState(() => _currentIndex = idx),
         onSelectVehicle: (v) {
@@ -659,6 +669,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       ProfileScreen(
         loans: _loans,
+        initialProfile: _currentUserProfile,
+        onProfileUpdated: (up) => setState(() => _currentUserProfile = up),
         onNavigateTab: (idx) => setState(() => _currentIndex = idx),
       ),
     ];

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
+import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/screens/loan_history_screen.dart';
 import 'package:simodis_jatim/screens/login_screen.dart';
 import 'package:simodis_jatim/screens/settings_screen.dart';
@@ -11,11 +12,15 @@ import 'package:simodis_jatim/widgets/app_image.dart';
 class ProfileScreen extends StatefulWidget {
   final List<LoanRequest> loans;
   final Function(int) onNavigateTab;
+  final UserProfile? initialProfile;
+  final Function(UserProfile)? onProfileUpdated;
 
   const ProfileScreen({
     super.key,
     required this.loans,
     required this.onNavigateTab,
+    this.initialProfile,
+    this.onProfileUpdated,
   });
 
   @override
@@ -26,6 +31,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final bool _largeTextMode = false;
   // State Foto Profil
   String? _profileImageUrl;
+  late UserProfile _userProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    _userProfile = widget.initialProfile ??
+        UserProfile(
+          name: 'Alamsyah',
+          nip: '199503152020121002',
+          position: 'Staf Pelaksana',
+          department: 'Dinas Sosial Jawa Timur',
+          email: 'alamsyah@dinsos.jatimprov.go.id',
+          phone: '0812-3456-7890',
+          profileImageUrl: _profileImageUrl,
+        );
+    _profileImageUrl = _userProfile.profileImageUrl;
+  }
+
+  void _updateProfile(UserProfile newProfile) {
+    setState(() {
+      _userProfile = newProfile;
+      _profileImageUrl = newProfile.profileImageUrl;
+    });
+    widget.onProfileUpdated?.call(newProfile);
+  }
+
 
   Widget _buildEmployeeAvatar({
     required String avatarId,
@@ -142,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: const Color(0xFFDCEBE8),
                     iconColor: const Color(0xFF5D8E86),
                     onTap: () {
-                      setState(() => _profileImageUrl = 'avatar:pegawai-1');
+                      _updateProfile(_userProfile.copyWith(profileImageUrl: 'avatar:pegawai-1'));
                       Navigator.pop(ctx);
                     },
                   ),
@@ -151,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: const Color(0xFFE6E1F0),
                     iconColor: const Color(0xFF7D719C),
                     onTap: () {
-                      setState(() => _profileImageUrl = 'avatar:pegawai-2');
+                      _updateProfile(_userProfile.copyWith(profileImageUrl: 'avatar:pegawai-2'));
                       Navigator.pop(ctx);
                     },
                   ),
@@ -182,8 +213,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }
                     final bytes = await picked.readAsBytes();
                     if (!context.mounted) return;
-                    setState(
-                      () => _profileImageUrl = imageDataUri(picked.name, bytes),
+                    _updateProfile(
+                      _userProfile.copyWith(
+                        profileImageUrl: imageDataUri(picked.name, bytes),
+                      ),
                     );
                     Navigator.pop(ctx);
                   },
@@ -197,7 +230,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        setState(() => _profileImageUrl = null);
+                        _updateProfile(
+                          UserProfile(
+                            name: _userProfile.name,
+                            nip: _userProfile.nip,
+                            position: _userProfile.position,
+                            department: _userProfile.department,
+                            email: _userProfile.email,
+                            phone: _userProfile.phone,
+                            profileImageUrl: null,
+                          ),
+                        );
                         Navigator.pop(ctx);
                       },
                       style: OutlinedButton.styleFrom(
@@ -223,7 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Simpan',
+                        'Tutup',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -886,7 +929,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Alamsyah',
+                    _userProfile.name,
                     style: TextStyle(
                       fontSize: nameFontSize,
                       fontWeight: FontWeight.bold,
@@ -895,7 +938,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'NIP. 199503152020121002',
+                    'NIP. ${_userProfile.nip}',
                     style: TextStyle(
                       fontSize: nipFontSize,
                       color: Colors.white70,
@@ -904,7 +947,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Staf Pelaksana • Dinas Sosial Jawa Timur',
+                    '${_userProfile.position} • ${_userProfile.department}',
                     style: TextStyle(
                       fontSize: roleFontSize,
                       color: Colors.white60,
@@ -931,18 +974,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     iconColor: const Color(0xFF24487A),
                     title: 'Informasi Pengguna',
                     subtitle: 'Lihat nama, NIP, jabatan, dan bidang',
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      final updated = await Navigator.push<UserProfile>(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const UserInformationScreen(
-                            name: 'Alamsyah',
-                            nip: '199503152020121002',
-                            position: 'Staf Pelaksana',
-                            department: 'Dinas Sosial Jawa Timur',
+                          builder: (_) => UserInformationScreen(
+                            name: _userProfile.name,
+                            nip: _userProfile.nip,
+                            position: _userProfile.position,
+                            department: _userProfile.department,
+                            email: _userProfile.email,
+                            phone: _userProfile.phone,
+                            profileImageUrl: _userProfile.profileImageUrl,
+                            onProfileUpdated: _updateProfile,
                           ),
                         ),
                       );
+                      if (updated != null && mounted) {
+                        _updateProfile(updated);
+                      }
                     },
                   ),
                   const Divider(
