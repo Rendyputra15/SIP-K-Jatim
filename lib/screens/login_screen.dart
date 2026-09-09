@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/screens/home_screen.dart';
+import 'package:simodis_jatim/widgets/notification_permission_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -177,18 +178,51 @@ class _LoginScreenState extends State<LoginScreen> {
     Future.delayed(const Duration(milliseconds: 900), () {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      Navigator.pushAndRemoveUntil(
+      Navigator.of(context, rootNavigator: true).pop(); // Tutup loading dialog
+
+      // Munculkan dialog perizinan notifikasi
+      NotificationPermissionDialog.show(
         context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(role: targetRole),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 350),
-        ),
-        (route) => false,
+        onGranted: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: const Color(0xFF16A34A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              content: const Row(
+                children: [
+                  Icon(Icons.notifications_active_rounded, color: Colors.white, size: 20),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text('Notifikasi aktif. Anda akan menerima pembaruan berkas secara real-time.'),
+                  ),
+                ],
+              ),
+            ),
+          );
+          _navigateToHome(targetRole);
+        },
+        onDismissed: () {
+          _navigateToHome(targetRole);
+        },
       );
     });
+  }
+
+  void _navigateToHome(String targetRole) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(role: targetRole),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 350),
+      ),
+      (route) => false,
+    );
   }
 
   // Quick fill untuk mempermudah testing saat demo/pengembangan

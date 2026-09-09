@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simodis_jatim/services/notification_permission_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -77,6 +78,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: _notifReminderEnabled,
                 onChanged: (value) =>
                     setState(() => _notifReminderEnabled = value),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.settings_suggest_rounded,
+                    color: Color(0xFF24487A),
+                    size: 20,
+                  ),
+                ),
+                title: const Text(
+                  'Buka Pengaturan Notifikasi HP',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                subtitle: const Text(
+                  'Kelola izin dan suara notifikasi langsung di pengaturan sistem perangkat.',
+                  style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                ),
+                trailing: const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Color(0xFF94A3B8),
+                ),
+                onTap: () => NotificationPermissionService.openSettings(),
               ),
             ],
           ),
