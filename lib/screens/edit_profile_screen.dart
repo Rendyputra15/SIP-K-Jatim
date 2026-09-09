@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simodis_jatim/models/user_model.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -136,9 +137,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _showChangePhotoDialog() {
+    final isDark = ThemeService.isDarkMode;
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -149,28 +152,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Pilih Foto / Avatar Profil',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
                   InkWell(
                     onTap: () => Navigator.pop(ctx),
-                    child: const Icon(
+                    child: Icon(
                       Icons.close_rounded,
                       size: 20,
-                      color: Color(0xFF64748B),
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 14),
-              const Text(
+              Text(
                 'Pilih avatar dinas atau unggah foto:',
-                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                ),
               ),
               const SizedBox(height: 14),
               Row(
@@ -189,7 +195,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           child: Icon(Icons.person_rounded, color: Color(0xFF1E293B)),
                         ),
                         const SizedBox(height: 6),
-                        const Text('Standar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text(
+                          'Standar',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -206,7 +219,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           iconColor: const Color(0xFF5D8E86),
                         ),
                         const SizedBox(height: 6),
-                        const Text('Pegawai 1', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text(
+                          'Pegawai 1',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -223,14 +243,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           iconColor: const Color(0xFF7D719C),
                         ),
                         const SizedBox(height: 6),
-                        const Text('Pegawai 2', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text(
+                          'Pegawai 2',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              const Divider(height: 1, color: Color(0xFFE2E8F0)),
+              Divider(
+                height: 1,
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
               const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
@@ -261,7 +291,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   icon: const Icon(Icons.upload_file_rounded, size: 18),
                   label: const Text('Unggah dari Galeri'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF24487A),
+                    backgroundColor: isDark ? const Color(0xFF2563EB) : const Color(0xFF24487A),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -328,11 +358,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1E293B),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        foregroundColor: isDark ? Colors.white : const Color(0xFF1E293B),
         elevation: 0,
         title: const Text(
           'Edit Profil',
@@ -374,7 +408,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFF24487A),
+                              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                               width: 2.5,
                             ),
                             boxShadow: [
@@ -442,14 +476,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _buildSectionHeader(
                 icon: Icons.badge_outlined,
                 title: 'Informasi Kepegawaian',
+                isDark: isDark,
               ),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,6 +495,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       label: 'Nama Lengkap',
                       hint: 'Masukkan nama lengkap',
                       icon: Icons.person_outline_rounded,
+                      isDark: isDark,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'Nama lengkap tidak boleh kosong';
@@ -476,6 +512,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       hint: 'Contoh: 199503152020121002',
                       icon: Icons.badge_outlined,
                       keyboardType: TextInputType.number,
+                      isDark: isDark,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'NIP tidak boleh kosong';
@@ -494,6 +531,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       label: 'Jabatan Kedinasan',
                       hint: 'Contoh: Staf Pelaksana',
                       icon: Icons.work_outline_rounded,
+                      isDark: isDark,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'Jabatan tidak boleh kosong';
@@ -512,13 +550,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             pos,
                             style: TextStyle(
                               fontSize: 11,
-                              color: isSelected ? Colors.white : const Color(0xFF475569),
+                              color: isSelected
+                                  ? Colors.white
+                                  : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                           selected: isSelected,
                           selectedColor: const Color(0xFF24487A),
-                          backgroundColor: const Color(0xFFF1F5F9),
+                          backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                           onSelected: (_) {
                             setState(() {
                               _positionController.text = pos;
@@ -535,6 +575,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       label: 'Bidang / Unit Kerja',
                       hint: 'Contoh: Dinas Sosial Jawa Timur',
                       icon: Icons.business_outlined,
+                      isDark: isDark,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'Bidang tidak boleh kosong';
@@ -553,13 +594,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             dept,
                             style: TextStyle(
                               fontSize: 11,
-                              color: isSelected ? Colors.white : const Color(0xFF475569),
+                              color: isSelected
+                                  ? Colors.white
+                                  : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                           selected: isSelected,
                           selectedColor: const Color(0xFF24487A),
-                          backgroundColor: const Color(0xFFF1F5F9),
+                          backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                           onSelected: (_) {
                             setState(() {
                               _departmentController.text = dept;
@@ -578,14 +621,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _buildSectionHeader(
                 icon: Icons.contact_mail_outlined,
                 title: 'Informasi Kontak & Akun',
+                isDark: isDark,
               ),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Column(
                   children: [
@@ -596,6 +640,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       hint: 'nama@dinsos.jatimprov.go.id',
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
+                      isDark: isDark,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'Email tidak boleh kosong';
@@ -615,6 +660,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       hint: 'Contoh: 0812-3456-7890',
                       icon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
+                      isDark: isDark,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'Nomor telepon tidak boleh kosong';
@@ -640,12 +686,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: const BorderSide(color: Color(0xFFCBD5E1)),
+                        side: BorderSide(
+                          color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                        ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Batal',
                         style: TextStyle(
-                          color: Color(0xFF64748B),
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -671,7 +719,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF24487A),
+                        backgroundColor: isDark ? const Color(0xFF2563EB) : const Color(0xFF24487A),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
@@ -690,17 +738,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildSectionHeader({required IconData icon, required String title}) {
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required bool isDark,
+  }) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFF24487A)),
+        Icon(
+          icon,
+          size: 18,
+          color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+        ),
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1E293B),
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
           ),
         ),
       ],
@@ -712,6 +768,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required String label,
     required String hint,
     required IconData icon,
+    required bool isDark,
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
   }) {
@@ -720,10 +777,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
           ),
         ),
         const SizedBox(height: 6),
@@ -731,29 +788,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           controller: controller,
           keyboardType: keyboardType,
           validator: validator,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1E293B),
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-            prefixIcon: Icon(icon, size: 18, color: const Color(0xFF24487A)),
+            hintStyle: TextStyle(
+              fontSize: 13,
+              color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            ),
+            prefixIcon: Icon(
+              icon,
+              size: 18,
+              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+            ),
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF24487A), width: 1.5),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+                width: 1.5,
+              ),
             ),
           ),
         ),

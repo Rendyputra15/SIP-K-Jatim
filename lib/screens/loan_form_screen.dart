@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class LoanFormScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -82,16 +83,24 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
       helpText: 'PILIH RENTANG TANGGAL',
       saveText: 'PILIH',
       builder: (context, child) {
+        final isDark = ThemeService.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF24487A),
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Color(0xFF1E293B),
-            ),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFF24487A),
+            colorScheme: isDark
+                ? const ColorScheme.dark(
+                    primary: Color(0xFF2563EB),
+                    onPrimary: Colors.white,
+                    surface: Color(0xFF1E293B),
+                    onSurface: Colors.white,
+                  )
+                : const ColorScheme.light(
+                    primary: Color(0xFF24487A),
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: Color(0xFF1E293B),
+                  ),
+            appBarTheme: AppBarTheme(
+              backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFF24487A),
               foregroundColor: Colors.white,
               elevation: 0,
             ),
@@ -240,13 +249,15 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       // HEADER DENGAN TEMA ABU MUDA
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
-          color: const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
           padding: const EdgeInsets.fromLTRB(10, 10, 20, 8),
           alignment: Alignment.centerLeft,
           child: SafeArea(
@@ -254,14 +265,14 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: Color(0xFF1E293B),
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
                 const SizedBox(width: 4),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -270,16 +281,16 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1E293B),
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                         letterSpacing: 0.2,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
                       'Pengajuan pinjam kendaraan dinas',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -339,35 +350,35 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 22),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: const Color(0xFFBFDBFE),
+                              color: isDark ? const Color(0xFF3B82F6).withValues(alpha: 0.5) : const Color(0xFFBFDBFE),
                               width: 1.2,
                             ),
                           ),
-                          child: const Column(
+                          child: Column(
                             children: [
                               Icon(
                                 Icons.add_a_photo_outlined,
                                 size: 30,
-                                color: Color(0xFF24487A),
+                                color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 'Upload atau foto SIM',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF24487A),
+                                  color: isDark ? Colors.white : const Color(0xFF24487A),
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
                                 'Pastikan foto jelas dan SIM masih berlaku',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Color(0xFF64748B),
+                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                 ),
                               ),
                             ],
@@ -441,12 +452,12 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Pilih Rentang Tanggal (Min. H+1 s/d H+7)',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF475569),
+                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -459,12 +470,12 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                             onTap: _pickDateRange,
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Icon(
                             Icons.arrow_forward_rounded,
                             size: 16,
-                            color: Color(0xFFCBD5E1),
+                            color: isDark ? const Color(0xFF64748B) : const Color(0xFFCBD5E1),
                           ),
                         ),
                         Expanded(
@@ -484,25 +495,25 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
+                          color: isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.4) : const Color(0xFFEFF6FF),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFDBEAFE)),
+                          border: Border.all(color: isDark ? const Color(0xFF2563EB) : const Color(0xFFDBEAFE)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.info_outline_rounded,
                               size: 14,
-                              color: Color(0xFF24487A),
+                              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                             ),
                             const SizedBox(width: 6),
                             Text(
                               'Durasi Peminjaman: ${_selectedDateRange!.duration.inDays + 1} Hari',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF24487A),
+                                color: isDark ? Colors.white : const Color(0xFF24487A),
                               ),
                             ),
                           ],
@@ -575,24 +586,24 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
                       Icon(
                         Icons.lock_clock_rounded,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         size: 24,
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           'Lengkapi identitas, jadwal tanggal, dan tujuan di atas terlebih dahulu untuk melihat daftar kendaraan yang tersedia.',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF64748B),
+                            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
                             height: 1.35,
                           ),
                         ),
@@ -619,18 +630,18 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? const Color(0xFFEFF6FF)
-                              : Colors.white,
+                              ? (isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.5) : const Color(0xFFEFF6FF))
+                              : (isDark ? const Color(0xFF1E293B) : Colors.white),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isSelected
-                                ? const Color(0xFF24487A)
-                                : const Color(0xFFE2E8F0),
+                                ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A))
+                                : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                             width: isSelected ? 1.8 : 1,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.02),
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -643,7 +654,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                               child: Container(
                                 width: 68,
                                 height: 56,
-                                color: const Color(0xFFF1F5F9),
+                                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                                 child: AppImage(
                                   source: v.imageUrl,
                                   fit: BoxFit.cover,
@@ -651,7 +662,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                                     v.type == VehicleType.mobil
                                         ? Icons.directions_car
                                         : Icons.two_wheeler,
-                                    color: const Color(0xFF24487A),
+                                    color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                                   ),
                                 ),
                               ),
@@ -663,27 +674,27 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                                 children: [
                                   Text(
                                     v.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
-                                      color: Color(0xFF1E293B),
+                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     v.plateNumber,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: Color(0xFF64748B),
+                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                       fontFamily: 'monospace',
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     '${v.fuelDisplay} • ${v.capacity} Penumpang',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: Color(0xFF0369A1),
+                                      color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0369A1),
                                     ),
                                   ),
                                 ],
@@ -696,14 +707,14 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                                   vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFEE2E2),
+                                  color: isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Terpakai',
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: Color(0xFFDC2626),
+                                    color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFDC2626),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -714,8 +725,8 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                                     ? Icons.check_circle_rounded
                                     : Icons.radio_button_unchecked_rounded,
                                 color: isSelected
-                                    ? const Color(0xFF24487A)
-                                    : const Color(0xFF94A3B8),
+                                    ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A))
+                                    : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
                                 size: 22,
                               ),
                           ],
@@ -731,10 +742,15 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
       bottomSheet: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            ),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
               blurRadius: 10,
               offset: const Offset(0, -3),
             ),
@@ -745,12 +761,14 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: _isStepDetailsComplete && _selectedVehicle != null
+              onPressed: _isStepDetailsComplete && _selectedVehicle != null && _simPhoto != null
                   ? _handleSubmit
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF24487A),
+                backgroundColor: isDark ? const Color(0xFF2563EB) : const Color(0xFF24487A),
                 foregroundColor: Colors.white,
+                disabledBackgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                disabledForegroundColor: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -772,35 +790,38 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     required DateTime? date,
     required VoidCallback onTap,
   }) {
+    final isDark = ThemeService.isDarkMode;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF64748B),
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 letterSpacing: 0.5,
               ),
             ),
             const SizedBox(height: 6),
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.calendar_today_rounded,
                   size: 14,
-                  color: Color(0xFF24487A),
+                  color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -810,8 +831,8 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: date != null
-                          ? const Color(0xFF1E293B)
-                          : const Color(0xFF94A3B8),
+                          ? (isDark ? Colors.white : const Color(0xFF1E293B))
+                          : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
                     ),
                   ),
                 ),
@@ -824,6 +845,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
   }
 
   Widget _buildDepartmentDropdown() {
+    final isDark = ThemeService.isDarkMode;
     const departments = [
       'Sekretariat',
       'Rehabilitasi',
@@ -835,39 +857,62 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Bidang / Seksi / Sub Bagian',
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF475569),
+            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
           ),
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           initialValue: _selectedDepartment,
           isExpanded: true,
-          icon: const Icon(
+          dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: Color(0xFF24487A),
+            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+          ),
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
           ),
           decoration: InputDecoration(
             hintText: 'Pilih bidang pemohon',
-            hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-            prefixIcon: const Icon(
+            hintStyle: TextStyle(
+              fontSize: 12,
+              color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            ),
+            prefixIcon: Icon(
               Icons.business_rounded,
               size: 18,
-              color: Color(0xFF64748B),
+              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF64748B),
             ),
             filled: true,
-            fillColor: const Color(0xFFF1F5F9),
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -884,9 +929,9 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                   value: department,
                   child: Text(
                     department,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
                 ),
@@ -904,16 +949,17 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
   }
 
   Widget _buildSectionTitle(String title, IconData icon) {
+    final isDark = ThemeService.isDarkMode;
     return Row(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFF24487A)),
+        Icon(icon, size: 18, color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A)),
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1E293B),
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
           ),
         ),
       ],
@@ -921,13 +967,14 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
   }
 
   BoxDecoration _cardBoxDecoration() {
+    final isDark = ThemeService.isDarkMode;
     return BoxDecoration(
-      color: Colors.white,
+      color: isDark ? const Color(0xFF1E293B) : Colors.white,
       borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: const Color(0xFFE2E8F0)),
+      border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.02),
+          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
           blurRadius: 6,
           offset: const Offset(0, 2),
         ),
@@ -943,15 +990,16 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
+    final isDark = ThemeService.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF475569),
+            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
           ),
         ),
         const SizedBox(height: 6),
@@ -959,20 +1007,35 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
           controller: controller,
           maxLines: maxLines,
           validator: validator,
-          style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+          style: TextStyle(fontSize: 13, color: isDark ? Colors.white : const Color(0xFF1E293B)),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-            prefixIcon: Icon(icon, size: 18, color: const Color(0xFF64748B)),
+            hintStyle: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+            prefixIcon: Icon(icon, size: 18, color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF64748B)),
             filled: true,
-            fillColor: const Color(0xFFF1F5F9),
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+                width: 1.5,
+              ),
             ),
           ),
         ),

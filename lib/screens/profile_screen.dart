@@ -8,6 +8,7 @@ import 'package:simodis_jatim/screens/settings_screen.dart';
 import 'package:simodis_jatim/screens/user_information_screen.dart';
 import 'package:simodis_jatim/widgets/nota_dinas_dialog.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   final List<LoanRequest> loans;
@@ -119,9 +120,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // DIALOG GANTI FOTO PROFIL
   void _showChangePhotoDialog(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -132,12 +135,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Ganti Foto Profil',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
                   InkWell(
@@ -293,6 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // MODAL DETAIL POP-UP RIWAYAT PINJAMAN
   void _showLoanDetailDialog(BuildContext context, LoanRequest item) {
+    final isDark = ThemeService.isDarkMode;
     Color statusBg;
     Color statusTextColor;
     String statusText;
@@ -300,40 +304,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
     switch (item.status) {
       case LoanStatus.disetujui:
       case LoanStatus.approved:
-        statusBg = const Color(0xFFDCFCE7);
-        statusTextColor = const Color(0xFF15803D);
+        statusBg = isDark ? const Color(0xFF166534) : const Color(0xFFDCFCE7);
+        statusTextColor = isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D);
         statusText = 'DISETUJUI';
         break;
       case LoanStatus.ditolak:
       case LoanStatus.rejected:
-        statusBg = const Color(0xFFFEE2E2);
-        statusTextColor = const Color(0xFFB91C1C);
+        statusBg = isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2);
+        statusTextColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C);
         statusText = 'DITOLAK';
         break;
       case LoanStatus.dibatalkan:
-        statusBg = const Color(0xFFE2E8F0);
-        statusTextColor = const Color(0xFF475569);
+        statusBg = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+        statusTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569);
         statusText = 'DIBATALKAN';
         break;
       case LoanStatus.selesai:
-        statusBg = const Color(0xFFEFF6FF);
-        statusTextColor = const Color(0xFF1D4ED8);
+        statusBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+        statusTextColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8);
         statusText = 'SELESAI';
         break;
-      default:
-        statusBg = const Color(0xFFFEF3C7);
-        statusTextColor = const Color(0xFFB45309);
-        statusText = 'MENUNGGU VERIFIKASI';
+      case LoanStatus.menunggu:
+      case LoanStatus.pending:
+        statusBg = isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7);
+        statusTextColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
+        statusText = 'MENUNGGU';
+        break;
     }
 
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,7 +355,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: statusBg,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         statusText,
@@ -361,17 +368,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     InkWell(
                       onTap: () => Navigator.pop(ctx),
-                      borderRadius: BorderRadius.circular(20),
                       child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF1F5F9),
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close_rounded,
                           size: 18,
-                          color: Color(0xFF64748B),
+                          color: isDark ? Colors.white : const Color(0xFF64748B),
                         ),
                       ),
                     ),
@@ -380,10 +386,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 Text(
                   item.vehicleName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -558,6 +564,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
+    final isDark = ThemeService.isDarkMode;
     final double labelSize = _largeTextMode ? 14 : 12;
     final double valueSize = _largeTextMode ? 14 : 12;
 
@@ -567,7 +574,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Icon(
           icon,
           size: _largeTextMode ? 18 : 16,
-          color: const Color(0xFF64748B),
+          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
         ),
         const SizedBox(width: 8),
         SizedBox(
@@ -576,13 +583,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label,
             style: TextStyle(
               fontSize: labelSize,
-              color: const Color(0xFF64748B),
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
             ),
           ),
         ),
         Text(
           ': ',
-          style: TextStyle(fontSize: labelSize, color: const Color(0xFF64748B)),
+          style: TextStyle(fontSize: labelSize, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
         ),
         Expanded(
           child: Text(
@@ -590,7 +597,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(
               fontSize: valueSize,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF1E293B),
+              color: isDark ? Colors.white : const Color(0xFF1E293B),
             ),
           ),
         ),
@@ -599,6 +606,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showHistoryModal(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -617,9 +625,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         height: MediaQuery.of(context).size.height * 0.78,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -630,7 +638,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFCBD5E1),
+                  color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -641,7 +649,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(
                 fontSize: _largeTextMode ? 18 : 16,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1E293B),
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
               ),
             ),
             const SizedBox(height: 4),
@@ -649,7 +657,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               'Ketuk pada salah satu kartu untuk melihat detail lengkap',
               style: TextStyle(
                 fontSize: _largeTextMode ? 13 : 11,
-                color: const Color(0xFF64748B),
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
             const SizedBox(height: 14),
@@ -679,10 +687,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
+                              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: const Color(0xFFE2E8F0),
+                                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                               ),
                             ),
                             child: Column(
@@ -692,13 +700,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Expanded(
+                                     Expanded(
                                       child: Text(
                                         item.vehicleName,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: _largeTextMode ? 15 : 13,
-                                          color: const Color(0xFF1E293B),
+                                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                                         ),
                                       ),
                                     ),
@@ -735,7 +743,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   'Tujuan: ${item.destination}',
                                   style: TextStyle(
                                     fontSize: _largeTextMode ? 14 : 12,
-                                    color: const Color(0xFF64748B),
+                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -743,7 +751,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   'Jadwal: ${_formatDate(item.startDate)} s/d ${_formatDate(item.endDate)}',
                                   style: TextStyle(
                                     fontSize: _largeTextMode ? 13 : 11,
-                                    color: const Color(0xFF0369A1),
+                                    color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0369A1),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -754,7 +762,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     style: TextStyle(
                                       fontSize: _largeTextMode ? 13 : 11,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF24487A),
+                                      color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                                     ),
                                   ),
                                 ],
@@ -812,16 +820,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     final double nameFontSize = _largeTextMode ? 20 : 17;
     final double nipFontSize = _largeTextMode ? 14 : 12;
     final double roleFontSize = _largeTextMode ? 13 : 11;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
-          color: const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
           alignment: Alignment.centerLeft,
           child: SafeArea(
@@ -835,7 +844,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontSize: _largeTextMode ? 20 : 18,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF1E293B),
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -844,7 +853,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'Informasi akun & riwayat dinas',
                   style: TextStyle(
                     fontSize: _largeTextMode ? 13 : 11,
-                    color: const Color(0xFF64748B),
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -962,9 +971,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // MENU PROFIL
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
               ),
               child: Column(
                 children: [
@@ -995,10 +1006,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                     },
                   ),
-                  const Divider(
+                  Divider(
                     height: 1,
                     indent: 64,
-                    color: Color(0xFFF1F5F9),
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                   ),
                   _buildMenuItem(
                     icon: Icons.history_rounded,
@@ -1008,10 +1019,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     subtitle: 'Lihat semua riwayat pengajuan armada',
                     onTap: () => _showHistoryModal(context),
                   ),
-                  const Divider(
+                  Divider(
                     height: 1,
                     indent: 64,
-                    color: Color(0xFFF1F5F9),
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                   ),
                   _buildMenuItem(
                     icon: Icons.settings_rounded,
@@ -1021,10 +1032,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     subtitle: 'Preferensi notifikasi, font, & keamanan',
                     onTap: () => _showSettingsModal(context),
                   ),
-                  const Divider(
+                  Divider(
                     height: 1,
                     indent: 64,
-                    color: Color(0xFFF1F5F9),
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                   ),
                   _buildMenuItem(
                     icon: Icons.logout_rounded,
@@ -1062,6 +1073,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
+    final isDark = ThemeService.isDarkMode;
     final double titleSize = _largeTextMode ? 16 : 14;
     final double subtitleSize = _largeTextMode ? 13 : 11;
 
@@ -1071,10 +1083,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: iconBg,
+          color: isDark && !isDestructive ? const Color(0xFF334155) : iconBg,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, color: iconColor, size: _largeTextMode ? 24 : 20),
+        child: Icon(
+          icon,
+          color: isDark && !isDestructive ? const Color(0xFF60A5FA) : iconColor,
+          size: _largeTextMode ? 24 : 20,
+        ),
       ),
       title: Text(
         title,
@@ -1083,20 +1099,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           fontWeight: FontWeight.bold,
           color: isDestructive
               ? const Color(0xFFDC2626)
-              : const Color(0xFF1E293B),
+              : (isDark ? Colors.white : const Color(0xFF1E293B)),
         ),
       ),
       subtitle: Text(
         subtitle,
         style: TextStyle(
           fontSize: subtitleSize,
-          color: const Color(0xFF64748B),
+          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
         ),
       ),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.arrow_forward_ios_rounded,
         size: 14,
-        color: Color(0xFF94A3B8),
+        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
       ),
     );
   }

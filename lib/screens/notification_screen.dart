@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/notification_model.dart';
 import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
 import 'package:simodis_jatim/screens/notification_detail_screen.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class NotificationScreen extends StatefulWidget {
   final List<AppNotification> notifications;
@@ -81,15 +82,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     final unreadCount = widget.notifications.where((n) => !n.isRead).length;
     final filteredNotifications = _filteredNotifications();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
-          color: const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SafeArea(
             bottom: false,
@@ -97,7 +99,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -107,18 +109,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF1E293B),
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                           letterSpacing: 0.2,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
                         'Informasi terbaru aktivitas akun Anda',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF64748B),
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -137,7 +139,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner Pusat Aktivitas
           Container(
             width: double.infinity,
             margin: const EdgeInsets.fromLTRB(16, 14, 16, 8),
@@ -198,40 +199,49 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ],
             ),
           ),
-
-          // Filter bulan dan aksi baca
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
             child: Row(
               children: [
                 Expanded(
                   child: DropdownButtonFormField<DateTime?>(
                     initialValue: _selectedMonth,
                     isDense: true,
+                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    style: TextStyle(fontSize: 12, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                     decoration: InputDecoration(
-                      labelText: 'Filter bulan',
-                      labelStyle: const TextStyle(fontSize: 11),
-                      prefixIcon: const Icon(
+                      hintText: 'Filter Bulan',
+                      hintStyle: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
+                      prefixIcon: Icon(
                         Icons.calendar_month_rounded,
-                        size: 18,
+                        size: 16,
+                        color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 8,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: BorderSide(
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                        ),
                       ),
                     ),
                     items: [
-                      const DropdownMenuItem<DateTime?>(
+                      DropdownMenuItem<DateTime?>(
                         value: null,
                         child: Text(
-                          'Semua bulan',
-                          style: TextStyle(fontSize: 12),
+                          'Semua Bulan',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          ),
                         ),
                       ),
                       ..._availableMonths.map(
@@ -239,7 +249,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           value: month,
                           child: Text(
                             _monthLabel(month),
-                            style: const TextStyle(fontSize: 12),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            ),
                           ),
                         ),
                       ),
@@ -256,22 +269,22 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       setState(() {});
                     },
                     borderRadius: BorderRadius.circular(6),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                       child: Row(
                         children: [
                           Icon(
                             Icons.done_all_rounded,
                             size: 14,
-                            color: Color(0xFF2563EB),
+                            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            'Tandai Telah Dibaca',
+                            'Tandai Dibaca',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF2563EB),
+                              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                             ),
                           ),
                         ],
@@ -281,8 +294,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ],
             ),
           ),
-
-          // List 10 Notifikasi
           Expanded(
             child: filteredNotifications.isEmpty
                 ? const Center(
@@ -306,6 +317,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget _buildNotificationCard(AppNotification item) {
+    final isDark = ThemeService.isDarkMode;
     Color iconBg;
     Color iconColor;
     IconData icon;
@@ -315,52 +327,52 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     switch (item.type) {
       case NotificationType.welcome:
-        iconBg = const Color(0xFFEFF6FF);
-        iconColor = const Color(0xFF2563EB);
+        iconBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+        iconColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
         icon = Icons.waving_hand_rounded;
         tagLabel = 'Informasi Akun';
-        tagBg = const Color(0xFFDBEAFE);
-        tagTextColor = const Color(0xFF1E40AF);
+        tagBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFDBEAFE);
+        tagTextColor = isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF);
         break;
       case NotificationType.submitted:
-        iconBg = const Color(0xFFFEF3C7);
-        iconColor = const Color(0xFFD97706);
+        iconBg = isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7);
+        iconColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
         icon = Icons.hourglass_top_rounded;
         tagLabel = 'Menunggu Verifikasi';
-        tagBg = const Color(0xFFFEF3C7);
-        tagTextColor = const Color(0xFFB45309);
+        tagBg = isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7);
+        tagTextColor = isDark ? const Color(0xFFFDE68A) : const Color(0xFFB45309);
         break;
       case NotificationType.approved:
-        iconBg = const Color(0xFFDCFCE7);
-        iconColor = const Color(0xFF16A34A);
+        iconBg = isDark ? const Color(0xFF166534) : const Color(0xFFDCFCE7);
+        iconColor = isDark ? const Color(0xFF86EFAC) : const Color(0xFF16A34A);
         icon = Icons.check_circle_rounded;
         tagLabel = 'Disetujui Kasubag';
-        tagBg = const Color(0xFFDCFCE7);
-        tagTextColor = const Color(0xFF15803D);
+        tagBg = isDark ? const Color(0xFF166534) : const Color(0xFFDCFCE7);
+        tagTextColor = isDark ? const Color(0xFFBBF7D0) : const Color(0xFF15803D);
         break;
       case NotificationType.rejected:
-        iconBg = const Color(0xFFFEE2E2);
-        iconColor = const Color(0xFFDC2626);
+        iconBg = isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2);
+        iconColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFFDC2626);
         icon = Icons.cancel_rounded;
-        tagLabel = 'Pengajuan Ditolak';
-        tagBg = const Color(0xFFFEE2E2);
-        tagTextColor = const Color(0xFFB91C1C);
+        tagLabel = 'Ditolak Aset';
+        tagBg = isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2);
+        tagTextColor = isDark ? const Color(0xFFFECACA) : const Color(0xFFB91C1C);
         break;
       case NotificationType.maintenance:
-        iconBg = const Color(0xFFF3E8FF);
-        iconColor = const Color(0xFF7E22CE);
+        iconBg = isDark ? const Color(0xFF581C87) : const Color(0xFFF3E8FF);
+        iconColor = isDark ? const Color(0xFFC084FC) : const Color(0xFF7E22CE);
         icon = Icons.build_circle_rounded;
-        tagLabel = 'Pemeliharaan';
-        tagBg = const Color(0xFFF3E8FF);
-        tagTextColor = const Color(0xFF6B21A8);
+        tagLabel = 'Info Pemeliharaan';
+        tagBg = isDark ? const Color(0xFF581C87) : const Color(0xFFF3E8FF);
+        tagTextColor = isDark ? const Color(0xFFE9D5FF) : const Color(0xFF6B21A8);
         break;
       case NotificationType.reminder:
-        iconBg = const Color(0xFFE0F2FE);
-        iconColor = const Color(0xFF0284C7);
+        iconBg = isDark ? const Color(0xFF0C4A6E) : const Color(0xFFE0F2FE);
+        iconColor = isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
         icon = Icons.schedule_rounded;
         tagLabel = 'Pengingat Jadwal';
-        tagBg = const Color(0xFFE0F2FE);
-        tagTextColor = const Color(0xFF0369A1);
+        tagBg = isDark ? const Color(0xFF0C4A6E) : const Color(0xFFE0F2FE);
+        tagTextColor = isDark ? const Color(0xFFBAE6FD) : const Color(0xFF0369A1);
         break;
     }
 
@@ -371,17 +383,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(11),
         decoration: BoxDecoration(
-          color: item.isRead ? Colors.white : const Color(0xFFF8FAFC),
+          color: isDark
+              ? (item.isRead ? const Color(0xFF1E293B) : const Color(0xFF1E3A8A).withValues(alpha: 0.35))
+              : (item.isRead ? Colors.white : const Color(0xFFF8FAFC)),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: item.isRead
-                ? const Color(0xFFE2E8F0)
-                : const Color(0xFF93C5FD),
+            color: isDark
+                ? (item.isRead ? const Color(0xFF334155) : const Color(0xFF2563EB))
+                : (item.isRead ? const Color(0xFFE2E8F0) : const Color(0xFF93C5FD)),
             width: item.isRead ? 1 : 1.3,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: item.isRead ? 0.02 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : (item.isRead ? 0.02 : 0.04)),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -425,9 +439,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         children: [
                           Text(
                             item.time,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: Color(0xFF94A3B8),
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF94A3B8),
                             ),
                           ),
                           if (!item.isRead) ...[
@@ -449,22 +463,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   Text(
                     item.title,
                     style: TextStyle(
-                      fontWeight: item.isRead
-                          ? FontWeight.w600
-                          : FontWeight.bold,
                       fontSize: 13,
-                      color: const Color(0xFF1E293B),
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     item.message,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF64748B),
-                      height: 1.3,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     ),
                   ),
                 ],

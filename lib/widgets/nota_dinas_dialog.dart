@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class NotaDinasDialog extends StatelessWidget {
   final LoanRequest loan;
@@ -12,15 +13,17 @@ class NotaDinasDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     final regNumber = loan.spkNumber ?? 'ND-0901/DINSOS/${DateTime.now().year}';
 
     return Dialog(
+      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(16),
         ),
         child: SingleChildScrollView(
@@ -32,26 +35,26 @@ class NotaDinasDialog extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Softfile Lembar Nota Dinas',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF1F5F9),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.close_rounded,
                         size: 18,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
                       ),
                     ),
                   ),

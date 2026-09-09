@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class LoanHistoryScreen extends StatefulWidget {
   final List<LoanRequest> loans;
@@ -91,24 +92,26 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+
     return DefaultTabController(
       length: 5,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF1E293B),
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          foregroundColor: isDark ? Colors.white : const Color(0xFF1E293B),
           elevation: 0,
           title: const Text(
             'Riwayat Peminjaman',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             isScrollable: true,
-            labelColor: Color(0xFF24487A),
-            unselectedLabelColor: Color(0xFF64748B),
-            indicatorColor: Color(0xFF24487A),
-            tabs: [
+            labelColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+            unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            indicatorColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+            tabs: const [
               Tab(text: 'Menunggu'),
               Tab(text: 'Disetujui'),
               Tab(text: 'Selesai'),
@@ -120,11 +123,14 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 18, 20, 12),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
               child: Text(
                 'Pantau status seluruh pengajuan kendaraan dinas Anda.',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                ),
               ),
             ),
             Padding(
@@ -132,35 +138,43 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
               child: DropdownButtonFormField<DateTime?>(
                 initialValue: _selectedMonth,
                 isDense: true,
+                dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                style: TextStyle(fontSize: 12, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                 decoration: InputDecoration(
                   labelText: 'Filter bulan peminjaman',
-                  labelStyle: const TextStyle(fontSize: 11),
-                  prefixIcon: const Icon(
+                  labelStyle: TextStyle(fontSize: 11, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                  prefixIcon: Icon(
                     Icons.calendar_month_rounded,
                     size: 18,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 9,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    ),
                   ),
                 ),
                 items: [
-                  const DropdownMenuItem<DateTime?>(
+                  DropdownMenuItem<DateTime?>(
                     value: null,
-                    child: Text('Semua bulan', style: TextStyle(fontSize: 12)),
+                    child: Text(
+                      'Semua bulan',
+                      style: TextStyle(fontSize: 12, color: isDark ? Colors.white : const Color(0xFF1E293B)),
+                    ),
                   ),
                   ..._availableMonths.map(
                     (month) => DropdownMenuItem<DateTime?>(
                       value: month,
                       child: Text(
                         _monthLabel(month),
-                        style: const TextStyle(fontSize: 12),
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                       ),
                     ),
                   ),
@@ -209,6 +223,7 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
   }
 
   Widget _buildLoanCard(BuildContext context, LoanRequest loan) {
+    final isDark = ThemeService.isDarkMode;
     final isApproved = _isApproved(loan.status);
     final isCompleted = loan.status == LoanStatus.selesai;
     final isRejected =
@@ -224,23 +239,23 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
         ? 'DIBATALKAN'
         : 'MENUNGGU';
     final statusBackground = isCompleted
-        ? const Color(0xFFDBEAFE)
+        ? (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFDBEAFE))
         : isApproved
-        ? const Color(0xFFDCFCE7)
+        ? (isDark ? const Color(0xFF166534) : const Color(0xFFDCFCE7))
         : isRejected
-        ? const Color(0xFFFEE2E2)
+        ? (isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2))
         : isCancelled
-        ? const Color(0xFFE2E8F0)
-        : const Color(0xFFFEF3C7);
+        ? (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))
+        : (isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7));
     final statusForeground = isCompleted
-        ? const Color(0xFF1D4ED8)
+        ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8))
         : isApproved
-        ? const Color(0xFF15803D)
+        ? (isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D))
         : isRejected
-        ? const Color(0xFFB91C1C)
+        ? (isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C))
         : isCancelled
-        ? const Color(0xFF475569)
-        : const Color(0xFFB45309);
+        ? (isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569))
+        : (isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309));
 
     return InkWell(
       onTap: () {
@@ -254,14 +269,16 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-          boxShadow: const [
+          border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          ),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x0A0F172A),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
               blurRadius: 10,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -274,10 +291,10 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
                 Expanded(
                   child: Text(
                     loan.vehicleName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
                 ),
@@ -304,14 +321,14 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
             const SizedBox(height: 10),
             Text(
               'Tujuan: ${loan.destination}',
-              style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+              style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
             ),
             const SizedBox(height: 4),
             Text(
               'Jadwal: ${_formatDate(loan.startDate)} s/d ${_formatDate(loan.endDate)}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: Color(0xFF0369A1),
+                color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0369A1),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -319,10 +336,10 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
               const SizedBox(height: 6),
               Text(
                 'SPK: ${loan.spkNumber}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF24487A),
+                  color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                 ),
               ),
             ],
@@ -371,146 +388,151 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
         : isCancelled
         ? 'DIBATALKAN'
         : 'MENUNGGU VERIFIKASI';
+    final isDarkDialog = ThemeService.isDarkMode;
     final statusColor = isCompleted
-        ? const Color(0xFF1D4ED8)
+        ? (isDarkDialog ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8))
         : isApproved
-        ? const Color(0xFF15803D)
+        ? (isDarkDialog ? const Color(0xFF86EFAC) : const Color(0xFF15803D))
         : isRejected
-        ? const Color(0xFFB91C1C)
+        ? (isDarkDialog ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C))
         : isCancelled
-        ? const Color(0xFF475569)
-        : const Color(0xFFB45309);
+        ? (isDarkDialog ? const Color(0xFF94A3B8) : const Color(0xFF475569))
+        : (isDarkDialog ? const Color(0xFFFBBF24) : const Color(0xFFB45309));
     final statusBackground = isCompleted
-        ? const Color(0xFFDBEAFE)
+        ? (isDarkDialog ? const Color(0xFF1E3A8A) : const Color(0xFFDBEAFE))
         : isApproved
-        ? const Color(0xFFDCFCE7)
+        ? (isDarkDialog ? const Color(0xFF166534) : const Color(0xFFDCFCE7))
         : isRejected
-        ? const Color(0xFFFEE2E2)
+        ? (isDarkDialog ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2))
         : isCancelled
-        ? const Color(0xFFE2E8F0)
-        : const Color(0xFFFEF3C7);
+        ? (isDarkDialog ? const Color(0xFF334155) : const Color(0xFFE2E8F0))
+        : (isDarkDialog ? const Color(0xFF78350F) : const Color(0xFFFEF3C7));
 
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: statusBackground,
-                        borderRadius: BorderRadius.circular(7),
-                      ),
-                      child: Text(
-                        statusLabel,
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
+      builder: (dialogContext) => Theme(
+        data: isDarkDialog ? ThemeService.darkTheme : ThemeService.lightTheme,
+        child: Dialog(
+          backgroundColor: isDarkDialog ? const Color(0xFF1E293B) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusBackground,
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: Text(
+                          statusLabel,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(dialogContext),
-                      icon: const Icon(Icons.close_rounded),
-                      color: const Color(0xFF64748B),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  loan.vehicleName,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+                      IconButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        icon: const Icon(Icons.close_rounded),
+                        color: isDarkDialog ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'ID Permohonan: #${loan.id.length > 8 ? loan.id.substring(loan.id.length - 8) : loan.id}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF94A3B8),
-                    fontFamily: 'monospace',
+                  const SizedBox(height: 8),
+                  Text(
+                    loan.vehicleName,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkDialog ? Colors.white : const Color(0xFF1E293B),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Divider(height: 1, color: Color(0xFFE2E8F0)),
-                const SizedBox(height: 14),
-                _buildDetailRow(
-                  Icons.person_outline_rounded,
-                  'Peminjam',
-                  loan.borrowerName,
-                ),
-                _buildDetailRow(
-                  Icons.business_rounded,
-                  'Bidang / Seksi',
-                  loan.department,
-                ),
-                _buildDetailRow(
-                  Icons.calendar_month_rounded,
-                  'Jadwal Tugas',
-                  '${_formatDate(loan.startDate)} - ${_formatDate(loan.endDate)}',
-                ),
-                _buildDetailRow(
-                  Icons.near_me_rounded,
-                  'Tujuan Instansi',
-                  loan.destination,
-                ),
-                _buildDetailRow(
-                  Icons.location_on_outlined,
-                  'Alamat Tujuan',
-                  loan.destinationAddress.isEmpty
-                      ? '-'
-                      : loan.destinationAddress,
-                ),
-                _buildDetailRow(
-                  Icons.description_outlined,
-                  'Keperluan Dinas',
-                  loan.purposeDescription.isEmpty
-                      ? '-'
-                      : loan.purposeDescription,
-                ),
-                if (loan.spkNumber != null)
+                  const SizedBox(height: 3),
+                  Text(
+                    'ID Permohonan: #${loan.id.length > 8 ? loan.id.substring(loan.id.length - 8) : loan.id}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: isDarkDialog ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(height: 1, color: isDarkDialog ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  const SizedBox(height: 14),
                   _buildDetailRow(
-                    Icons.badge_outlined,
-                    'Nomor SPK',
-                    loan.spkNumber!,
+                    Icons.person_outline_rounded,
+                    'Peminjam',
+                    loan.borrowerName,
                   ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF24487A),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  _buildDetailRow(
+                    Icons.business_rounded,
+                    'Bidang / Seksi',
+                    loan.department,
+                  ),
+                  _buildDetailRow(
+                    Icons.calendar_month_rounded,
+                    'Jadwal Tugas',
+                    '${_formatDate(loan.startDate)} - ${_formatDate(loan.endDate)}',
+                  ),
+                  _buildDetailRow(
+                    Icons.near_me_rounded,
+                    'Tujuan Instansi',
+                    loan.destination,
+                  ),
+                  _buildDetailRow(
+                    Icons.location_on_outlined,
+                    'Alamat Tujuan',
+                    loan.destinationAddress.isEmpty
+                        ? '-'
+                        : loan.destinationAddress,
+                  ),
+                  _buildDetailRow(
+                    Icons.description_outlined,
+                    'Keperluan Dinas',
+                    loan.purposeDescription.isEmpty
+                        ? '-'
+                        : loan.purposeDescription,
+                  ),
+                  if (loan.spkNumber != null)
+                    _buildDetailRow(
+                      Icons.badge_outlined,
+                      'Nomor SPK',
+                      loan.spkNumber!,
+                    ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF24487A),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Tutup',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    child: const Text(
-                      'Tutup',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -519,31 +541,32 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
   }
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
+    final isDark = ThemeService.isDarkMode;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 17, color: const Color(0xFF64748B)),
+          Icon(icon, size: 17, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
           const SizedBox(width: 10),
           SizedBox(
             width: 105,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+              style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
             ),
           ),
-          const Text(
+          Text(
             ': ',
-            style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+            style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1E293B),
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
               ),
             ),
           ),

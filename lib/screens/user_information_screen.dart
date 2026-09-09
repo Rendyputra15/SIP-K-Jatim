@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/screens/edit_profile_screen.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
 
 class UserInformationScreen extends StatefulWidget {
@@ -111,6 +112,10 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
@@ -119,10 +124,10 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF1E293B),
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          foregroundColor: isDark ? Colors.white : const Color(0xFF1E293B),
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -189,9 +194,9 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: borderColor),
               ),
               child: Column(
                 children: [
@@ -199,24 +204,28 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                     Icons.person_outline_rounded,
                     'Nama Lengkap',
                     _currentProfile.name,
+                    isDark,
                   ),
-                  _buildDivider(),
+                  _buildDivider(isDark),
                   _buildInformationRow(
                     Icons.badge_outlined,
                     'NIP',
                     _currentProfile.nip,
+                    isDark,
                   ),
-                  _buildDivider(),
+                  _buildDivider(isDark),
                   _buildInformationRow(
                     Icons.work_outline_rounded,
                     'Jabatan',
                     _currentProfile.position,
+                    isDark,
                   ),
-                  _buildDivider(),
+                  _buildDivider(isDark),
                   _buildInformationRow(
                     Icons.business_outlined,
                     'Bidang',
                     _currentProfile.department,
+                    isDark,
                   ),
                 ],
               ),
@@ -228,9 +237,9 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: borderColor),
               ),
               child: Column(
                 children: [
@@ -238,21 +247,25 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                     Icons.email_outlined,
                     'Email Kedinasan',
                     _currentProfile.email,
+                    isDark,
                   ),
-                  _buildDivider(),
+                  _buildDivider(isDark),
                   _buildInformationRow(
                     Icons.phone_outlined,
                     'Nomor WhatsApp / HP',
                     _currentProfile.phone,
+                    isDark,
                   ),
-                  _buildDivider(),
+                  _buildDivider(isDark),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(9),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDCFCE7),
+                          color: isDark
+                              ? const Color(0xFF064E3B).withValues(alpha: 0.5)
+                              : const Color(0xFFDCFCE7),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
@@ -262,7 +275,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -270,11 +283,11 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                               'Status Akun',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Color(0xFF64748B),
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                               ),
                             ),
-                            SizedBox(height: 3),
-                            Text(
+                            const SizedBox(height: 3),
+                            const Text(
                               'Aktif (ASN Pegawai Dinsos)',
                               style: TextStyle(
                                 fontSize: 13,
@@ -305,7 +318,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF24487A),
+                  backgroundColor: isDark ? const Color(0xFF2563EB) : const Color(0xFF24487A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -320,21 +333,28 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
     );
   }
 
-  Widget _buildDivider() {
-    return const Divider(height: 24, color: Color(0xFFE2E8F0));
+  Widget _buildDivider(bool isDark) {
+    return Divider(
+      height: 24,
+      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+    );
   }
 
-  Widget _buildInformationRow(IconData icon, String label, String value) {
+  Widget _buildInformationRow(IconData icon, String label, String value, bool isDark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
-            color: const Color(0xFFEFF6FF),
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFEFF6FF),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 19, color: const Color(0xFF24487A)),
+          child: Icon(
+            icon,
+            size: 19,
+            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -343,15 +363,18 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                ),
               ),
               const SizedBox(height: 3),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1E293B),
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
                 ),
               ),
             ],

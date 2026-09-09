@@ -3,6 +3,7 @@ import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/vehicle_detail_screen.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
 import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class CatalogScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -45,6 +46,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     final filteredList = widget.vehicles.where((v) {
       if (_wheelFilter == 'Roda 4' && v.type != VehicleType.mobil) return false;
       if (_wheelFilter == 'Roda 2' && v.type != VehicleType.motor) return false;
@@ -52,12 +54,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      // 1. HEADER UTAMA ABU-ABU MUDA
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      // 1. HEADER UTAMA
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
-          color: const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SafeArea(
             bottom: false,
@@ -65,7 +67,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -74,16 +76,16 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1E293B),
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                         letterSpacing: 0.2,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
                       'Pilih unit operasional dinas',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -97,7 +99,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           ),
         ),
       ),
-      // 2. KONTEN BODY (DROPDOWN TEPAT DI BAWAH HEADER ABU)
+      // 2. KONTEN BODY
       body: Column(
         children: [
           // Filter Dropdown Ringkas tepat di bawah header
@@ -110,9 +112,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   height: 34,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFCBD5E1)),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.03),
@@ -124,21 +128,27 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _wheelFilter,
-                      icon: const Icon(
+                      dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      icon: Icon(
                         Icons.filter_list_rounded,
-                        color: Color(0xFF24487A),
+                        color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                         size: 18,
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF24487A),
+                        color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                       ),
                       items: ['Semua', 'Roda 2', 'Roda 4']
                           .map(
                             (item) => DropdownMenuItem(
                               value: item,
-                              child: Text(item),
+                              child: Text(
+                                item,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                ),
+                              ),
                             ),
                           )
                           .toList(),
@@ -171,16 +181,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
                           ],
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -194,7 +206,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     child: Container(
                                       width: 84,
                                       height: 74,
-                                      color: const Color(0xFFEFF6FF),
+                                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFEFF6FF),
                                       child: _buildVehicleImage(
                                         item.imageUrl,
                                         item.type,
@@ -209,18 +221,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       children: [
                                         Text(
                                           item.name,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14,
-                                            color: Color(0xFF1E293B),
+                                            color: isDark ? Colors.white : const Color(0xFF1E293B),
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           item.plateNumber,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 11,
-                                            color: Color(0xFF64748B),
+                                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                             fontFamily: 'monospace',
                                           ),
                                         ),
@@ -229,23 +241,23 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           children: [
                                             Text(
                                               '${item.fuelDisplay} • ${item.fuelType}',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 11,
-                                                color: Color(0xFF0369A1),
+                                                color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0369A1),
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
-                                            const Text(
+                                            Text(
                                               ' • ',
                                               style: TextStyle(
-                                                color: Colors.grey,
+                                                color: isDark ? const Color(0xFF64748B) : Colors.grey,
                                               ),
                                             ),
                                             Text(
                                               '${item.currentOdometer} KM',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 11,
-                                                color: Color(0xFF64748B),
+                                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                               ),
                                             ),
                                           ],
@@ -261,9 +273,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 horizontal: 14,
                                 vertical: 10,
                               ),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFF8FAFC),
-                                borderRadius: BorderRadius.vertical(
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                                borderRadius: const BorderRadius.vertical(
                                   bottom: Radius.circular(16),
                                 ),
                               ),
@@ -283,16 +295,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         );
                                       },
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: const Color(
-                                          0xFF24487A,
-                                        ),
-                                        side: const BorderSide(
-                                          color: Color(0xFFCBD5E1),
+                                        foregroundColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+                                        side: BorderSide(
+                                          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                       ),
                                       child: const Text(
@@ -311,15 +319,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           ? () => widget.onSelectVehicle(item)
                                           : null,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF24487A,
-                                        ),
+                                        backgroundColor: const Color(0xFF24487A),
                                         foregroundColor: Colors.white,
                                         elevation: 0,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                       ),
                                       child: const Text(
@@ -345,3 +349,4 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 }
+

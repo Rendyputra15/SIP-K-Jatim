@@ -12,6 +12,7 @@ import 'package:simodis_jatim/screens/loan_history_screen.dart';
 import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/screens/login_screen.dart';
 import 'package:simodis_jatim/screens/profile_screen.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final String role;
@@ -40,6 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.role != 'user') {
+      ThemeService.setDarkMode(false);
+    }
     if (widget.showLoading) {
       Future.delayed(const Duration(milliseconds: 700), () {
         if (mounted) {
@@ -680,123 +684,134 @@ class _HomeScreenState extends State<HomeScreen> {
       final bool isSuper = widget.role == 'superadmin';
       final activeUser = isSuper ? _appUsers[0] : _appUsers[1];
 
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF24487A),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isSuper
-                    ? 'SIP-K • SUPERADMINISTRATOR'
-                    : 'SIP-K • KASUBAG ADMIN',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                activeUser.name,
-                style: const TextStyle(fontSize: 11, color: Color(0xFFBAE6FD)),
-              ),
-            ],
-          ),
-          actions: [
-            // Tombol Switch Role Cepat (Superadmin <-> Admin) untuk mempermudah testing
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.swap_horiz_rounded, color: Colors.white),
-              tooltip: 'Ganti Peran Admin untuk Demo',
-              onSelected: (selectedRole) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HomeScreen(role: selectedRole),
-                  ),
-                );
-              },
-              itemBuilder: (ctx) => [
-                const PopupMenuItem(
-                  value: 'superadmin',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.shield_rounded,
-                        color: Color(0xFFB45309),
-                        size: 18,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Masuk sebagai Superadmin',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
+      return Theme(
+        data: ThemeService.lightTheme,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF24487A),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isSuper
+                      ? 'SIP-K • SUPERADMINISTRATOR'
+                      : 'SIP-K • KASUBAG ADMIN',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                const PopupMenuItem(
-                  value: 'admin',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.admin_panel_settings_rounded,
-                        color: Color(0xFF24487A),
-                        size: 18,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Masuk sebagai Kasubag Admin',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
+                Text(
+                  activeUser.name,
+                  style: const TextStyle(fontSize: 11, color: Color(0xFFBAE6FD)),
                 ),
               ],
             ),
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
+            actions: [
+              // Tombol Switch Role Cepat (Superadmin <-> Admin) untuk mempermudah testing
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.swap_horiz_rounded, color: Colors.white),
+                tooltip: 'Ganti Peran Admin untuk Demo',
+                onSelected: (selectedRole) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => HomeScreen(role: selectedRole),
+                    ),
+                  );
+                },
+                itemBuilder: (ctx) => [
+                  const PopupMenuItem(
+                    value: 'superadmin',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.shield_rounded,
+                          color: Color(0xFFB45309),
+                          size: 18,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Masuk sebagai Superadmin',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'admin',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.admin_panel_settings_rounded,
+                          color: Color(0xFF24487A),
+                          size: 18,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Masuk sebagai Kasubag Admin',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-        body: AdminApprovalScreen(
-          requests: _loans,
-          onVerify: _handleVerification,
-          onReturn: _handleReturn,
-          currentUser: activeUser,
-          users: _appUsers,
-          onAddUser: (newUser) => setState(() => _appUsers.add(newUser)),
-          onUpdateUser: (updatedUser) => setState(() {}),
-          onDeleteUser: (id) =>
-              setState(() => _appUsers.removeWhere((u) => u.id == id)),
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.white),
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                ),
+              ),
+            ],
+          ),
+          body: AdminApprovalScreen(
+            requests: _loans,
+            onVerify: _handleVerification,
+            onReturn: _handleReturn,
+            currentUser: activeUser,
+            users: _appUsers,
+            onAddUser: (newUser) => setState(() => _appUsers.add(newUser)),
+            onUpdateUser: (updatedUser) => setState(() {}),
+            onDeleteUser: (id) =>
+                setState(() => _appUsers.removeWhere((u) => u.id == id)),
 
-          // OPERAN KATALOG KENDARAAN (TAMBAHAN):
-          vehicles: _vehicles,
-          onAddVehicle: (newV) => setState(() => _vehicles.add(newV)),
-          onUpdateVehicle: (updV) {
-            setState(() {
-              final index = _vehicles.indexWhere((v) => v.id == updV.id);
-              if (index != -1) {
-                _vehicles[index] = updV;
-              }
-            });
-          },
-          onDeleteVehicle: (id) =>
-              setState(() => _vehicles.removeWhere((v) => v.id == id)),
+            // OPERAN KATALOG KENDARAAN (TAMBAHAN):
+            vehicles: _vehicles,
+            onAddVehicle: (newV) => setState(() => _vehicles.add(newV)),
+            onUpdateVehicle: (updV) {
+              setState(() {
+                final index = _vehicles.indexWhere((v) => v.id == updV.id);
+                if (index != -1) {
+                  _vehicles[index] = updV;
+                }
+              });
+            },
+            onDeleteVehicle: (id) =>
+                setState(() => _vehicles.removeWhere((v) => v.id == id)),
+          ),
         ),
       );
     }
 
+    final isDark = ThemeService.isDarkMode;
+
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: userPages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            ),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.06),
               blurRadius: 10,
               offset: const Offset(0, -3),
             ),
@@ -809,8 +824,8 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildNavButton(Icons.home_filled, 'Beranda', 0),
-                _buildNavButton(Icons.directions_car_rounded, 'Catalog', 1),
+                _buildNavButton(Icons.home_filled, 'Beranda', 0, isDark),
+                _buildNavButton(Icons.directions_car_rounded, 'Catalog', 1, isDark),
 
                 // Tombol Pinjam Tengah yang Sejajar Sempurna
                 Expanded(
@@ -827,14 +842,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 44,
                             decoration: BoxDecoration(
                               color: _currentIndex == 2
-                                  ? const Color(0xFF1E3A8A)
-                                  : const Color(0xFF24487A),
+                                  ? (isDark ? const Color(0xFF2563EB) : const Color(0xFF1E3A8A))
+                                  : (isDark ? const Color(0xFF3B82F6) : const Color(0xFF24487A)),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFF24487A,
-                                  ).withValues(alpha: 0.35),
+                                  color: (isDark ? const Color(0xFF3B82F6) : const Color(0xFF24487A))
+                                      .withValues(alpha: 0.35),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
                                 ),
@@ -855,10 +869,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontSize: 10,
                               fontWeight: _currentIndex == 2
                                   ? FontWeight.bold
-                                  : FontWeight.normal,
+                                  : FontWeight.w600,
                               color: _currentIndex == 2
-                                  ? const Color(0xFF24487A)
-                                  : const Color(0xFF94A3B8),
+                                  ? (isDark ? const Color(0xFF38BDF8) : const Color(0xFF24487A))
+                                  : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                             ),
                           ),
                         ),
@@ -867,8 +881,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                _buildNavButton(Icons.notifications_rounded, 'Notifikasi', 3),
-                _buildNavButton(Icons.person_rounded, 'Profil', 4),
+                _buildNavButton(Icons.notifications_rounded, 'Notifikasi', 3, isDark),
+                _buildNavButton(Icons.person_rounded, 'Profil', 4, isDark),
               ],
             ),
           ),
@@ -877,8 +891,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNavButton(IconData icon, String label, int index) {
+  Widget _buildNavButton(IconData icon, String label, int index, bool isDark) {
     final isSelected = _currentIndex == index;
+    final activeColor = isDark ? const Color(0xFF38BDF8) : const Color(0xFF24487A);
+    final inactiveColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Expanded(
       child: InkWell(
         onTap: () => setState(() => _currentIndex = index),
@@ -890,9 +907,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Icon(
                 icon,
-                color: isSelected
-                    ? const Color(0xFF24487A)
-                    : const Color(0xFF94A3B8),
+                color: isSelected ? activeColor : inactiveColor,
                 size: 22,
               ),
               const SizedBox(height: 3),
@@ -900,10 +915,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected
-                      ? const Color(0xFF24487A)
-                      : const Color(0xFF94A3B8),
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  color: isSelected ? activeColor : inactiveColor,
                 ),
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/services/notification_permission_service.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -15,12 +16,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF4F7FA);
+    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE0E8ED);
+    final titleColor = isDark ? Colors.white : const Color(0xFF334A5C);
+    final subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF6D8190);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final infoBg = isDark ? const Color(0xFF1E293B) : const Color(0xFFEAF1F5);
+    final infoBorder = isDark ? const Color(0xFF334155) : const Color(0xFFD6E2E9);
+    final infoTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF55758D);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FA),
+      backgroundColor: bgColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF334A5C),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        foregroundColor: isDark ? Colors.white : const Color(0xFF334A5C),
         title: const Text(
           'Pengaturan',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
@@ -29,81 +41,114 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 28),
         children: [
-          const Text(
+          Text(
             'Sesuaikan pengalaman aplikasi',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: _largeTextMode ? 22 : 20,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF334A5C),
+              color: titleColor,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Atur tampilan dan pemberitahuan agar SIP-K tetap nyaman digunakan setiap hari.',
-            style: TextStyle(fontSize: 12, color: Color(0xFF6D8190)),
+            style: TextStyle(
+              fontSize: _largeTextMode ? 14 : 12,
+              color: subtitleColor,
+            ),
           ),
           const SizedBox(height: 22),
+
+          // SEKSI TAMPILAN
           _buildSection(
             title: 'Tampilan',
             icon: Icons.palette_outlined,
+            cardColor: cardColor,
+            borderColor: borderColor,
+            titleColor: titleColor,
             children: [
+              _buildSwitchTile(
+                icon: isDark ? Icons.dark_mode_rounded : Icons.dark_mode_outlined,
+                title: 'Mode Gelap',
+                subtitle: 'Tampilan warna gelap khusus untuk antarmuka pengguna (user).',
+                value: isDark,
+                titleColor: titleColor,
+                subtitleColor: subtitleColor,
+                onChanged: (value) {
+                  setState(() {
+                    ThemeService.setDarkMode(value);
+                  });
+                },
+              ),
+              Divider(height: 1, indent: 16, endIndent: 16, color: dividerColor),
               _buildSwitchTile(
                 icon: Icons.text_fields_rounded,
                 title: 'Teks lebih besar',
-                subtitle:
-                    'Perbesar teks untuk membaca informasi dengan lebih nyaman.',
+                subtitle: 'Perbesar teks untuk membaca informasi dengan lebih nyaman.',
                 value: _largeTextMode,
+                titleColor: titleColor,
+                subtitleColor: subtitleColor,
                 onChanged: (value) => setState(() => _largeTextMode = value),
               ),
             ],
           ),
           const SizedBox(height: 16),
+
+          // SEKSI NOTIFIKASI
           _buildSection(
             title: 'Notifikasi',
             icon: Icons.notifications_none_rounded,
+            cardColor: cardColor,
+            borderColor: borderColor,
+            titleColor: titleColor,
             children: [
               _buildSwitchTile(
                 icon: Icons.assignment_turned_in_outlined,
                 title: 'Status pengajuan dan SPK',
                 subtitle: 'Terima kabar saat pengajuan diverifikasi.',
                 value: _notifStatusEnabled,
-                onChanged: (value) =>
-                    setState(() => _notifStatusEnabled = value),
+                titleColor: titleColor,
+                subtitleColor: subtitleColor,
+                onChanged: (value) => setState(() => _notifStatusEnabled = value),
               ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
+              Divider(height: 1, indent: 16, endIndent: 16, color: dividerColor),
               _buildSwitchTile(
                 icon: Icons.schedule_rounded,
                 title: 'Pengingat pengembalian',
                 subtitle: 'Dapatkan pengingat sebelum waktu dinas berakhir.',
                 value: _notifReminderEnabled,
-                onChanged: (value) =>
-                    setState(() => _notifReminderEnabled = value),
+                titleColor: titleColor,
+                subtitleColor: subtitleColor,
+                onChanged: (value) => setState(() => _notifReminderEnabled = value),
               ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
+              Divider(height: 1, indent: 16, endIndent: 16, color: dividerColor),
               ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.settings_suggest_rounded,
-                    color: Color(0xFF24487A),
+                    color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                     size: 20,
                   ),
                 ),
-                title: const Text(
+                title: Text(
                   'Buka Pengaturan Notifikasi HP',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: _largeTextMode ? 14 : 13,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+                    color: titleColor,
                   ),
                 ),
-                subtitle: const Text(
+                subtitle: Text(
                   'Kelola izin dan suara notifikasi langsung di pengaturan sistem perangkat.',
-                  style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style: TextStyle(
+                    fontSize: _largeTextMode ? 12 : 11,
+                    color: subtitleColor,
+                  ),
                 ),
                 trailing: const Icon(
                   Icons.arrow_forward_ios_rounded,
@@ -115,25 +160,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           const SizedBox(height: 16),
+
+          // INFO BANNER
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF1F5),
+              color: infoBg,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFD6E2E9)),
+              border: Border.all(color: infoBorder),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline_rounded, color: Color(0xFF6F91A8)),
-                SizedBox(width: 12),
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF6F91A8),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Pengaturan tersimpan otomatis di perangkat ini. Anda dapat mengubahnya kapan saja.',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: _largeTextMode ? 13 : 12,
                       height: 1.4,
-                      color: Color(0xFF55758D),
+                      color: infoTextColor,
                     ),
                   ),
                 ),
@@ -148,13 +198,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSection({
     required String title,
     required IconData icon,
+    required Color cardColor,
+    required Color borderColor,
+    required Color titleColor,
     required List<Widget> children,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0E8ED)),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         children: [
@@ -162,14 +215,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 15, 16, 10),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: const Color(0xFF6F91A8)),
+                Icon(
+                  icon,
+                  size: 20,
+                  color: ThemeService.isDarkMode
+                      ? const Color(0xFF60A5FA)
+                      : const Color(0xFF6F91A8),
+                ),
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF334A5C),
+                    color: titleColor,
                   ),
                 ),
               ],
@@ -186,19 +245,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String title,
     required String subtitle,
     required bool value,
+    required Color titleColor,
+    required Color subtitleColor,
     required ValueChanged<bool> onChanged,
   }) {
+    final isDark = ThemeService.isDarkMode;
     return SwitchListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
-      secondary: Icon(icon, color: const Color(0xFF7893A8)),
-      activeThumbColor: const Color(0xFF6F91A8),
+      secondary: Icon(
+        icon,
+        color: isDark
+            ? (value ? const Color(0xFF60A5FA) : const Color(0xFF94A3B8))
+            : (value ? const Color(0xFF2563EB) : const Color(0xFF7893A8)),
+      ),
+      activeThumbColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+      activeTrackColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFBFDBFE),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+        style: TextStyle(
+          fontSize: _largeTextMode ? 14 : 13,
+          fontWeight: FontWeight.w700,
+          color: titleColor,
+        ),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(fontSize: 11, color: Color(0xFF718592)),
+        style: TextStyle(
+          fontSize: _largeTextMode ? 12 : 11,
+          color: subtitleColor,
+        ),
       ),
       value: value,
       onChanged: onChanged,

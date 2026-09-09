@@ -3,6 +3,7 @@ import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/vehicle_detail_screen.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
 import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -85,9 +86,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   void _showNewsDetailDialog(Map<String, String> item) {
+    final isDark = ThemeService.isDarkMode;
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: ClipRRect(
@@ -103,7 +106,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     Container(
                       height: 190,
                       width: double.infinity,
-                      color: const Color(0xFFEFF6FF),
+                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFEFF6FF),
                       child: AppImage(
                         source: item['image']!,
                         fit: BoxFit.cover,
@@ -152,15 +155,17 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
+                              color: isDark
+                                  ? const Color(0xFF1E3A8A).withValues(alpha: 0.5)
+                                  : const Color(0xFFEFF6FF),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               item['tag']!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF2563EB),
+                                color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                               ),
                             ),
                           ),
@@ -176,18 +181,18 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       const SizedBox(height: 10),
                       Text(
                         item['title']!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B),
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         item['desc']!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF475569),
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                           height: 1.5,
                         ),
                       ),
@@ -204,8 +209,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -214,7 +221,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               pinned: true,
               delegate: _StickyHeaderDelegate(
                 child: Container(
-                  color: const Color(0xFFF1F5F9),
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 8,
@@ -248,7 +255,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               ),
                             ),
                           ),
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -257,16 +264,16 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1E293B),
+                                  color: isDark ? Colors.white : const Color(0xFF1E293B),
                                   letterSpacing: 0.2,
                                 ),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
                                 'Provinsi Jawa Timur',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Color(0xFF64748B),
+                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -398,14 +405,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     const SizedBox(height: 22),
 
                     // INFORMASI & PENGUMUMAN
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         'Informasi & Pengumuman',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF1E293B),
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                         ),
                       ),
                     ),
@@ -431,10 +438,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                     horizontal: 18,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: const Color(0xFFE2E8F0),
+                                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                                     ),
                                     boxShadow: [
                                       BoxShadow(
@@ -529,10 +536,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                                 item['title']!,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF1E293B),
+                                                  color: isDark ? Colors.white : const Color(0xFF1E293B),
                                                 ),
                                               ),
                                               const SizedBox(height: 3),
@@ -540,9 +547,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                                 item['desc']!,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 11,
-                                                  color: Color(0xFF64748B),
+                                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                                 ),
                                               ),
                                             ],
@@ -571,10 +578,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(5),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: const Color(0xFFCBD5E1),
+                                    color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
                                   ),
                                   boxShadow: [
                                     BoxShadow(
@@ -589,8 +596,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                   Icons.chevron_left_rounded,
                                   size: 20,
                                   color: _currentNewsIndex > 0
-                                      ? const Color(0xFF24487A)
-                                      : const Color(0xFFCBD5E1),
+                                      ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A))
+                                      : (isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1)),
                                 ),
                               ),
                             ),
@@ -611,10 +618,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(5),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: const Color(0xFFCBD5E1),
+                                    color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
                                   ),
                                   boxShadow: [
                                     BoxShadow(
@@ -630,8 +637,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                   size: 20,
                                   color:
                                       _currentNewsIndex < _newsList.length - 1
-                                      ? const Color(0xFF24487A)
-                                      : const Color(0xFFCBD5E1),
+                                      ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A))
+                                      : (isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1)),
                                 ),
                               ),
                             ),
@@ -665,14 +672,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     const SizedBox(height: 24),
 
                     // ARMADA REKOMENDASI
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         'Armada Rekomendasi',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF1E293B),
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                         ),
                       ),
                     ),
@@ -696,17 +703,17 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: isDark ? const Color(0xFF1E293B) : Colors.white,
                               borderRadius: BorderRadius.circular(18),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.04),
+                                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
                               border: Border.all(
-                                color: const Color(0xFFE2E8F0),
+                                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                               ),
                             ),
                             child: Column(
@@ -745,18 +752,18 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                         item.name,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
-                                          color: Color(0xFF1E293B),
+                                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                                         ),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         item.plateNumber,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
-                                          color: Color(0xFF64748B),
+                                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                           fontFamily: 'monospace',
                                         ),
                                       ),

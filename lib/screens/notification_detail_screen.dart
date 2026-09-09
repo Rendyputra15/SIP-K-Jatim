@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:simodis_jatim/models/notification_model.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class NotificationDetailScreen extends StatelessWidget {
   final AppNotification notification;
@@ -10,37 +10,37 @@ class NotificationDetailScreen extends StatelessWidget {
     required this.notification,
   });
 
-  Color _getIconBg(NotificationType type) {
+  Color _getIconBg(NotificationType type, bool isDark) {
     switch (type) {
       case NotificationType.welcome:
-        return const Color(0xFFEFF6FF);
+        return isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
       case NotificationType.submitted:
-        return const Color(0xFFFEF3C7);
+        return isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7);
       case NotificationType.approved:
-        return const Color(0xFFDCFCE7);
+        return isDark ? const Color(0xFF166534) : const Color(0xFFDCFCE7);
       case NotificationType.rejected:
-        return const Color(0xFFFEE2E2);
+        return isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2);
       case NotificationType.maintenance:
-        return const Color(0xFFF3E8FF);
+        return isDark ? const Color(0xFF581C87) : const Color(0xFFF3E8FF);
       case NotificationType.reminder:
-        return const Color(0xFFE0F2FE);
+        return isDark ? const Color(0xFF0C4A6E) : const Color(0xFFE0F2FE);
     }
   }
 
-  Color _getIconColor(NotificationType type) {
+  Color _getIconColor(NotificationType type, bool isDark) {
     switch (type) {
       case NotificationType.welcome:
-        return const Color(0xFF2563EB);
+        return isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
       case NotificationType.submitted:
-        return const Color(0xFFD97706);
+        return isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
       case NotificationType.approved:
-        return const Color(0xFF16A34A);
+        return isDark ? const Color(0xFF86EFAC) : const Color(0xFF16A34A);
       case NotificationType.rejected:
-        return const Color(0xFFDC2626);
+        return isDark ? const Color(0xFFFCA5A5) : const Color(0xFFDC2626);
       case NotificationType.maintenance:
-        return const Color(0xFF7E22CE);
+        return isDark ? const Color(0xFFC084FC) : const Color(0xFF7E22CE);
       case NotificationType.reminder:
-        return const Color(0xFF0284C7);
+        return isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
     }
   }
 
@@ -72,13 +72,13 @@ class NotificationDetailScreen extends StatelessWidget {
       case NotificationType.rejected:
         return 'Pengajuan Ditolak';
       case NotificationType.maintenance:
-        return 'Pemeliharaan Unit';
+        return 'Info Pemeliharaan';
       case NotificationType.reminder:
-        return 'Pengingat Dinas';
+        return 'Pengingat Jadwal';
     }
   }
 
-  Widget _buildGuidanceBox(NotificationType type) {
+  Widget _buildTipCard(NotificationType type, bool isDark) {
     Color bg;
     Color border;
     Color textColor;
@@ -88,36 +88,36 @@ class NotificationDetailScreen extends StatelessWidget {
 
     switch (type) {
       case NotificationType.approved:
-        bg = const Color(0xFFF0FDF4);
-        border = const Color(0xFFBBF7D0);
-        textColor = const Color(0xFF15803D);
-        icon = Icons.verified_user_rounded;
-        title = 'Petunjuk Pengambilan Armada';
+        bg = isDark ? const Color(0xFF166534) : const Color(0xFFF0FDF4);
+        border = isDark ? const Color(0xFF22C55E) : const Color(0xFFBBF7D0);
+        textColor = isDark ? const Color(0xFF86EFAC) : const Color(0xFF166534);
+        icon = Icons.check_circle_outline_rounded;
+        title = 'Petunjuk Langkah Selanjutnya';
         content =
-            'Pengajuan telah disahkan. Silakan tunjukkan berkas Nota Dinas / lembar SPK digital ini ke loket pengelola pool kendaraan untuk serah terima kunci kontak, STNK, dan pengecekan fisik unit.';
+            'Silakan bawa Nota Dinas / Surat Tugas ke Loket Pengelola Aset Gedung A Dinsos Jatim untuk serah terima kunci kontak dan kendaraan dinas.';
         break;
       case NotificationType.rejected:
-        bg = const Color(0xFFFEF2F2);
-        border = const Color(0xFFFECACA);
-        textColor = const Color(0xFFB91C1C);
+        bg = isDark ? const Color(0xFF991B1B) : const Color(0xFFFEF2F2);
+        border = isDark ? const Color(0xFFEF4444) : const Color(0xFFFECACA);
+        textColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C);
         icon = Icons.info_outline_rounded;
         title = 'Petunjuk Penolakan Pengajuan';
         content =
             'Permohonan armada belum dapat disetujui. Periksa kembali kelengkapan administrasi Nota Dinas atau konsultasikan dengan atasan/Kasubag Umum untuk rekomendasi jadwal armada pengganti.';
         break;
       case NotificationType.maintenance:
-        bg = const Color(0xFFFAF5FF);
-        border = const Color(0xFFE9D5FF);
-        textColor = const Color(0xFF6B21A8);
+        bg = isDark ? const Color(0xFF581C87) : const Color(0xFFFAF5FF);
+        border = isDark ? const Color(0xFFA855F7) : const Color(0xFFE9D5FF);
+        textColor = isDark ? const Color(0xFFE9D5FF) : const Color(0xFF6B21A8);
         icon = Icons.car_repair_rounded;
         title = 'Status Pemeliharaan Berkala';
         content =
             'Armada yang bersangkutan sedang dalam pemeliharaan rutin keselamatan jalan demi kelancaran tugas dinas sosial. Unit akan kembali tersedia setelah pengecekan teknis selesai.';
         break;
       case NotificationType.submitted:
-        bg = const Color(0xFFFFFBEB);
-        border = const Color(0xFFFDE68A);
-        textColor = const Color(0xFFB45309);
+        bg = isDark ? const Color(0xFF78350F) : const Color(0xFFFFFBEB);
+        border = isDark ? const Color(0xFFF59E0B) : const Color(0xFFFDE68A);
+        textColor = isDark ? const Color(0xFFFDE68A) : const Color(0xFFB45309);
         icon = Icons.hourglass_bottom_rounded;
         title = 'Status Antrean Verifikasi';
         content =
@@ -125,9 +125,9 @@ class NotificationDetailScreen extends StatelessWidget {
         break;
       case NotificationType.welcome:
       case NotificationType.reminder:
-        bg = const Color(0xFFEFF6FF);
-        border = const Color(0xFFBFDBFE);
-        textColor = const Color(0xFF1E40AF);
+        bg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+        border = isDark ? const Color(0xFF3B82F6) : const Color(0xFFBFDBFE);
+        textColor = isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF);
         icon = Icons.lightbulb_rounded;
         title = 'Ketentuan Operasional Dinsos Jatim';
         content =
@@ -179,18 +179,18 @@ class NotificationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconBg = _getIconBg(notification.type);
-    final iconColor = _getIconColor(notification.type);
+    final isDark = ThemeService.isDarkMode;
+    final iconBg = _getIconBg(notification.type, isDark);
+    final iconColor = _getIconColor(notification.type, isDark);
     final icon = _getIcon(notification.type);
     final tagLabel = _getTagLabel(notification.type);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      // 1. APP BAR RESMI SIP-K
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
-          color: const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
           padding: const EdgeInsets.fromLTRB(10, 10, 20, 8),
           child: SafeArea(
             bottom: false,
@@ -198,15 +198,15 @@ class NotificationDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: Color(0xFF1E293B),
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                   onPressed: () => Navigator.pop(context),
                   tooltip: 'Kembali',
                 ),
                 const SizedBox(width: 4),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -215,16 +215,16 @@ class NotificationDetailScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1E293B),
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                         letterSpacing: 0.2,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
                       'Informasi lengkap aktivitas dan pengajuan armada',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -235,7 +235,6 @@ class NotificationDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      // 2. KONTEN DETAIL HALAMAN PENUH
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 32),
         child: Column(
@@ -246,12 +245,14 @@ class NotificationDetailScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -260,7 +261,6 @@ class NotificationDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Baris Kategori & Waktu
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -302,58 +302,56 @@ class NotificationDetailScreen extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           notification.time,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF64748B),
+                            color: isDark ? Colors.white : const Color(0xFF64748B),
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-
-                  // Judul Notifikasi
                   Text(
                     notification.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                       height: 1.3,
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // Ringkasan Cepat
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
+                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFFEDF2F7)),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFEDF2F7),
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.short_text_rounded,
                           size: 18,
-                          color: Color(0xFF64748B),
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             notification.message,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              color: Color(0xFF475569),
+                              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                               height: 1.4,
                             ),
                           ),
@@ -371,12 +369,14 @@ class NotificationDetailScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -385,116 +385,48 @@ class NotificationDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Informasi Pengenal & Jadwal',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
-                  const SizedBox(height: 14),
-
-                  // Waktu Lengkap
+                  const SizedBox(height: 12),
                   _buildMetaRow(
                     icon: Icons.calendar_today_rounded,
-                    label: 'Tanggal & Waktu',
-                    value: notification.fullDate,
+                    label: 'Tanggal Diterima',
+                    value:
+                        '${notification.createdAt.day.toString().padLeft(2, '0')}/${notification.createdAt.month.toString().padLeft(2, '0')}/${notification.createdAt.year} (${notification.time})',
+                    isDark: isDark,
                   ),
-                  const Divider(height: 20, color: Color(0xFFF1F5F9)),
-
-                  // Nomor Referensi Resmi
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.receipt_long_rounded,
-                        size: 16,
-                        color: Color(0xFF64748B),
-                      ),
-                      const SizedBox(width: 8),
-                      const SizedBox(
-                        width: 110,
-                        child: Text(
-                          'No. Registrasi',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF64748B),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                notification.referenceNumber,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1E293B),
-                                  fontFamily: 'monospace',
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Clipboard.setData(
-                                  ClipboardData(
-                                    text: notification.referenceNumber,
-                                  ),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Nomor referensi ${notification.referenceNumber} disalin!',
-                                    ),
-                                    duration: const Duration(seconds: 2),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(6),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Icon(
-                                      Icons.copy_rounded,
-                                      size: 14,
-                                      color: Color(0xFF24487A),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      'Salin',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF24487A),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 10),
+                  _buildMetaRow(
+                    icon: Icons.tag_rounded,
+                    label: 'ID Notifikasi',
+                    value: '#NOTIF-${notification.id}',
+                    isDark: isDark,
                   ),
-                  const Divider(height: 20, color: Color(0xFFF1F5F9)),
-
-                  // Status Verifikasi Akun
+                  const SizedBox(height: 10),
+                  _buildMetaRow(
+                    icon: Icons.mark_email_read_outlined,
+                    label: 'Status Keterbacaan',
+                    value: notification.isRead
+                        ? 'Telah Dibaca (Sudah Dilihat)'
+                        : 'Baru (Belum Dibaca)',
+                    valueColor: notification.isRead
+                        ? const Color(0xFF16A34A)
+                        : const Color(0xFF2563EB),
+                    isDark: isDark,
+                  ),
+                  Divider(height: 24, color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
                   _buildMetaRow(
                     icon: Icons.shield_outlined,
                     label: 'Status Berkas',
                     value: 'Terkonfirmasi di Database SIP-K',
                     valueColor: const Color(0xFF16A34A),
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -506,12 +438,14 @@ class NotificationDetailScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -521,19 +455,19 @@ class NotificationDetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: const [
+                    children: [
                       Icon(
                         Icons.article_outlined,
                         size: 18,
-                        color: Color(0xFF24487A),
+                        color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'Rincian Informasi & Deskripsi',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B),
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                         ),
                       ),
                     ],
@@ -541,9 +475,9 @@ class NotificationDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     notification.detailContent,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13.5,
-                      color: Color(0xFF334155),
+                      color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
                       height: 1.6,
                       letterSpacing: 0.1,
                     ),
@@ -554,7 +488,7 @@ class NotificationDetailScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // PETUNJUK KHUSUS SESUAI TIPE NOTIFIKASI
-            _buildGuidanceBox(notification.type),
+            _buildTipCard(notification.type, isDark),
             const SizedBox(height: 24),
 
             // TOMBOL KEMBALI
@@ -589,19 +523,20 @@ class NotificationDetailScreen extends StatelessWidget {
     required String label,
     required String value,
     Color? valueColor,
+    required bool isDark,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: const Color(0xFF64748B)),
+        Icon(icon, size: 16, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
         const SizedBox(width: 8),
         SizedBox(
           width: 110,
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF64748B),
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
             ),
           ),
         ),
@@ -611,7 +546,7 @@ class NotificationDetailScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: valueColor ?? const Color(0xFF1E293B),
+              color: valueColor ?? (isDark ? Colors.white : const Color(0xFF1E293B)),
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/widgets/app_image.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
   final Vehicle vehicle;
@@ -44,15 +45,16 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     final isAvailable = widget.vehicle.status == VehicleStatus.tersedia;
     final images = widget.vehicle.allImages;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
-          color: const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
           padding: const EdgeInsets.fromLTRB(10, 10, 20, 8),
           child: SafeArea(
             bottom: false,
@@ -60,14 +62,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: Color(0xFF1E293B),
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
                 const SizedBox(width: 4),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -76,16 +78,16 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1E293B),
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                         letterSpacing: 0.2,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
                       'Spesifikasi dan kelayakan fisik armada',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -104,7 +106,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
             Container(
               height: 230,
               width: double.infinity,
-              color: const Color(0xFFE2E8F0),
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
               child: Stack(
                 children: [
                   PageView.builder(
@@ -118,7 +120,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                     },
                   ),
 
-                  // Indikator Badge Posisi Foto (Contoh: "1 / 4")
+                  // Indikator Foto
                   if (images.length > 1)
                     Positioned(
                       bottom: 12,
@@ -130,26 +132,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.65),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.photo_library_rounded,
-                              size: 12,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              '${_currentImageIndex + 1} / ${images.length}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          '${_currentImageIndex + 1}/${images.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -214,18 +205,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                           children: [
                             Text(
                               widget.vehicle.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E293B),
+                                color: isDark ? Colors.white : const Color(0xFF1E293B),
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               widget.vehicle.plateNumber,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
-                                color: Color(0xFF64748B),
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                 fontFamily: 'monospace',
                                 fontWeight: FontWeight.w600,
                               ),
@@ -240,8 +231,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isAvailable
-                              ? const Color(0xFFDCFCE7)
-                              : const Color(0xFFFEE2E2),
+                              ? (isDark ? const Color(0xFF166534) : const Color(0xFFDCFCE7))
+                              : (isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -250,20 +241,20 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: isAvailable
-                                ? const Color(0xFF15803D)
-                                : const Color(0xFFB91C1C),
+                                ? (isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D))
+                                : (isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C)),
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Spesifikasi & Keadaan Fisik',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -273,16 +264,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         'Merk Unit',
                         widget.vehicle.brand,
                         Icons.directions_car_outlined,
-                        const Color(0xFFEFF6FF),
-                        const Color(0xFF2563EB),
+                        isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+                        isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                        isDark,
                       ),
                       const SizedBox(width: 10),
                       _buildSpecCard(
                         'Warna Body',
                         widget.vehicle.color,
                         Icons.palette_outlined,
-                        const Color(0xFFFDF2F8),
-                        const Color(0xFFDB2777),
+                        isDark ? const Color(0xFF831843) : const Color(0xFFFDF2F8),
+                        isDark ? const Color(0xFFF472B6) : const Color(0xFFDB2777),
+                        isDark,
                       ),
                     ],
                   ),
@@ -293,16 +286,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         'Sisa BBM',
                         widget.vehicle.fuelDisplay,
                         Icons.local_gas_station_rounded,
-                        const Color(0xFFFEF3C7),
-                        const Color(0xFFD97706),
+                        isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7),
+                        isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+                        isDark,
                       ),
                       const SizedBox(width: 10),
                       _buildSpecCard(
                         'Jenis BBM',
                         widget.vehicle.fuelType,
                         Icons.ev_station_rounded,
-                        const Color(0xFFECFDF5),
-                        const Color(0xFF059669),
+                        isDark ? const Color(0xFF065F46) : const Color(0xFFECFDF5),
+                        isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                        isDark,
                       ),
                     ],
                   ),
@@ -313,16 +308,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         'Odometer (KM)',
                         '${widget.vehicle.currentOdometer} KM',
                         Icons.speed_rounded,
-                        const Color(0xFFF1F5F9),
-                        const Color(0xFF475569),
+                        isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                        isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                        isDark,
                       ),
                       const SizedBox(width: 10),
                       _buildSpecCard(
                         'Transmisi',
                         widget.vehicle.transmission,
                         Icons.tune_rounded,
-                        const Color(0xFFF3E8FF),
-                        const Color(0xFF7E22CE),
+                        isDark ? const Color(0xFF581C87) : const Color(0xFFF3E8FF),
+                        isDark ? const Color(0xFFC084FC) : const Color(0xFF7E22CE),
+                        isDark,
                       ),
                     ],
                   ),
@@ -333,8 +330,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         'Kapasitas',
                         '${widget.vehicle.capacity} Orang',
                         Icons.groups_rounded,
-                        const Color(0xFFEFF6FF),
-                        const Color(0xFF1D4ED8),
+                        isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+                        isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8),
+                        isDark,
                       ),
                       const SizedBox(width: 10),
                       _buildSpecCard(
@@ -345,18 +343,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         widget.vehicle.type == VehicleType.mobil
                             ? Icons.commute_rounded
                             : Icons.two_wheeler_rounded,
-                        const Color(0xFFF8FAFC),
-                        const Color(0xFF334155),
+                        isDark ? const Color(0xFF334155) : const Color(0xFFF8FAFC),
+                        isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                        isDark,
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Catatan Kondisi Fisik Unit',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -364,12 +363,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
+                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -381,22 +382,22 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEF3C7),
+                            color: isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.fact_check_outlined,
                             size: 18,
-                            color: Color(0xFFD97706),
+                            color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             widget.vehicle.conditionNote,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              color: Color(0xFF475569),
+                              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                               height: 1.4,
                             ),
                           ),
@@ -446,14 +447,17 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
     IconData icon,
     Color bgIconColor,
     Color iconColor,
+    bool isDark,
   ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          ),
         ),
         child: Row(
           children: [
@@ -472,18 +476,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: Color(0xFF64748B),
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

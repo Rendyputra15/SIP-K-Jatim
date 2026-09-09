@@ -3,6 +3,7 @@ import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/screens/loan_form_screen.dart';
 import 'package:simodis_jatim/widgets/app_header_profile_avatar.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class LoanFlowScreen extends StatelessWidget {
   final List<Vehicle> vehicles;
@@ -33,12 +34,14 @@ class LoanFlowScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(76.0),
         child: Container(
-          color: const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SafeArea(
             bottom: false,
@@ -46,7 +49,7 @@ class LoanFlowScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -55,16 +58,16 @@ class LoanFlowScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1E293B),
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                         letterSpacing: 0.2,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
                       'Panduan alur operasional armada dinas',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -88,15 +91,17 @@ class LoanFlowScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF24487A), Color(0xFF1E3A8A)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? const [Color(0xFF1E3A8A), Color(0xFF2563EB)]
+                      : const [Color(0xFF24487A), Color(0xFF1E3A8A)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF24487A).withValues(alpha: 0.22),
+                    color: const Color(0xFF24487A).withValues(alpha: isDark ? 0.4 : 0.22),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -107,7 +112,7 @@ class LoanFlowScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.alt_route_rounded, color: Colors.white, size: 28),
@@ -118,19 +123,19 @@ class LoanFlowScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'SOP Peminjaman Armada',
+                          'Alur Mudah & Transparan',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 2),
                         Text(
-                          'Ikuti 3 tahapan resmi di bawah ini untuk memperoleh Surat Perintah Kerja (SPK) dinas.',
+                          'Ikuti 3 langkah mudah berikut untuk mengajukan permohonan pinjam armada dinas.',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
+                            fontSize: 11.5,
+                            color: Color(0xFFF1F5F9),
                             height: 1.35,
                           ),
                         ),
@@ -141,40 +146,33 @@ class LoanFlowScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
 
-            const Text(
-              'Tahapan Alur Peminjaman',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF1E293B),
-              ),
-            ),
-            const SizedBox(height: 14),
-
+            // Timeline Steps
             _buildTimelineStep(
               stepNumber: '1',
-              title: 'Mengajukan Permohonan',
-              subtitle: 'Pengisian Formulir & Dokumen',
-              description: 'Pegawai mengisi formulir peminjaman dengan memilih unit armada yang tersedia, mencantumkan tanggal tugas, tujuan dinas, serta mengunggah scan Nota Dinas / Surat Perintah Tugas (SPT).',
+              title: 'Isi Formulir & Upload Nota',
+              subtitle: 'Formulir Peminjaman & Softfile Nota Dinas',
+              description: 'Lengkapi data peminjam, instansi/bidang, tanggal penggunaan, serta upload scan Nota Dinas resmi atau Surat Tugas.',
               icon: Icons.edit_note_rounded,
-              iconColor: const Color(0xFF2563EB),
-              badgeColor: const Color(0xFFDBEAFE),
-              badgeText: 'Tahap Input',
+              iconColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+              badgeColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+              badgeText: 'Tahap 1',
               isLast: false,
+              isDark: isDark,
             ),
 
             _buildTimelineStep(
               stepNumber: '2',
-              title: 'Diproses & Diverifikasi',
-              subtitle: 'Review oleh Kasubag Umum',
-              description: 'Permohonan masuk ke antrean verifikasi Pengelola Aset dan Kasubag Umum Dinsos Jatim untuk memeriksa kelengkapan administrasi serta kesesuaian jadwal penggunaan kendaraan.',
-              icon: Icons.hourglass_top_rounded,
-              iconColor: const Color(0xFFD97706),
-              badgeColor: const Color(0xFFFEF3C7),
-              badgeText: 'Tahap Verifikasi',
+              title: 'Verifikasi Pengelola Aset',
+              subtitle: 'Pengecekan Kasubag Umum & Aset',
+              description: 'Tim pengelola aset Dinsos Jatim akan memverifikasi kesesuaian jadwal dan ketersediaan armada dalam waktu 1-3 jam jam kerja.',
+              icon: Icons.verified_user_rounded,
+              iconColor: isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+              badgeColor: isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7),
+              badgeText: 'Tahap 2',
               isLast: false,
+              isDark: isDark,
             ),
 
             _buildTimelineStep(
@@ -183,10 +181,11 @@ class LoanFlowScreen extends StatelessWidget {
               subtitle: 'Penerbitan SPK & Pengambilan Kunci',
               description: 'Setelah permohonan disetujui, nomor Surat Perintah Kerja (SPK) terbit secara otomatis. Pegawai dapat mengambil kunci kontak dan STNK asli di loket pengelola aset Gedung A Dinsos Jatim.',
               icon: Icons.check_circle_rounded,
-              iconColor: const Color(0xFF16A34A),
-              badgeColor: const Color(0xFFDCFCE7),
+              iconColor: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
+              badgeColor: isDark ? const Color(0xFF166534) : const Color(0xFFDCFCE7),
               badgeText: 'Tahap Akhir',
               isLast: true,
+              isDark: isDark,
             ),
 
             const SizedBox(height: 14),
@@ -195,32 +194,38 @@ class LoanFlowScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.info_outline_rounded, color: Color(0xFF24487A), size: 18),
-                      SizedBox(width: 8),
+                      Icon(
+                        Icons.info_outline_rounded,
+                        color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
                       Text(
                         'Ketentuan Penggunaan Armada',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B),
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  _buildRequirementItem('Wajib memiliki SIM A / SIM C yang masih berlaku aktif.'),
-                  _buildRequirementItem('Nota Dinas / Surat Tugas harus ditandatangani Kepala Bidang.'),
-                  _buildRequirementItem('Wajib mengembalikan armada tepat waktu dan mengisi form BAST.'),
-                  _buildRequirementItem('Menjaga kebersihan dan memeriksa kondisi fisik unit saat selesai.'),
+                  _buildRequirementItem('Wajib memiliki SIM A / SIM C yang masih berlaku aktif.', isDark),
+                  _buildRequirementItem('Nota Dinas / Surat Tugas harus ditandatangani Kepala Bidang.', isDark),
+                  _buildRequirementItem('Wajib mengembalikan armada tepat waktu dan mengisi form BAST.', isDark),
+                  _buildRequirementItem('Menjaga kebersihan dan memeriksa kondisi fisik unit saat selesai.', isDark),
                 ],
               ),
             ),
@@ -231,10 +236,10 @@ class LoanFlowScreen extends StatelessWidget {
       bottomSheet: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
               blurRadius: 10,
               offset: const Offset(0, -3),
             ),
@@ -247,7 +252,7 @@ class LoanFlowScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () => _navigateToForm(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF24487A),
+                backgroundColor: isDark ? const Color(0xFF2563EB) : const Color(0xFF24487A),
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -258,8 +263,11 @@ class LoanFlowScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Lanjutkan ke Formulir Permohonan',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    'Mulai Isi Formulir Peminjaman',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(width: 8),
                   Icon(Icons.arrow_forward_rounded, size: 18),
@@ -282,6 +290,7 @@ class LoanFlowScreen extends StatelessWidget {
     required Color badgeColor,
     required String badgeText,
     required bool isLast,
+    required bool isDark,
   }) {
     return IntrinsicHeight(
       child: Row(
@@ -293,12 +302,13 @@ class LoanFlowScreen extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF24487A),
+                  color: isDark ? const Color(0xFF2563EB) : const Color(0xFF24487A),
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF24487A).withValues(alpha: 0.25),
+                      color: (isDark ? const Color(0xFF2563EB) : const Color(0xFF24487A))
+                          .withValues(alpha: 0.3),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -320,7 +330,7 @@ class LoanFlowScreen extends StatelessWidget {
                   child: Container(
                     width: 2,
                     margin: const EdgeInsets.symmetric(vertical: 4),
-                    color: const Color(0xFFCBD5E1),
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
                   ),
                 ),
             ],
@@ -331,12 +341,14 @@ class LoanFlowScreen extends StatelessWidget {
               margin: EdgeInsets.only(bottom: isLast ? 0 : 16),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -354,10 +366,10 @@ class LoanFlowScreen extends StatelessWidget {
                           const SizedBox(width: 6),
                           Text(
                             title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                              color: isDark ? Colors.white : const Color(0xFF1E293B),
                             ),
                           ),
                         ],
@@ -379,21 +391,21 @@ class LoanFlowScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: Color(0xFF64748B),
+                      color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11.5,
-                      color: Color(0xFF475569),
+                      color: isDark ? const Color(0xFFF1F5F9) : const Color(0xFF475569),
                       height: 1.4,
                     ),
                   ),
@@ -406,21 +418,30 @@ class LoanFlowScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRequirementItem(String text) {
+  Widget _buildRequirementItem(String text, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 4),
-            child: Icon(Icons.check_circle_outline_rounded, size: 13, color: Color(0xFF16A34A)),
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Icon(
+              Icons.check_circle_outline_rounded,
+              size: 13,
+              color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 11.5, color: Color(0xFF475569), height: 1.3),
+              style: TextStyle(
+                fontSize: 11.5,
+                color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF334155),
+                height: 1.3,
+                fontWeight: isDark ? FontWeight.w500 : FontWeight.normal,
+              ),
             ),
           ),
         ],
