@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:simodis_jatim/models/loan_model.dart';
+import 'package:simodis_jatim/models/vehicle_model.dart';
+import 'package:simodis_jatim/screens/admin/admin_queue_analytics_screen.dart';
 import 'package:simodis_jatim/screens/admin/widgets/admin_stat_card.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class AdminDashboardTab extends StatelessWidget {
   final int pendingCount;
   final int activeCount;
   final int completedCount;
   final int totalVehicles;
+  final List<LoanRequest>? requests;
+  final List<Vehicle>? vehicles;
+  final Function(LoanRequest, bool)? onVerify;
 
   const AdminDashboardTab({
     super.key,
@@ -13,21 +20,30 @@ class AdminDashboardTab extends StatelessWidget {
     required this.activeCount,
     required this.completedCount,
     required this.totalVehicles,
+    this.requests,
+    this.vehicles,
+    this.onVerify,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
+    final headerColor = isDark ? Colors.white : const Color(0xFF1E293B);
+    final containerBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Ringkasan Operasional',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1E293B),
+              color: headerColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -39,9 +55,21 @@ class AdminDashboardTab extends StatelessWidget {
                 AdminStatCard(
                   title: 'Antrean Masuk',
                   value: pendingCount.toString(),
-                  sub: 'Butuh Verifikasi',
+                  sub: 'Butuh Verifikasi • Ketuk untuk Grafik ↗',
                   icon: Icons.hourglass_empty_rounded,
                   color: const Color(0xFFF59E0B),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AdminQueueAnalyticsScreen(
+                          requests: requests ?? [],
+                          vehicles: vehicles ?? [],
+                          onVerify: onVerify,
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 AdminStatCard(
                   title: 'Armada Jalan',
@@ -108,12 +136,12 @@ class AdminDashboardTab extends StatelessWidget {
           ),
 
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Log Aktivitas Terakhir',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1E293B),
+              color: headerColor,
             ),
           ),
           const SizedBox(height: 12),
@@ -122,29 +150,29 @@ class AdminDashboardTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: containerBg,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: borderColor),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                AdminLogItem(
+                const AdminLogItem(
                   title: 'Persetujuan Peminjaman',
                   desc: 'Admin menyetujui Toyota Innova (L 1023 SP)',
                   time: '10 Menit lalu',
                   icon: Icons.check_circle_outline,
                   color: Colors.green,
                 ),
-                Divider(height: 24),
-                AdminLogItem(
+                Divider(height: 24, color: dividerColor),
+                const AdminLogItem(
                   title: 'BAST Masuk',
                   desc: 'Pengembalian Unit Mitsubishi Pajero (L 4444 AS)',
                   time: '1 Jam lalu',
                   icon: Icons.assignment_returned_outlined,
                   color: Colors.blue,
                 ),
-                Divider(height: 24),
-                AdminLogItem(
+                Divider(height: 24, color: dividerColor),
+                const AdminLogItem(
                   title: 'User Baru',
                   desc: 'Penambahan Akun Pegawai: Alamsyah',
                   time: '3 Jam lalu',

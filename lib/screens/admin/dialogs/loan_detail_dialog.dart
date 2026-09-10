@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class LoanDetailDialog {
   static void show(
@@ -7,6 +8,7 @@ class LoanDetailDialog {
     required LoanRequest loan,
     required Function(LoanRequest, bool) onVerify,
   }) {
+    final isDark = ThemeService.isDarkMode;
     final durationDays = loan.endDate.difference(loan.startDate).inDays + 1;
     final isPending =
         loan.status == LoanStatus.menunggu || loan.status == LoanStatus.pending;
@@ -29,20 +31,26 @@ class LoanDetailDialog {
               width: 120,
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                ),
               ),
             ),
-            const Text(
+            Text(
               ': ',
-              style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              style: TextStyle(
+                fontSize: 11,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
             ),
             Expanded(
               child: Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
                 ),
               ),
             ),
@@ -59,6 +67,7 @@ class LoanDetailDialog {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -77,7 +86,10 @@ class LoanDetailDialog {
             approve
                 ? 'Sistem akan otomatis mengirimkan Softfile Nota Dinas resmi ke akun pemohon ${loan.borrowerName} untuk dicetak.'
                 : 'Permohonan peminjaman armada oleh ${loan.borrowerName} akan ditolak.',
-            style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+            ),
           ),
           actions: [
             TextButton(
@@ -120,6 +132,7 @@ class LoanDetailDialog {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -138,12 +151,12 @@ class LoanDetailDialog {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Detail Pengajuan Peminjaman',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                       ),
                     ),
                     InkWell(
@@ -165,13 +178,16 @@ class LoanDetailDialog {
                     fontFamily: 'monospace',
                   ),
                 ),
-                const Divider(height: 20, color: Color(0xFFE2E8F0)),
+                Divider(
+                  height: 20,
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
 
                 // Informasi Waktu Masuk Sistem (Jam & Menit)
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -186,19 +202,19 @@ class LoanDetailDialog {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Waktu Pengajuan Diterima:',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Color(0xFF64748B),
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                               ),
                             ),
                             Text(
                               formatDateTimeFull(loan.submittedAt),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E293B),
+                                color: isDark ? Colors.white : const Color(0xFF1E293B),
                               ),
                             ),
                           ],
@@ -209,12 +225,12 @@ class LoanDetailDialog {
                 ),
                 const SizedBox(height: 14),
 
-                const Text(
+                Text(
                   'Data Pemohon & Kendaraan',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF24487A),
+                    color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF24487A),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -232,12 +248,12 @@ class LoanDetailDialog {
                 ),
 
                 const SizedBox(height: 14),
-                const Text(
+                Text(
                   'Rincian Penugasan Dinas',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF24487A),
+                    color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF24487A),
                   ),
                 ),
                 const SizedBox(height: 8),

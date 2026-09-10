@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/screens/admin/dialogs/user_form_dialog.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class AdminUsersTab extends StatefulWidget {
   final UserRole targetRole;
@@ -33,6 +34,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     final filtered =
         widget.userList.where((u) {
           final q = _userSearchQuery.toLowerCase();
@@ -45,7 +47,14 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
       children: [
         Container(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            border: Border(
+              bottom: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -58,19 +67,19 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                       children: [
                         Text(
                           widget.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 14,
-                            color: Color(0xFF1E293B),
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Text(
                           widget.subtitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF64748B),
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -120,7 +129,10 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
               const SizedBox(height: 10),
               TextField(
                 onChanged: (val) => setState(() => _userSearchQuery = val),
-                style: const TextStyle(fontSize: 12),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
                 decoration: InputDecoration(
                   hintText: 'Cari berdasarkan nama, NIP, atau bidang...',
                   hintStyle: const TextStyle(
@@ -133,16 +145,20 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                     color: Color(0xFF94A3B8),
                   ),
                   filled: true,
-                  fillColor: const Color(0xFFF8FAFC),
+                  fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    ),
                   ),
                 ),
               ),
@@ -152,10 +168,13 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
         Expanded(
           child:
               filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                     child: Text(
                       'Tidak ada akun yang cocok',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
                     ),
                   )
                   : ListView.builder(
@@ -167,9 +186,11 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -177,16 +198,16 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               radius: 20,
                               backgroundColor:
                                   widget.targetRole == UserRole.admin
-                                      ? const Color(0xFFDBEAFE)
-                                      : const Color(0xFFF1F5F9),
+                                      ? (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFDBEAFE))
+                                      : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
                               child: Icon(
                                 widget.targetRole == UserRole.admin
                                     ? Icons.admin_panel_settings_rounded
                                     : Icons.person_rounded,
                                 color:
                                     widget.targetRole == UserRole.admin
-                                        ? const Color(0xFF1E40AF)
-                                        : const Color(0xFF64748B),
+                                        ? (isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF))
+                                        : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                                 size: 20,
                               ),
                             ),
@@ -197,10 +218,10 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                 children: [
                                   Text(
                                     user.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
-                                      color: Color(0xFF1E293B),
+                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                                     ),
                                   ),
                                   const SizedBox(height: 2),

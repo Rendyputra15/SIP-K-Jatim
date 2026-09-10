@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/screens/home_screen.dart';
-import 'package:simodis_jatim/services/theme_service.dart';
 import 'package:simodis_jatim/widgets/notification_permission_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -57,9 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         if (targetRole != null) {
-          if (targetRole != 'user') {
-            ThemeService.setDarkMode(false);
-          }
           _showLoginSuccessLoading(targetRole, roleLabel);
         } else {
           setState(() => _isLoading = false);

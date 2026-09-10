@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class VehicleFormDialog {
-  static InputDecoration _inputDecoration() {
+  static InputDecoration _inputDecoration([bool isDark = false]) {
     return InputDecoration(
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
+      fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+        borderSide: BorderSide(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderSide: BorderSide(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+        ),
       ),
     );
   }
@@ -23,6 +28,7 @@ class VehicleFormDialog {
     String label,
     String hint, {
     bool isNumber = false,
+    bool isDark = false,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -30,33 +36,40 @@ class VehicleFormDialog {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF334155),
+            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
           ),
         ),
         const SizedBox(height: 6),
         TextFormField(
           controller: ctrl,
           keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-          style: const TextStyle(fontSize: 13),
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
             ),
           ),
           validator:
@@ -114,10 +127,12 @@ class VehicleFormDialog {
         vehicleToEdit?.status ?? VehicleStatus.tersedia;
     final formKey = GlobalKey<FormState>();
 
+    final isDark = ThemeService.isDarkMode;
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) => Dialog(
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -141,10 +156,10 @@ class VehicleFormDialog {
                           isEdit
                               ? 'Edit Armada Kendaraan'
                               : 'Tambah Armada Baru',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
                           ),
                         ),
                         IconButton(
@@ -157,19 +172,28 @@ class VehicleFormDialog {
                         ),
                       ],
                     ),
-                    const Divider(height: 20, color: Color(0xFFE2E8F0)),
+                    Divider(
+                      height: 20,
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    ),
 
                     _buildFormInput(
                       nameCtrl,
                       'Nama Kendaraan',
                       'Toyota Innova Reborn',
+                      isDark: isDark,
                     ),
                     const SizedBox(height: 10),
 
                     Row(
                       children: [
                         Expanded(
-                          child: _buildFormInput(brandCtrl, 'Merek', 'Toyota'),
+                          child: _buildFormInput(
+                            brandCtrl,
+                            'Merek',
+                            'Toyota',
+                            isDark: isDark,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -177,6 +201,7 @@ class VehicleFormDialog {
                             plateCtrl,
                             'Plat Nomor',
                             'L 1023 SP',
+                            isDark: isDark,
                           ),
                         ),
                       ],
@@ -189,25 +214,37 @@ class VehicleFormDialog {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Jenis',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
+                                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
                                 ),
                               ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<VehicleType>(
                                 initialValue: selectedType,
-                                decoration: _inputDecoration(),
-                                items: const [
+                                dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                decoration: _inputDecoration(isDark),
+                                items: [
                                   DropdownMenuItem(
                                     value: VehicleType.mobil,
-                                    child: Text('Mobil'),
+                                    child: Text(
+                                      'Mobil',
+                                      style: TextStyle(
+                                        color: isDark ? Colors.white : Colors.black,
+                                      ),
+                                    ),
                                   ),
                                   DropdownMenuItem(
                                     value: VehicleType.motor,
-                                    child: Text('Motor'),
+                                    child: Text(
+                                      'Motor',
+                                      style: TextStyle(
+                                        color: isDark ? Colors.white : Colors.black,
+                                      ),
+                                    ),
                                   ),
                                 ],
                                 onChanged: (v) => setModalState(
@@ -222,17 +259,19 @@ class VehicleFormDialog {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Status Unit',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
+                                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
                                 ),
                               ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<VehicleStatus>(
                                 initialValue: selectedStatus,
-                                decoration: _inputDecoration(),
+                                dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                decoration: _inputDecoration(isDark),
                                 items: const [
                                   DropdownMenuItem(
                                     value: VehicleStatus.tersedia,
@@ -275,6 +314,7 @@ class VehicleFormDialog {
                             'Kapasitas',
                             '7',
                             isNumber: true,
+                            isDark: isDark,
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -283,6 +323,7 @@ class VehicleFormDialog {
                             transCtrl,
                             'Transmisi',
                             'Matic / Manual',
+                            isDark: isDark,
                           ),
                         ),
                       ],
@@ -293,12 +334,14 @@ class VehicleFormDialog {
                       imgUrlCtrl,
                       'URL Gambar Armada',
                       'https://...',
+                      isDark: isDark,
                     ),
                     const SizedBox(height: 10),
                     _buildFormInput(
                       noteCtrl,
                       'Catatan Kondisi Unit',
                       'Kondisi siap dinas luar kota',
+                      isDark: isDark,
                     ),
                     const SizedBox(height: 20),
 

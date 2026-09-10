@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/admin/dialogs/vehicle_form_dialog.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class AdminVehiclesTab extends StatefulWidget {
   final List<Vehicle> vehicles;
@@ -25,6 +26,7 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.isDarkMode;
     final filtered =
         widget.vehicles.where((v) {
           final q = _vehicleSearchQuery.toLowerCase();
@@ -37,14 +39,21 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
       children: [
         Container(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            border: Border(
+              bottom: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -54,17 +63,17 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 14,
-                            color: Color(0xFF1E293B),
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
                           'Kelola unit mobil, motor operasional, dan statusnya',
                           style: TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF64748B),
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -108,7 +117,10 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
               const SizedBox(height: 10),
               TextField(
                 onChanged: (val) => setState(() => _vehicleSearchQuery = val),
-                style: const TextStyle(fontSize: 12),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
                 decoration: InputDecoration(
                   hintText: 'Cari mobil/motor, plat, atau merek...',
                   hintStyle: const TextStyle(
@@ -121,16 +133,20 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
                     color: Color(0xFF94A3B8),
                   ),
                   filled: true,
-                  fillColor: const Color(0xFFF8FAFC),
+                  fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    ),
                   ),
                 ),
               ),
@@ -140,7 +156,15 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
         Expanded(
           child:
               filtered.isEmpty
-                  ? const Center(child: Text('Tidak ada kendaraan yang cocok'))
+                  ? Center(
+                    child: Text(
+                      'Tidak ada kendaraan yang cocok',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
+                    ),
+                  )
                   : ListView.builder(
                     padding: const EdgeInsets.all(14),
                     itemCount: filtered.length,
@@ -151,9 +175,11 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -164,7 +190,7 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
                               child: Container(
                                 width: 95,
                                 height: 95,
-                                color: const Color(0xFFEFF6FF),
+                                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFEFF6FF),
                                 child: Image.network(
                                   item.imageUrl,
                                   fit: BoxFit.cover,
@@ -193,9 +219,10 @@ class _AdminVehiclesTabState extends State<AdminVehiclesTab> {
                                       Expanded(
                                         child: Text(
                                           item.name,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
+                                            color: isDark ? Colors.white : const Color(0xFF1E293B),
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                         ),

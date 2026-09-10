@@ -3,6 +3,7 @@ import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/screens/admin/dialogs/loan_detail_dialog.dart';
 import 'package:simodis_jatim/screens/admin/dialogs/vehicle_return_dialog.dart';
 import 'package:simodis_jatim/screens/admin/widgets/admin_loan_card.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class AdminLoansTab extends StatefulWidget {
   final List<LoanRequest> requests;
@@ -23,6 +24,8 @@ class AdminLoansTab extends StatefulWidget {
 class _AdminLoansTabState extends State<AdminLoansTab> {
   int _requestSubTabIndex = 0; // 0: Menunggu, 1: Aktif, 2: Riwayat
 
+  bool get isDark => ThemeService.isDarkMode;
+
   Widget _buildFilterChip(int index, String label, bool hasBadge) {
     final isSelected = _requestSubTabIndex == index;
     return Expanded(
@@ -32,11 +35,15 @@ class _AdminLoansTabState extends State<AdminLoansTab> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color:
-                isSelected
-                    ? const Color(0xFF24487A)
-                    : const Color(0xFFF1F5F9),
+            color: isSelected
+                ? const Color(0xFF24487A)
+                : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected
+                  ? const Color(0xFF24487A)
+                  : (isDark ? const Color(0xFF334155) : Colors.transparent),
+            ),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -45,7 +52,11 @@ class _AdminLoansTabState extends State<AdminLoansTab> {
             style: TextStyle(
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
+              color: isSelected
+                  ? Colors.white
+                  : (isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B)),
             ),
           ),
         ),
@@ -94,7 +105,15 @@ class _AdminLoansTabState extends State<AdminLoansTab> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            border: Border(
+              bottom: BorderSide(
+                color:
+                    isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+          ),
           child: Row(
             children: [
               _buildFilterChip(

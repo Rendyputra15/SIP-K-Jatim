@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/user_model.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class UserFormDialog {
   static Widget _buildFormInput(
@@ -8,6 +9,7 @@ class UserFormDialog {
     String hint, {
     bool isNumber = false,
     bool isPassword = false,
+    bool isDark = false,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -15,10 +17,10 @@ class UserFormDialog {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF334155),
+            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
           ),
         ),
         const SizedBox(height: 6),
@@ -26,23 +28,30 @@ class UserFormDialog {
           controller: ctrl,
           keyboardType: isNumber ? TextInputType.number : TextInputType.text,
           obscureText: isPassword,
-          style: const TextStyle(fontSize: 13),
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
             ),
           ),
           validator:
@@ -63,6 +72,7 @@ class UserFormDialog {
     Function(AppUser)? onUpdateUser,
     VoidCallback? onSuccess,
   }) {
+    final isDark = ThemeService.isDarkMode;
     final isEdit = userToEdit != null;
     final nameCtrl = TextEditingController(text: userToEdit?.name ?? '');
     final nipCtrl = TextEditingController(text: userToEdit?.nip ?? '');
@@ -77,6 +87,7 @@ class UserFormDialog {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -95,30 +106,42 @@ class UserFormDialog {
                 children: [
                   Text(
                     isEdit ? 'Edit $roleLabel' : 'Tambah $roleLabel',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                   ),
-                  const Divider(height: 20),
+                  Divider(
+                    height: 20,
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  ),
                   _buildFormInput(
                     nameCtrl,
                     'Nama Lengkap',
                     'Ahmad Fauzi, S.ST',
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 10),
-                  _buildFormInput(nipCtrl, 'NIP', '198501012010011001'),
+                  _buildFormInput(
+                    nipCtrl,
+                    'NIP',
+                    '198501012010011001',
+                    isDark: isDark,
+                  ),
                   const SizedBox(height: 10),
                   _buildFormInput(
                     deptCtrl,
                     'Bidang Dinas',
                     'Bidang Linjamsos',
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 10),
                   _buildFormInput(
                     emailCtrl,
                     'Email',
                     'nama@dinsos.jatimprov.go.id',
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 10),
 
@@ -131,6 +154,7 @@ class UserFormDialog {
                           : 'Password',
                       '********',
                       isPassword: true,
+                      isDark: isDark,
                       validator: (val) {
                         if (!isEdit && (val == null || val.isEmpty)) {
                           return 'Password wajib diisi';

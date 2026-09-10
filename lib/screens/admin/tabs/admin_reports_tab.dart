@@ -3,6 +3,7 @@ import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/services/report_export_service.dart';
+import 'package:simodis_jatim/services/theme_service.dart';
 
 class AdminReportsTab extends StatefulWidget {
   final List<LoanRequest> requests;
@@ -21,6 +22,8 @@ class AdminReportsTab extends StatefulWidget {
 }
 
 class _AdminReportsTabState extends State<AdminReportsTab> {
+  bool get isDark => ThemeService.isDarkMode;
+
   String _selectedPeriod = 'Bulan Ini (September 2026)';
   String _searchQuery = '';
   String _selectedStatusFilter = 'Semua';
@@ -170,9 +173,9 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         child: SingleChildScrollView(
@@ -186,7 +189,9 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFCBD5E1),
+                    color: isDark
+                        ? const Color(0xFF475569)
+                        : const Color(0xFFCBD5E1),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -194,18 +199,21 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Detail Berkas Laporan',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: badgeColor.withValues(alpha: 0.1),
+                      color: badgeColor.withValues(alpha: isDark ? 0.25 : 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -226,42 +234,86 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   ),
                 ],
               ),
-              const Divider(height: 24, color: Color(0xFFF1F5F9)),
-              _buildDetailItem(Icons.person_rounded, 'Nama Pemohon', item.borrowerName),
-              _buildDetailItem(Icons.apartment_rounded, 'Bidang / Unit Kerja', item.department),
-              _buildDetailItem(Icons.directions_car_rounded, 'Armada Ditugaskan', item.vehicleName),
-              _buildDetailItem(Icons.location_on_rounded, 'Tujuan Penugasan', item.destination),
+              Divider(
+                height: 24,
+                color:
+                    isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+              ),
+              _buildDetailItem(
+                Icons.person_rounded,
+                'Nama Pemohon',
+                item.borrowerName,
+              ),
+              _buildDetailItem(
+                Icons.apartment_rounded,
+                'Bidang / Unit Kerja',
+                item.department,
+              ),
+              _buildDetailItem(
+                Icons.directions_car_rounded,
+                'Armada Ditugaskan',
+                item.vehicleName,
+              ),
+              _buildDetailItem(
+                Icons.location_on_rounded,
+                'Tujuan Penugasan',
+                item.destination,
+              ),
               if (item.destinationAddress.isNotEmpty)
-                _buildDetailItem(Icons.map_rounded, 'Alamat Lengkap', item.destinationAddress),
+                _buildDetailItem(
+                  Icons.map_rounded,
+                  'Alamat Lengkap',
+                  item.destinationAddress,
+                ),
               _buildDetailItem(
                 Icons.calendar_today_rounded,
                 'Periode Peminjaman',
                 '${_formatDate(item.startDate)} s/d ${_formatDate(item.endDate)}',
               ),
               if (item.purposeDescription.isNotEmpty)
-                _buildDetailItem(Icons.notes_rounded, 'Keperluan Dinas', item.purposeDescription),
+                _buildDetailItem(
+                  Icons.notes_rounded,
+                  'Keperluan Dinas',
+                  item.purposeDescription,
+                ),
               _buildDetailItem(
                 Icons.assignment_rounded,
                 'Nomor Nota Dinas',
-                item.officialNoteNumber.isNotEmpty ? item.officialNoteNumber : '-',
+                item.officialNoteNumber.isNotEmpty
+                    ? item.officialNoteNumber
+                    : '-',
               ),
               if (item.spkNumber != null && item.spkNumber!.isNotEmpty)
-                _buildDetailItem(Icons.badge_rounded, 'Nomor SPK Terbit', item.spkNumber!),
+                _buildDetailItem(
+                  Icons.badge_rounded,
+                  'Nomor SPK Terbit',
+                  item.spkNumber!,
+                ),
               if (item.returnOdometer != null || item.returnFuel != null) ...[
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDF4),
+                    color: isDark
+                        ? const Color(0xFF064E3B).withValues(alpha: 0.25)
+                        : const Color(0xFFF0FDF4),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFBBF7D0)),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF047857)
+                          : const Color(0xFFBBF7D0),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.assignment_turned_in_rounded, size: 16, color: Color(0xFF16A34A)),
+                          Icon(
+                            Icons.assignment_turned_in_rounded,
+                            size: 16,
+                            color: Color(0xFF16A34A),
+                          ),
                           SizedBox(width: 6),
                           Text(
                             'Data Pengembalian Unit (BAST)',
@@ -276,16 +328,32 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                       const SizedBox(height: 8),
                       Text(
                         '• Odometer Kembali: ${item.returnOdometer ?? "-"} km',
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF334155)),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? const Color(0xFFCBD5E1)
+                              : const Color(0xFF334155),
+                        ),
                       ),
                       Text(
                         '• Sisa BBM: ${item.returnFuel ?? "-"}',
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF334155)),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? const Color(0xFFCBD5E1)
+                              : const Color(0xFF334155),
+                        ),
                       ),
-                      if (item.returnNotes != null && item.returnNotes!.isNotEmpty)
+                      if (item.returnNotes != null &&
+                          item.returnNotes!.isNotEmpty)
                         Text(
                           '• Catatan BAST: ${item.returnNotes}',
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF334155)),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? const Color(0xFFCBD5E1)
+                                : const Color(0xFF334155),
+                          ),
                         ),
                     ],
                   ),
@@ -305,7 +373,10 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text('Tutup Detail', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Tutup Detail',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
@@ -324,10 +395,17 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color:
+                  isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 16, color: const Color(0xFF24487A)),
+            child: Icon(
+              icon,
+              size: 16,
+              color: isDark
+                  ? const Color(0xFF60A5FA)
+                  : const Color(0xFF24487A),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -336,15 +414,20 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E293B),
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                 ),
               ],
@@ -531,13 +614,21 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
 
                 // Baris Dropdown Periode (Dengan Background Card Putih)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFE2E8F0),
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.25 : 0.08,
+                        ),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -545,14 +636,22 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.date_range_rounded, size: 16, color: Color(0xFF24487A)),
+                      Icon(
+                        Icons.date_range_rounded,
+                        size: 16,
+                        color: isDark
+                            ? const Color(0xFF60A5FA)
+                            : const Color(0xFF24487A),
+                      ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Periode:',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF64748B),
+                          color: isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -561,11 +660,22 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                           child: DropdownButton<String>(
                             value: _selectedPeriod,
                             isExpanded: true,
-                            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF24487A), size: 18),
-                            style: const TextStyle(
+                            dropdownColor: isDark
+                                ? const Color(0xFF1E293B)
+                                : Colors.white,
+                            icon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: isDark
+                                  ? const Color(0xFF60A5FA)
+                                  : const Color(0xFF24487A),
+                              size: 18,
+                            ),
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF1E3A5F),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E3A5F),
                             ),
                             items: [
                               'Bulan Ini (September 2026)',
@@ -576,7 +686,15 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                                 .map(
                                   (p) => DropdownMenuItem(
                                     value: p,
-                                    child: Text(p, overflow: TextOverflow.ellipsis),
+                                    child: Text(
+                                      p,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF1E3A5F),
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -670,7 +788,7 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
@@ -678,12 +796,17 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF0F172A),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             Text(
               'Performa Periode Ini',
-              style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              style: TextStyle(
+                fontSize: 11,
+                color: isDark
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF64748B),
+              ),
             ),
           ],
         ),
@@ -730,7 +853,9 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
             Expanded(
               child: _buildMetricTile(
                 title: 'Bidang Teraktif',
-                value: topDept.length > 12 ? '${topDept.substring(0, 11)}...' : topDept,
+                value: topDept.length > 12
+                    ? '${topDept.substring(0, 11)}...'
+                    : topDept,
                 badge: 'Peminjam Terbanyak',
                 icon: Icons.apartment_rounded,
                 color: const Color(0xFF8B5CF6),
@@ -754,12 +879,14 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -774,7 +901,7 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               Container(
                 padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
-                  color: bgTint,
+                  color: isDark ? color.withValues(alpha: 0.2) : bgTint,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 18),
@@ -782,7 +909,7 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: bgTint,
+                  color: isDark ? color.withValues(alpha: 0.2) : bgTint,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -810,10 +937,12 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           const SizedBox(height: 2),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
+              color: isDark
+                  ? const Color(0xFF94A3B8)
+                  : const Color(0xFF64748B),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -830,12 +959,14 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -847,16 +978,22 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.speed_rounded, color: Color(0xFF24487A), size: 20),
-                  SizedBox(width: 8),
+                  Icon(
+                    Icons.speed_rounded,
+                    color: isDark
+                        ? const Color(0xFF60A5FA)
+                        : const Color(0xFF24487A),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
                   Text(
                     'Tingkat Utilisasi Armada',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                 ],
@@ -864,24 +1001,33 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: isDark
+                      ? const Color(0xFF0F172A)
+                      : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${widget.vehicles.length} Unit Pool',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF475569),
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF475569),
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Rasio frekuensi penugasan armada dinas selama periode terpilih.',
-            style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+            style: TextStyle(
+              fontSize: 11,
+              color: isDark
+                  ? const Color(0xFF94A3B8)
+                  : const Color(0xFF64748B),
+            ),
           ),
           const SizedBox(height: 14),
 
@@ -889,7 +1035,11 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           for (final v in widget.vehicles) ...[
             _buildVehicleUtilizationItem(v, totalLoans),
             if (v != widget.vehicles.last)
-              const Divider(height: 16, color: Color(0xFFF1F5F9)),
+              Divider(
+                height: 16,
+                color:
+                    isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+              ),
           ],
         ],
       ),
@@ -897,7 +1047,8 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
   }
 
   Widget _buildVehicleUtilizationItem(Vehicle v, int totalLoans) {
-    final loanCount = widget.requests.where((r) => r.vehicleName.contains(v.name)).length;
+    final loanCount =
+        widget.requests.where((r) => r.vehicleName.contains(v.name)).length;
     final percentage = ((loanCount / totalLoans) * 100).round();
     final progressVal = (loanCount / totalLoans).clamp(0.0, 1.0);
 
@@ -907,7 +1058,8 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
     } else if (progressVal >= 0.2) {
       progressColor = const Color(0xFF2563EB);
     } else {
-      progressColor = const Color(0xFF64748B);
+      progressColor =
+          isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
     }
 
     return Column(
@@ -919,8 +1071,12 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: v.type == VehicleType.motor
-                    ? const Color(0xFFFFFBEB)
-                    : const Color(0xFFEFF6FF),
+                    ? (isDark
+                        ? const Color(0xFF78350F).withValues(alpha: 0.3)
+                        : const Color(0xFFFFFBEB))
+                    : (isDark
+                        ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
+                        : const Color(0xFFEFF6FF)),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -940,10 +1096,10 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                 children: [
                   Text(
                     v.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -951,10 +1107,18 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: isDark
+                              ? const Color(0xFF0F172A)
+                              : const Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(4),
+                          border: isDark
+                              ? Border.all(color: const Color(0xFF334155))
+                              : null,
                         ),
                         child: Text(
                           v.plateNumber,
@@ -969,7 +1133,12 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                       const SizedBox(width: 6),
                       Text(
                         '${v.transmission} • ${v.capacity} Seat',
-                        style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B),
+                        ),
                       ),
                     ],
                   ),
@@ -989,10 +1158,12 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                 ),
                 Text(
                   '$percentage%',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF94A3B8),
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF94A3B8),
                   ),
                 ),
               ],
@@ -1005,7 +1176,8 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           child: LinearProgressIndicator(
             value: progressVal == 0 ? 0.04 : progressVal,
             minHeight: 6,
-            backgroundColor: const Color(0xFFF1F5F9),
+            backgroundColor:
+                isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
             valueColor: AlwaysStoppedAnimation<Color>(progressColor),
           ),
         ),
@@ -1018,12 +1190,14 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -1035,32 +1209,43 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.inventory_2_rounded, color: Color(0xFF24487A), size: 18),
-                  SizedBox(width: 8),
+                  Icon(
+                    Icons.inventory_2_rounded,
+                    color: isDark
+                        ? const Color(0xFF60A5FA)
+                        : const Color(0xFF24487A),
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
                   Text(
                     'Arsip Berkas Permohonan',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
+                  color: isDark
+                      ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
+                      : const Color(0xFFEFF6FF),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${filteredRequests.length} Berkas',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2563EB),
+                    color: isDark
+                        ? const Color(0xFF93C5FD)
+                        : const Color(0xFF2563EB),
                   ),
                 ),
               ),
@@ -1072,14 +1257,34 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
           TextField(
             controller: _searchController,
             onChanged: (val) => setState(() => _searchQuery = val.trim()),
-            style: const TextStyle(fontSize: 12, color: Color(0xFF1E293B)),
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white : const Color(0xFF1E293B),
+            ),
             decoration: InputDecoration(
               hintText: 'Cari nama, armada, tujuan, atau SPK...',
-              hintStyle: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-              prefixIcon: const Icon(Icons.search_rounded, size: 18, color: Color(0xFF94A3B8)),
+              hintStyle: TextStyle(
+                fontSize: 11,
+                color: isDark
+                    ? const Color(0xFF64748B)
+                    : const Color(0xFF94A3B8),
+              ),
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                size: 18,
+                color: isDark
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF94A3B8),
+              ),
               suffixIcon: _searchQuery.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.clear, size: 16, color: Color(0xFF94A3B8)),
+                      icon: Icon(
+                        Icons.clear,
+                        size: 16,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF94A3B8),
+                      ),
                       onPressed: () {
                         _searchController.clear();
                         setState(() => _searchQuery = '');
@@ -1087,20 +1292,31 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                     )
                   : null,
               filled: true,
-              fillColor: const Color(0xFFF8FAFC),
+              fillColor:
+                  isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFE2E8F0),
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFE2E8F0),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5),
+                borderSide:
+                    const BorderSide(color: Color(0xFF2563EB), width: 1.5),
               ),
             ),
           ),
@@ -1128,20 +1344,31 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               alignment: Alignment.center,
               child: Column(
                 children: [
-                  Icon(Icons.search_off_rounded, size: 42, color: Colors.grey.shade400),
+                  Icon(
+                    Icons.search_off_rounded,
+                    size: 42,
+                    color: isDark ? const Color(0xFF64748B) : Colors.grey.shade400,
+                  ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Tidak ada berkas yang sesuai filter',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF64748B),
+                      color: isDark
+                          ? const Color(0xFFCBD5E1)
+                          : const Color(0xFF64748B),
                     ),
                   ),
                   const SizedBox(height: 2),
-                  const Text(
+                  Text(
                     'Coba ubah kata kunci pencarian atau ganti status filter di atas.',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF94A3B8),
+                    ),
                   ),
                 ],
               ),
@@ -1150,7 +1377,12 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
             for (final item in filteredRequests) ...[
               _buildReportCardItem(item),
               if (item != filteredRequests.last)
-                const Divider(height: 16, color: Color(0xFFF1F5F9)),
+                Divider(
+                  height: 16,
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9),
+                ),
             ],
         ],
       ),
@@ -1167,10 +1399,14 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF1E3A5F) : const Color(0xFFF1F5F9),
+            color: isSelected
+                ? const Color(0xFF24487A)
+                : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected ? const Color(0xFF1E3A5F) : const Color(0xFFE2E8F0),
+              color: isSelected
+                  ? const Color(0xFF24487A)
+                  : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
             ),
           ),
           child: Text(
@@ -1178,7 +1414,11 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              color: isSelected ? Colors.white : const Color(0xFF475569),
+              color: isSelected
+                  ? Colors.white
+                  : (isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF475569)),
             ),
           ),
         ),
@@ -1216,7 +1456,12 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
     }
 
     final initials = item.borrowerName.isNotEmpty
-        ? item.borrowerName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join()
+        ? item.borrowerName
+            .trim()
+            .split(' ')
+            .map((e) => e.isNotEmpty ? e[0] : '')
+            .take(2)
+            .join()
         : 'U';
 
     return InkWell(
@@ -1230,13 +1475,17 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
             // Avatar
             CircleAvatar(
               radius: 18,
-              backgroundColor: const Color(0xFF24487A).withValues(alpha: 0.1),
+              backgroundColor: isDark
+                  ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
+                  : const Color(0xFF24487A).withValues(alpha: 0.1),
               child: Text(
                 initials,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF24487A),
+                  color: isDark
+                      ? const Color(0xFF93C5FD)
+                      : const Color(0xFF24487A),
                 ),
               ),
             ),
@@ -1253,19 +1502,24 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                       Expanded(
                         child: Text(
                           item.borrowerName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF0F172A),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: badgeColor.withValues(alpha: 0.1),
+                          color:
+                              badgeColor.withValues(alpha: isDark ? 0.25 : 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
@@ -1289,10 +1543,12 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   const SizedBox(height: 2),
                   Text(
                     '${item.vehicleName} • ${item.department}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF475569),
+                      color: isDark
+                          ? const Color(0xFFCBD5E1)
+                          : const Color(0xFF475569),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1300,12 +1556,23 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.place_outlined, size: 12, color: Color(0xFF94A3B8)),
+                      Icon(
+                        Icons.place_outlined,
+                        size: 12,
+                        color: isDark
+                            ? const Color(0xFF64748B)
+                            : const Color(0xFF94A3B8),
+                      ),
                       const SizedBox(width: 2),
                       Expanded(
                         child: Text(
                           '${item.destination} (${_formatDate(item.startDate)} - ${_formatDate(item.endDate)})',
-                          style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF94A3B8),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -1315,17 +1582,27 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
                   if (item.spkNumber != null && item.spkNumber!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 1,
+                      ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: isDark
+                            ? const Color(0xFF0F172A)
+                            : const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(4),
+                        border: isDark
+                            ? Border.all(color: const Color(0xFF334155))
+                            : null,
                       ),
                       child: Text(
                         'SPK: ${item.spkNumber}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF24487A),
+                          color: isDark
+                              ? const Color(0xFF93C5FD)
+                              : const Color(0xFF24487A),
                         ),
                       ),
                     ),
@@ -1334,7 +1611,13 @@ class _AdminReportsTabState extends State<AdminReportsTab> {
               ),
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0xFFCBD5E1)),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: isDark
+                  ? const Color(0xFF475569)
+                  : const Color(0xFFCBD5E1),
+            ),
           ],
         ),
       ),

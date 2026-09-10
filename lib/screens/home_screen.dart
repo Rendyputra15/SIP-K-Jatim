@@ -41,9 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.role != 'user') {
-      ThemeService.setDarkMode(false);
-    }
     if (widget.showLoading) {
       Future.delayed(const Duration(milliseconds: 700), () {
         if (mounted) {
@@ -436,6 +433,93 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   ];
 
+  final List<AppNotification> _adminNotifications = [
+    AppNotification(
+      id: 'ADM-001',
+      title: 'Permohonan Masuk: Perlu Verifikasi',
+      message:
+          'Rendy Cahyono (Subbag Program) mengajukan Toyota Innova Reborn untuk Monev UPT Balai Malang.',
+      time: '10 mnt lalu',
+      fullDate: '10 September 2026, 11:30 WIB',
+      detailContent:
+          'Permohonan dinas masuk ke antrean verifikasi Kasubag. Tanggal tugas 12-14 September 2026. Dokumen Nota Dinas dan formulir permohonan telah dilampirkan.',
+      referenceNumber: 'REQ-2026-0910-01',
+      createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
+      type: NotificationType.submitted,
+      isRead: false,
+    ),
+    AppNotification(
+      id: 'ADM-002',
+      title: 'Peringatan Servis Rutin Armada',
+      message:
+          'Toyota Avanza 1.3 Veloz (L 1455 EP) telah mencapai 49.850 KM. Segera jadwalkan ganti oli berkala.',
+      time: '45 mnt lalu',
+      fullDate: '10 September 2026, 10:45 WIB',
+      detailContent:
+          'Sistem telematika mendeteksi odometer armada mendekati ambang batas servis 50.000 KM. Hubungi bengkel rekanan Pemprov Jatim untuk perawatan berkala.',
+      referenceNumber: 'SRV-2026-09-002',
+      createdAt: DateTime.now().subtract(const Duration(minutes: 45)),
+      type: NotificationType.maintenance,
+      isRead: false,
+    ),
+    AppNotification(
+      id: 'ADM-003',
+      title: 'Pengembalian Unit & BAST Masuk',
+      message:
+          'Bambang Triyono telah menyelesaikan perjalanan dinas dengan Isuzu Elf Minibus. Menunggu cek fisik & BAST.',
+      time: '2 jam lalu',
+      fullDate: '10 September 2026, 09:15 WIB',
+      detailContent:
+          'Unit telah diparkir di Pool Dinsos Jatim. Pengemudi melaporkan BBM 3/4 tangki, odometer akhir 45.200 KM, dan melampirkan formulir BAST serah terima kunci.',
+      referenceNumber: 'BAST-2026-0902',
+      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+      type: NotificationType.approved,
+      isRead: false,
+    ),
+    AppNotification(
+      id: 'ADM-004',
+      title: 'Peringatan: Jadwal Penugasan Bentrok',
+      message:
+          'Terdapat 2 usulan penugasan bersamaan pada tanggal 15 September untuk unit Toyota HiAce Commuter.',
+      time: 'Kemarin',
+      fullDate: '09 September 2026, 16:30 WIB',
+      detailContent:
+          'Bidang Linjamsos dan Bidang Rehsos mengajukan unit yang sama pada tanggal 15-16 September 2026. Mohon Kasubag melakukan penyesuaian alokasi armada alternatif.',
+      referenceNumber: 'WARN-SCH-004',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      type: NotificationType.reminder,
+      isRead: true,
+    ),
+    AppNotification(
+      id: 'ADM-005',
+      title: 'Pendaftaran Akun Pegawai Baru',
+      message:
+          'Siti Nurhaliza, S.Tr.Sos (Bidang Rehsos) mendaftarkan akun baru SIP-K.',
+      time: '2 hari lalu',
+      fullDate: '08 September 2026, 14:00 WIB',
+      detailContent:
+          'Data pegawai NIP 199806122022032005 telah diverifikasi oleh kepegawaian. Silakan periksa di menu Kelola Pegawai untuk aktivasi hak akses.',
+      referenceNumber: 'USR-REG-2026-088',
+      createdAt: DateTime.now().subtract(const Duration(days: 2)),
+      type: NotificationType.welcome,
+      isRead: true,
+    ),
+    AppNotification(
+      id: 'ADM-006',
+      title: 'Rekapitulasi Bulanan Siap Ekspor',
+      message:
+          'Laporan pemakaian dan utilisasi armada dinas periode Agustus 2026 telah rampung.',
+      time: '3 hari lalu',
+      fullDate: '07 September 2026, 08:00 WIB',
+      detailContent:
+          'Data rekapitulasi 42 berkas peminjaman bulan Agustus telah siap diunduh dalam format PDF/Excel pada tab Laporan.',
+      referenceNumber: 'REP-2026-08-01',
+      createdAt: DateTime.now().subtract(const Duration(days: 3)),
+      type: NotificationType.approved,
+      isRead: true,
+    ),
+  ];
+
   void _handleCreateLoan(LoanRequest request) {
     setState(() {
       _loans.add(request);
@@ -684,130 +768,37 @@ class _HomeScreenState extends State<HomeScreen> {
       final bool isSuper = widget.role == 'superadmin';
       final activeUser = isSuper ? _appUsers[0] : _appUsers[1];
 
-      return Theme(
-        data: ThemeService.lightTheme,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: const Color(0xFF24487A),
-            leadingWidth: 48,
-            leading: const Padding(
-              padding: EdgeInsets.only(left: 12),
-              child: Icon(Icons.admin_panel_settings_rounded,
-                  color: Colors.white, size: 26),
-            ),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  isSuper ? 'SUPERADMIN' : 'KASUBAG ADMIN',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  activeUser.name,
-                  style: const TextStyle(
-                      fontSize: 10, color: Color(0xFFBAE6FD)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-            titleSpacing: 8,
-            actions: [
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white),
-                tooltip: 'Opsi',
-                onSelected: (val) {
-                  if (val == 'logout') {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const LoginScreen()),
-                    );
-                  } else {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => HomeScreen(role: val)),
-                    );
-                  }
-                },
-                itemBuilder: (ctx) => [
-                  const PopupMenuItem(
-                    value: 'superadmin',
-                    child: Row(
-                      children: [
-                        Icon(Icons.shield_rounded,
-                            color: Color(0xFFB45309), size: 18),
-                        SizedBox(width: 8),
-                        Text('Masuk sebagai Superadmin',
-                            style: TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'admin',
-                    child: Row(
-                      children: [
-                        Icon(Icons.admin_panel_settings_rounded,
-                            color: Color(0xFF24487A), size: 18),
-                        SizedBox(width: 8),
-                        Text('Masuk sebagai Kasubag Admin',
-                            style: TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem(
-                    value: 'logout',
-                    child: Row(
-                      children: [
-                        Icon(Icons.logout, color: Color(0xFFEF4444),
-                            size: 18),
-                        SizedBox(width: 8),
-                        Text('Keluar / Logout',
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFFEF4444))),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          body: AdminApprovalScreen(
-            requests: _loans,
-            onVerify: _handleVerification,
-            onReturn: _handleReturn,
-            currentUser: activeUser,
-            users: _appUsers,
-            onAddUser: (newUser) => setState(() => _appUsers.add(newUser)),
-            onUpdateUser: (updatedUser) => setState(() {}),
-            onDeleteUser: (id) =>
-                setState(() => _appUsers.removeWhere((u) => u.id == id)),
+      return AdminApprovalScreen(
+        requests: _loans,
+        onVerify: _handleVerification,
+        onReturn: _handleReturn,
+        currentUser: activeUser,
+        users: _appUsers,
+        onAddUser: (newUser) => setState(() => _appUsers.add(newUser)),
+        onUpdateUser: (updatedUser) => setState(() {}),
+        onDeleteUser: (id) =>
+            setState(() => _appUsers.removeWhere((u) => u.id == id)),
 
-            // OPERAN KATALOG KENDARAAN (TAMBAHAN):
-            vehicles: _vehicles,
-            onAddVehicle: (newV) => setState(() => _vehicles.add(newV)),
-            onUpdateVehicle: (updV) {
-              setState(() {
-                final index = _vehicles.indexWhere((v) => v.id == updV.id);
-                if (index != -1) {
-                  _vehicles[index] = updV;
-                }
-              });
-            },
-            onDeleteVehicle: (id) =>
-                setState(() => _vehicles.removeWhere((v) => v.id == id)),
-          ),
-        ),
+        // OPERAN KATALOG KENDARAAN:
+        vehicles: _vehicles,
+        onAddVehicle: (newV) => setState(() => _vehicles.add(newV)),
+        onUpdateVehicle: (updV) {
+          setState(() {
+            final index = _vehicles.indexWhere((v) => v.id == updV.id);
+            if (index != -1) {
+              _vehicles[index] = updV;
+            }
+          });
+        },
+        onDeleteVehicle: (id) =>
+            setState(() => _vehicles.removeWhere((v) => v.id == id)),
+        notifications: _adminNotifications,
+        onLogout: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+          );
+        },
       );
     }
 

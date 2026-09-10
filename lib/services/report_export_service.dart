@@ -1,16 +1,14 @@
 // lib/services/report_export_service.dart
 // Layanan untuk menghasilkan dan mengunduh laporan PDF dan Excel
-// Menggunakan web download via anchor tag (dart:html) untuk target web/Chrome
+// Mendukung cross-platform (Web, Android, iOS, Desktop)
 
-import 'dart:convert';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:excel/excel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
+import 'package:simodis_jatim/services/file_saver_helper.dart';
 
 class ReportExportService {
   /// Unduh laporan sebagai PDF di browser
@@ -736,19 +734,10 @@ class ReportExportService {
     }
   }
 
-  // ─── HELPER: DOWNLOAD VIA WEB ──────────────────────────────
+  // ─── HELPER: DOWNLOAD VIA PLATFORM ─────────────────────────
   static void _downloadFile(
       Uint8List bytes, String filename, String mimeType) {
-    if (kIsWeb) {
-      final base64Data = base64Encode(bytes);
-      final dataUri = 'data:$mimeType;base64,$base64Data';
-      final anchor = html.AnchorElement(href: dataUri)
-        ..setAttribute('download', filename)
-        ..style.display = 'none';
-      html.document.body!.append(anchor);
-      anchor.click();
-      anchor.remove();
-    }
+    saveAndDownloadFile(bytes, filename, mimeType);
   }
 
   // ─── HELPER: FORMAT TANGGAL ─────────────────────────────────
