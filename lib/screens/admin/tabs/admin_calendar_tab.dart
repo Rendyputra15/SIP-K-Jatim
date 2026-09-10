@@ -139,7 +139,6 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
       if (_selectedTypeFilter == 'Semua') return true;
       final vehicle = widget.vehicles.where((v) => v.id == l.vehicleId).firstOrNull;
       if (vehicle == null) {
-        // Cek lewat nama kendaraan bila ID tidak persis
         if (_selectedTypeFilter == 'Mobil') {
           return !l.vehicleName.toLowerCase().contains('vario') &&
               !l.vehicleName.toLowerCase().contains('nmax') &&
@@ -175,23 +174,28 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
     }).length;
     final availableVehiclesCount = (totalVehicles - busyVehiclesCount).clamp(0, totalVehicles);
 
+    final pendingCount = loansForSelectedDate
+        .where((l) => l.status == LoanStatus.menunggu || l.status == LoanStatus.pending)
+        .length;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Header Banner & Navigasi Cepat
+          // 1. Header Banner Superadmin (Overflow Fix & Aesthetic Design)
           _buildHeaderBanner(),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           // 2. Kalender & Jadwal Detail
           if (isMobile) ...[
             _buildCalendarCard(),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             _buildScheduleDetailCard(
               filteredLoans,
               busyVehiclesCount,
               availableVehiclesCount,
+              pendingCount,
             ),
           ] else ...[
             Row(
@@ -201,13 +205,14 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                   flex: 5,
                   child: _buildCalendarCard(),
                 ),
-                const SizedBox(width: 18),
+                const SizedBox(width: 16),
                 Expanded(
                   flex: 6,
                   child: _buildScheduleDetailCard(
                     filteredLoans,
                     busyVehiclesCount,
                     availableVehiclesCount,
+                    pendingCount,
                   ),
                 ),
               ],
@@ -218,9 +223,12 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
     );
   }
 
+  // 1. HEADER BANNER UTAMA (SUPERADMIN)
   Widget _buildHeaderBanner() {
+    final now = DateTime.now();
+    final isTodaySelected = _isSameDay(_selectedDate, now);
+
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -229,79 +237,147 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_month_rounded,
-                      color: isDark
-                          ? const Color(0xFF60A5FA)
-                          : const Color(0xFF24487A),
-                      size: 22,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Jadwal & Kalender Armada',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                color: isDark ? const Color(0xFF3B82F6) : const Color(0xFF24487A),
+                width: 5,
+              ),
+            ),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 480;
+
+              return Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1E3A8A).withValues(alpha: 0.5)
+                              : const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF2563EB).withValues(alpha: 0.4)
+                                : const Color(0xFFBFDBFE),
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.calendar_month_rounded,
+                          color: isDark
+                              ? const Color(0xFF60A5FA)
+                              : const Color(0xFF24487A),
+                          size: 24,
+                        ),
                       ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Jadwal & Kalender Armada',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                letterSpacing: 0.1,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Pantau ketersediaan, reservasi aktif, dan penugasan armada harian.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark
+                                    ? const Color(0xFF94A3B8)
+                                    : const Color(0xFF64748B),
+                                height: 1.3,
+                              ),
+                              maxLines: isCompact ? 1 : 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isCompact) ...[
+                        const SizedBox(width: 12),
+                        _buildTodayButton(isTodaySelected),
+                      ],
+                    ],
+                  ),
+                  if (isCompact) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: _buildTodayButton(isTodaySelected),
                     ),
                   ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Pantau ketersediaan, reservasi aktif, dan penugasan armada dinas harian.',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           ),
-          ElevatedButton.icon(
-            onPressed: _jumpToToday,
-            icon: const Icon(Icons.today_rounded, size: 16),
-            label: const Text(
-              'Hari Ini',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF24487A),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
+  Widget _buildTodayButton(bool isTodaySelected) {
+    return ElevatedButton.icon(
+      onPressed: _jumpToToday,
+      icon: Icon(
+        Icons.today_rounded,
+        size: 16,
+        color: isTodaySelected ? Colors.white : (isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A)),
+      ),
+      label: Text(
+        'Hari Ini',
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: isTodaySelected ? Colors.white : (isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A)),
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isTodaySelected
+            ? const Color(0xFF24487A)
+            : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
+        elevation: isTodaySelected ? 2 : 0,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(
+            color: isTodaySelected
+                ? const Color(0xFF24487A)
+                : (isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 2. KARTU KALENDER INTERAKTIF & MODERN
   Widget _buildCalendarCard() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // Hitung hari awal bulan dan total hari dalam bulan
     final firstDayOfMonth = DateTime(
       _displayedMonth.year,
       _displayedMonth.month,
@@ -313,8 +389,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
       0,
     ).day;
 
-    // Hari dalam seminggu: 1 = Senin, 7 = Minggu
-    final startingWeekday = firstDayOfMonth.weekday; // 1-7
+    final startingWeekday = firstDayOfMonth.weekday; // 1-7 (Senin-Minggu)
     final prevMonthDays = DateTime(
       _displayedMonth.year,
       _displayedMonth.month,
@@ -324,79 +399,108 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
     final totalGridCells = (startingWeekday - 1 + daysInMonth > 35) ? 42 : 35;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Bulan & Navigasi Prev/Next
+          // Navigasi Bulan & Tahun
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left_rounded, size: 24),
-                onPressed: _previousMonth,
-                tooltip: 'Bulan Sebelumnya',
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF2563EB).withValues(alpha: 0.15)
+                          : const Color(0xFFEFF6FF),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.calendar_month,
+                      size: 18,
+                      color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${_monthNames[_displayedMonth.month - 1]} ${_displayedMonth.year}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                '${_monthNames[_displayedMonth.month - 1]} ${_displayedMonth.year}',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right_rounded, size: 24),
-                onPressed: _nextMonth,
-                tooltip: 'Bulan Berikutnya',
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              Row(
+                children: [
+                  _buildNavIconButton(
+                    icon: Icons.chevron_left_rounded,
+                    onTap: _previousMonth,
+                    tooltip: 'Bulan Sebelumnya',
+                  ),
+                  const SizedBox(width: 6),
+                  _buildNavIconButton(
+                    icon: Icons.chevron_right_rounded,
+                    onTap: _nextMonth,
+                    tooltip: 'Bulan Berikutnya',
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
-          // Baris Nama Hari (Sen - Min)
-          Row(
-            children: _dayNames.map((d) {
-              final isWeekend = d == 'Sab' || d == 'Min';
-              return Expanded(
-                child: Center(
-                  child: Text(
-                    d,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: isWeekend
-                          ? const Color(0xFFEF4444)
-                          : (isDark
-                              ? const Color(0xFF94A3B8)
-                              : const Color(0xFF64748B)),
+          // Header Hari (Sen - Min) dengan background container tipis
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+            child: Row(
+              children: _dayNames.map((d) {
+                final isWeekend = d == 'Sab' || d == 'Min';
+                return Expanded(
+                  child: Center(
+                    child: Text(
+                      d,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                        color: isWeekend
+                            ? const Color(0xFFEF4444)
+                            : (isDark
+                                ? const Color(0xFFCBD5E1)
+                                : const Color(0xFF475569)),
+                      ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
-          const SizedBox(height: 8),
-          Divider(
-            height: 1,
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
           // Grid Tanggal
           GridView.builder(
@@ -414,7 +518,6 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
               bool isCurrentMonth = true;
 
               if (index < startingWeekday - 1) {
-                // Hari dari bulan sebelumnya
                 final prevDay = prevMonthDays - (startingWeekday - 2 - index);
                 cellDate = DateTime(
                   _displayedMonth.year,
@@ -423,7 +526,6 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                 );
                 isCurrentMonth = false;
               } else if (index >= startingWeekday - 1 + daysInMonth) {
-                // Hari dari bulan berikutnya
                 final nextDay = index - (startingWeekday - 1 + daysInMonth) + 1;
                 cellDate = DateTime(
                   _displayedMonth.year,
@@ -432,7 +534,6 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                 );
                 isCurrentMonth = false;
               } else {
-                // Hari di bulan aktif
                 final dayNumber = index - startingWeekday + 2;
                 cellDate = DateTime(
                   _displayedMonth.year,
@@ -444,6 +545,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
               final isSelected = _isSameDay(cellDate, _selectedDate);
               final isToday = _isSameDay(cellDate, today);
               final loansOnDay = _getLoansForDate(cellDate);
+              
               final hasApproved = loansOnDay.any(
                 (l) =>
                     l.status == LoanStatus.disetujui ||
@@ -469,22 +571,40 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                     }
                   });
                 },
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
+                borderRadius: BorderRadius.circular(12),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? const Color(0xFF24487A)
                         : (isToday
                             ? (isDark
-                                ? const Color(0xFF1E3A8A).withValues(alpha: 0.35)
+                                ? const Color(0xFF1E3A8A).withValues(alpha: 0.45)
                                 : const Color(0xFFEFF6FF))
-                            : Colors.transparent),
-                    borderRadius: BorderRadius.circular(10),
-                    border: isToday && !isSelected
-                        ? Border.all(
-                            color: const Color(0xFF3B82F6),
-                            width: 1.5,
-                          )
+                            : (isCurrentMonth
+                                ? (isDark
+                                    ? const Color(0xFF0F172A).withValues(alpha: 0.5)
+                                    : Colors.transparent)
+                                : Colors.transparent)),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? const Color(0xFF1E3A8A)
+                          : (isToday
+                              ? const Color(0xFF3B82F6)
+                              : (isDark
+                                  ? const Color(0xFF334155).withValues(alpha: 0.5)
+                                  : const Color(0xFFF1F5F9))),
+                      width: isToday && !isSelected ? 1.8 : 1.0,
+                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFF24487A).withValues(alpha: 0.35),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
                         : null,
                   ),
                   child: Column(
@@ -493,7 +613,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                       Text(
                         '${cellDate.day}',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 12.5,
                           fontWeight: isSelected || isToday
                               ? FontWeight.w900
                               : FontWeight.w600,
@@ -510,19 +630,17 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                                       : const Color(0xFFCBD5E1))),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      // Indikator Titik Jadwal
+                      const SizedBox(height: 3),
+                      // Indikator Titik Status Penugasan
                       if (loansOnDay.isNotEmpty)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (hasApproved)
                               Container(
-                                width: 5,
-                                height: 5,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 1,
-                                ),
+                                width: 5.5,
+                                height: 5.5,
+                                margin: const EdgeInsets.symmetric(horizontal: 1.5),
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? const Color(0xFF4ADE80)
@@ -532,11 +650,9 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                               ),
                             if (hasPending)
                               Container(
-                                width: 5,
-                                height: 5,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 1,
-                                ),
+                                width: 5.5,
+                                height: 5.5,
+                                margin: const EdgeInsets.symmetric(horizontal: 1.5),
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? const Color(0xFFFBBF24)
@@ -547,7 +663,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                           ],
                         )
                       else
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 5.5),
                     ],
                   ),
                 ),
@@ -561,14 +677,28 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
           ),
           const SizedBox(height: 12),
 
-          // Keterangan Legenda
+          // Legenda Status Kalender (Clean Pill Style)
           Wrap(
-            spacing: 16,
+            spacing: 12,
             runSpacing: 8,
             children: [
-              _buildLegendItem(const Color(0xFF16A34A), 'Armada Bertugas'),
-              _buildLegendItem(const Color(0xFFF59E0B), 'Menunggu Verifikasi'),
-              _buildLegendItem(const Color(0xFF24487A), 'Tanggal Dipilih'),
+              _buildLegendPill(
+                color: const Color(0xFF16A34A),
+                label: 'Armada Bertugas',
+              ),
+              _buildLegendPill(
+                color: const Color(0xFFF59E0B),
+                label: 'Menunggu Verifikasi',
+              ),
+              _buildLegendPill(
+                color: const Color(0xFF3B82F6),
+                label: 'Hari Ini',
+                isBorderOnly: true,
+              ),
+              _buildLegendPill(
+                color: const Color(0xFF24487A),
+                label: 'Tanggal Dipilih',
+              ),
             ],
           ),
         ],
@@ -576,47 +706,94 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
     );
   }
 
-  Widget _buildLegendItem(Color color, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 8,
-          height: 8,
+  Widget _buildNavIconButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    required String tooltip,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Tooltip(
+        message: tooltip,
+        child: Container(
+          padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+            color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            ),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
           ),
         ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
+  Widget _buildLegendPill({
+    required Color color,
+    required String label,
+    bool isBorderOnly = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: isBorderOnly ? Colors.transparent : color,
+              shape: BoxShape.circle,
+              border: isBorderOnly ? Border.all(color: color, width: 2) : null,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 3. KARTU DETAIL JADWAL TUGAS ARMADA HARI TERPILIH
   Widget _buildScheduleDetailCard(
     List<LoanRequest> loans,
     int busyVehicles,
     int availableVehicles,
+    int pendingCount,
   ) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -624,7 +801,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tanggal Terpilih & Badge Ketersediaan
+          // Tanggal Terpilih & Indicator Badges
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,16 +813,17 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                     Text(
                       _formatDateString(_selectedDate),
                       style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w900,
                         color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        letterSpacing: 0.1,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
-                      '${loans.length} Berkas Penugasan Terjadwal',
+                      '${loans.length} Berkas Penugasan Terdaftar',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 11.5,
                         fontWeight: FontWeight.w600,
                         color: isDark
                             ? const Color(0xFF94A3B8)
@@ -655,7 +833,8 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                   ],
                 ),
               ),
-              // Chip Ketersediaan
+              const SizedBox(width: 8),
+              // Indicator Status Armada Ringkas
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -665,7 +844,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                   color: isDark
                       ? const Color(0xFF0F172A)
                       : const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isDark
                         ? const Color(0xFF334155)
@@ -675,8 +854,8 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.circle, color: Color(0xFF16A34A), size: 8),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.circle, color: Color(0xFF16A34A), size: 7),
+                    const SizedBox(width: 5),
                     Text(
                       '$availableVehicles Siap',
                       style: const TextStyle(
@@ -685,18 +864,19 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                         color: Color(0xFF16A34A),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
                       '•',
                       style: TextStyle(
                         color: isDark
                             ? const Color(0xFF64748B)
                             : const Color(0xFF94A3B8),
+                        fontSize: 10,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.circle, color: Color(0xFF2563EB), size: 8),
                     const SizedBox(width: 6),
+                    const Icon(Icons.circle, color: Color(0xFF2563EB), size: 7),
+                    const SizedBox(width: 5),
                     Text(
                       '$busyVehicles Jalan',
                       style: const TextStyle(
@@ -710,51 +890,50 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Filter Tipe Armada (Semua / Mobil / Motor)
+          // Filter Tipe Armada Segmented Control (Semua / Mobil / Motor)
           Row(
             children: ['Semua', 'Mobil', 'Motor'].map((type) {
               final isSelected = _selectedTypeFilter == type;
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
-                child: ChoiceChip(
-                  label: Text(
-                    type,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected
-                          ? Colors.white
-                          : (isDark
-                              ? const Color(0xFFCBD5E1)
-                              : const Color(0xFF475569)),
+                child: InkWell(
+                  onTap: () => setState(() => _selectedTypeFilter = type),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
                     ),
-                  ),
-                  selected: isSelected,
-                  selectedColor: const Color(0xFF24487A),
-                  backgroundColor: isDark
-                      ? const Color(0xFF0F172A)
-                      : const Color(0xFFF1F5F9),
-                  showCheckmark: false,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    side: BorderSide(
+                    decoration: BoxDecoration(
                       color: isSelected
                           ? const Color(0xFF24487A)
                           : (isDark
-                              ? const Color(0xFF334155)
-                              : Colors.transparent),
+                              ? const Color(0xFF0F172A)
+                              : const Color(0xFFF1F5F9)),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF24487A)
+                            : (isDark
+                                ? const Color(0xFF334155)
+                                : const Color(0xFFE2E8F0)),
+                      ),
+                    ),
+                    child: Text(
+                      type,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark
+                                ? const Color(0xFFCBD5E1)
+                                : const Color(0xFF475569)),
+                      ),
                     ),
                   ),
-                  onSelected: (val) {
-                    if (val) setState(() => _selectedTypeFilter = type);
-                  },
                 ),
               );
             }).toList(),
@@ -764,7 +943,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
             color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           ),
 
-          // Daftar Kartu Tugas pada Hari Tersebut
+          // Daftar Penugasan pada Hari Tersebut
           if (loans.isEmpty)
             Center(
               child: Padding(
@@ -793,27 +972,27 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                         color: isDark
                             ? const Color(0xFF64748B)
                             : const Color(0xFF94A3B8),
-                        size: 38,
+                        size: 40,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Tidak Ada Jadwal Tugas',
+                      'Tidak Ada Jadwal Penugasan',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 13.5,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF1E293B),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Seluruh armada dinas tersedia untuk diajukan pada tanggal ini.',
+                      'Seluruh armada dinas siap & dapat diajukan pada tanggal ini.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 11.5,
                         color: isDark
                             ? const Color(0xFF94A3B8)
-                            : const Color(0xFF94A3B8),
+                            : const Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -836,6 +1015,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
     );
   }
 
+  // 4. KARTU PENUGASAN INDIVIDUAL
   Widget _buildScheduleItemCard(LoanRequest item) {
     Color badgeBg;
     Color badgeColor;
@@ -853,7 +1033,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
         badgeBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFDBEAFE);
         badgeColor =
             isDark ? const Color(0xFF93C5FD) : const Color(0xFF2563EB);
-        statusLabel = 'Tuntas (BAST)';
+        statusLabel = 'Selesai (BAST)';
         break;
       case LoanStatus.ditolak:
       case LoanStatus.rejected:
@@ -866,7 +1046,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
         badgeBg = isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7);
         badgeColor =
             isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
-        statusLabel = 'Menunggu';
+        statusLabel = 'Menunggu Verifikasi';
     }
 
     final isCar = !item.vehicleName.toLowerCase().contains('vario') &&
@@ -875,10 +1055,10 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
         !item.vehicleName.toLowerCase().contains('motor');
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
         ),
@@ -886,22 +1066,20 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon Avatar
+          // Icon Avatar Armada
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1E293B) : Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color:
-                    isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
               ),
             ),
             child: Icon(
               isCar ? Icons.directions_car_rounded : Icons.two_wheeler_rounded,
-              color:
-                  isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
-              size: 20,
+              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+              size: 22,
             ),
           ),
           const SizedBox(width: 12),
@@ -918,14 +1096,14 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                       child: Text(
                         item.vehicleName,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w800,
-                          color:
-                              isDark ? Colors.white : const Color(0xFF1E293B),
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -938,7 +1116,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                       child: Text(
                         statusLabel,
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.bold,
                           color: badgeColor,
                         ),
@@ -946,7 +1124,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Text(
                   'Pemohon: ${item.borrowerName} (${item.department})',
                   style: TextStyle(
@@ -957,7 +1135,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(
@@ -972,7 +1150,7 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                       child: Text(
                         item.destination,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 10.5,
                           color: isDark
                               ? const Color(0xFF94A3B8)
                               : const Color(0xFF64748B),
@@ -982,15 +1160,15 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
+                    horizontal: 8,
+                    vertical: 3,
                   ),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(6),
                     border: Border.all(
                       color: isDark
                           ? const Color(0xFF334155)
@@ -1002,16 +1180,16 @@ class _AdminCalendarTabState extends State<AdminCalendarTab> {
                     children: [
                       Icon(
                         Icons.date_range_rounded,
-                        size: 11,
+                        size: 12,
                         color: isDark
                             ? const Color(0xFF60A5FA)
                             : const Color(0xFF24487A),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       Text(
                         'Periode: ${_formatRangeDate(item.startDate, item.endDate)}',
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.w600,
                           color: isDark
                               ? const Color(0xFF93C5FD)
