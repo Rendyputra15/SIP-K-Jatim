@@ -358,67 +358,78 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
           // Daftar Card Kendaraan
           Expanded(
-            child: filteredList.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.search_off_rounded,
-                              size: 40,
-                              color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Armada Tidak Ditemukan',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF1E293B),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _searchQuery.isNotEmpty
-                                ? 'Tidak ada kendaraan dengan kata kunci "$_searchQuery".'
-                                : 'Tidak ada kendaraan pada filter "$_wheelFilter".',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            ),
-                          ),
-                          if (_searchQuery.isNotEmpty || _wheelFilter != 'Semua') ...[
-                            const SizedBox(height: 12),
-                            TextButton.icon(
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                  _wheelFilter = 'Semua';
-                                });
-                              },
-                              icon: const Icon(Icons.refresh_rounded, size: 16),
-                              label: const Text('Reset Pencarian & Filter'),
-                              style: TextButton.styleFrom(
-                                foregroundColor: const Color(0xFF24487A),
+            child: RefreshIndicator(
+              color: const Color(0xFF24487A),
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              onRefresh: () async {
+                await Future.delayed(const Duration(milliseconds: 750));
+                if (mounted) setState(() {});
+              },
+              child: filteredList.isEmpty
+                  ? SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.search_off_rounded,
+                                  size: 40,
+                                  color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                                ),
                               ),
-                            ),
-                          ],
-                        ],
+                              const SizedBox(height: 12),
+                              Text(
+                                'Armada Tidak Ditemukan',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _searchQuery.isNotEmpty
+                                    ? 'Tidak ada kendaraan dengan kata kunci "$_searchQuery".'
+                                    : 'Tidak ada kendaraan pada filter "$_wheelFilter".',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                ),
+                              ),
+                              if (_searchQuery.isNotEmpty || _wheelFilter != 'Semua') ...[
+                                const SizedBox(height: 12),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {
+                                      _searchQuery = '';
+                                      _wheelFilter = 'Semua';
+                                    });
+                                  },
+                                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                                  label: const Text('Reset Pencarian & Filter'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: const Color(0xFF24487A),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  )
-                : ListView.builder(
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                     itemCount: filteredList.length,
                     itemBuilder: (context, index) {
@@ -621,6 +632,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       );
                     },
                   ),
+            ),
           ),
         ],
       ),

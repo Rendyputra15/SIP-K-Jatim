@@ -114,15 +114,19 @@ class AdminSidebar extends StatelessWidget {
                         : MainAxisAlignment.center,
                 children: [
                   if (isExpanded)
-                    const Text(
-                      'SIP-K DINSOS',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12,
-                        letterSpacing: 1,
+                    const Flexible(
+                      child: Text(
+                        'SIP-K DINSOS',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
+                          letterSpacing: 1,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                  if (isExpanded) const SizedBox(width: 4),
                   GestureDetector(
                     onTap: onToggleExpand,
                     child: Container(

@@ -235,8 +235,15 @@ class NotificationDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 32),
+      body: RefreshIndicator(
+        color: const Color(0xFF24487A),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 750));
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -514,6 +521,7 @@ class NotificationDetailScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

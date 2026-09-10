@@ -390,9 +390,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-        child: Form(
+      body: RefreshIndicator(
+        color: const Color(0xFF24487A),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 750));
+          if (mounted) setState(() {});
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -734,6 +742,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

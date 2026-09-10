@@ -689,53 +689,65 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: const Color(0xFF24487A),
+            leadingWidth: 48,
+            leading: const Padding(
+              padding: EdgeInsets.only(left: 12),
+              child: Icon(Icons.admin_panel_settings_rounded,
+                  color: Colors.white, size: 26),
+            ),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isSuper
-                      ? 'SIP-K • SUPERADMINISTRATOR'
-                      : 'SIP-K • KASUBAG ADMIN',
+                  isSuper ? 'SUPERADMIN' : 'KASUBAG ADMIN',
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   activeUser.name,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFFBAE6FD)),
+                  style: const TextStyle(
+                      fontSize: 10, color: Color(0xFFBAE6FD)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
+            titleSpacing: 8,
             actions: [
-              // Tombol Switch Role Cepat (Superadmin <-> Admin) untuk mempermudah testing
               PopupMenuButton<String>(
-                icon: const Icon(Icons.swap_horiz_rounded, color: Colors.white),
-                tooltip: 'Ganti Peran Admin untuk Demo',
-                onSelected: (selectedRole) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => HomeScreen(role: selectedRole),
-                    ),
-                  );
+                icon: const Icon(Icons.more_vert, color: Colors.white),
+                tooltip: 'Opsi',
+                onSelected: (val) {
+                  if (val == 'logout') {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const LoginScreen()),
+                    );
+                  } else {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => HomeScreen(role: val)),
+                    );
+                  }
                 },
                 itemBuilder: (ctx) => [
                   const PopupMenuItem(
                     value: 'superadmin',
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.shield_rounded,
-                          color: Color(0xFFB45309),
-                          size: 18,
-                        ),
+                        Icon(Icons.shield_rounded,
+                            color: Color(0xFFB45309), size: 18),
                         SizedBox(width: 8),
-                        Text(
-                          'Masuk sebagai Superadmin',
-                          style: TextStyle(fontSize: 12),
-                        ),
+                        Text('Masuk sebagai Superadmin',
+                            style: TextStyle(fontSize: 12)),
                       ],
                     ),
                   ),
@@ -743,27 +755,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: 'admin',
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.admin_panel_settings_rounded,
-                          color: Color(0xFF24487A),
-                          size: 18,
-                        ),
+                        Icon(Icons.admin_panel_settings_rounded,
+                            color: Color(0xFF24487A), size: 18),
                         SizedBox(width: 8),
-                        Text(
-                          'Masuk sebagai Kasubag Admin',
-                          style: TextStyle(fontSize: 12),
-                        ),
+                        Text('Masuk sebagai Kasubag Admin',
+                            style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout, color: Color(0xFFEF4444),
+                            size: 18),
+                        SizedBox(width: 8),
+                        Text('Keluar / Logout',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFFEF4444))),
                       ],
                     ),
                   ),
                 ],
-              ),
-              IconButton(
-                icon: const Icon(Icons.logout, color: Colors.white),
-                onPressed: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                ),
               ),
             ],
           ),

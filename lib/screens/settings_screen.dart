@@ -10,13 +10,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _largeTextMode = false;
   bool _notifStatusEnabled = true;
   bool _notifReminderEnabled = true;
 
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.isDarkMode;
+    final isLarge = ThemeService.isLargeText;
     final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF4F7FA);
     final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
     final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE0E8ED);
@@ -38,13 +38,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 20, 18, 28),
-        children: [
+      body: RefreshIndicator(
+        color: const Color(0xFF24487A),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 750));
+          if (mounted) setState(() {});
+        },
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(18, 20, 18, 28),
+          children: [
           Text(
             'Sesuaikan pengalaman aplikasi',
             style: TextStyle(
-              fontSize: _largeTextMode ? 22 : 20,
+              fontSize: isLarge ? 22 : 20,
               fontWeight: FontWeight.w800,
               color: titleColor,
             ),
@@ -53,7 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Text(
             'Atur tampilan dan pemberitahuan agar SIP-K tetap nyaman digunakan setiap hari.',
             style: TextStyle(
-              fontSize: _largeTextMode ? 14 : 12,
+              fontSize: isLarge ? 14 : 12,
               color: subtitleColor,
             ),
           ),
@@ -85,10 +93,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.text_fields_rounded,
                 title: 'Teks lebih besar',
                 subtitle: 'Perbesar teks untuk membaca informasi dengan lebih nyaman.',
-                value: _largeTextMode,
+                value: isLarge,
                 titleColor: titleColor,
                 subtitleColor: subtitleColor,
-                onChanged: (value) => setState(() => _largeTextMode = value),
+                onChanged: (value) {
+                  setState(() {
+                    ThemeService.setLargeText(value);
+                  });
+                },
               ),
             ],
           ),
@@ -138,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Text(
                   'Buka Pengaturan Notifikasi HP',
                   style: TextStyle(
-                    fontSize: _largeTextMode ? 14 : 13,
+                    fontSize: isLarge ? 14 : 13,
                     fontWeight: FontWeight.bold,
                     color: titleColor,
                   ),
@@ -146,7 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: Text(
                   'Kelola izin dan suara notifikasi langsung di pengaturan sistem perangkat.',
                   style: TextStyle(
-                    fontSize: _largeTextMode ? 12 : 11,
+                    fontSize: isLarge ? 12 : 11,
                     color: subtitleColor,
                   ),
                 ),
@@ -181,7 +193,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Text(
                     'Pengaturan tersimpan otomatis di perangkat ini. Anda dapat mengubahnya kapan saja.',
                     style: TextStyle(
-                      fontSize: _largeTextMode ? 13 : 12,
+                      fontSize: isLarge ? 13 : 12,
                       height: 1.4,
                       color: infoTextColor,
                     ),
@@ -191,6 +203,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -250,6 +263,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required ValueChanged<bool> onChanged,
   }) {
     final isDark = ThemeService.isDarkMode;
+    final isLarge = ThemeService.isLargeText;
     return SwitchListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
       secondary: Icon(
@@ -263,7 +277,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: Text(
         title,
         style: TextStyle(
-          fontSize: _largeTextMode ? 14 : 13,
+          fontSize: isLarge ? 14 : 13,
           fontWeight: FontWeight.w700,
           color: titleColor,
         ),
@@ -271,7 +285,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       subtitle: Text(
         subtitle,
         style: TextStyle(
-          fontSize: _largeTextMode ? 12 : 11,
+          fontSize: isLarge ? 12 : 11,
           color: subtitleColor,
         ),
       ),

@@ -201,24 +201,38 @@ class _LoanHistoryScreenState extends State<LoanHistoryScreen> {
 
   Widget _buildLoanList(int tabIndex) {
     final filteredLoans = _loansForTab(tabIndex);
+    final isDark = ThemeService.isDarkMode;
 
-    if (filteredLoans.isEmpty) {
-      return const Center(
-        child: Text(
-          'Belum ada pengajuan pada kategori ini.',
-          style: TextStyle(color: Color(0xFF94A3B8)),
-        ),
-      );
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-      itemCount: filteredLoans.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final loan = filteredLoans[index];
-        return _buildLoanCard(context, loan);
+    return RefreshIndicator(
+      color: const Color(0xFF24487A),
+      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+      onRefresh: () async {
+        await Future.delayed(const Duration(milliseconds: 750));
+        if (mounted) setState(() {});
       },
+      child: filteredLoans.isEmpty
+          ? const SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 80),
+                  child: Text(
+                    'Belum ada pengajuan pada kategori ini.',
+                    style: TextStyle(color: Color(0xFF94A3B8)),
+                  ),
+                ),
+              ),
+            )
+          : ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+              itemCount: filteredLoans.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final loan = filteredLoans[index];
+                return _buildLoanCard(context, loan);
+              },
+            ),
     );
   }
 

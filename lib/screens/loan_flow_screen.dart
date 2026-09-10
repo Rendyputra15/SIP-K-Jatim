@@ -81,8 +81,15 @@ class LoanFlowScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 90),
+      body: RefreshIndicator(
+        color: const Color(0xFF24487A),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 750));
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 90),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -231,6 +238,7 @@ class LoanFlowScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
 
       bottomSheet: Container(

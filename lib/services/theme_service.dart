@@ -14,6 +14,18 @@ class ThemeService {
     setDarkMode(!isDarkMode);
   }
 
+  // ─── FITUR TEKS LEBIH BESAR ─────────────────────────────────────────────────
+  // textScaleNotifier menyimpan skala font yang digunakan di seluruh aplikasi.
+  // Nilai normal = 1.0, nilai besar = 1.2 (20% lebih besar dari default).
+  static final ValueNotifier<double> textScaleNotifier =
+      ValueNotifier<double>(1.0);
+
+  static bool get isLargeText => textScaleNotifier.value > 1.0;
+
+  static void setLargeText(bool enable) {
+    textScaleNotifier.value = enable ? 1.2 : 1.0;
+  }
+
   // Tema Terang (Light Mode)
   static ThemeData get lightTheme {
     return ThemeData(

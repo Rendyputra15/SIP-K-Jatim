@@ -214,8 +214,16 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
+        child: RefreshIndicator(
+          color: const Color(0xFF24487A),
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          onRefresh: () async {
+            await Future.delayed(const Duration(milliseconds: 750));
+            if (mounted) setState(() {});
+          },
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
             // 1. STICKY APP BAR (Logo Diperbesar & Teks Sejajar Proporsional)
             SliverPersistentHeader(
               pinned: true,
@@ -844,6 +852,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

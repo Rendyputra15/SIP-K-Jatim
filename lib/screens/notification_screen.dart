@@ -295,21 +295,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           ),
           Expanded(
-            child: filteredNotifications.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Belum ada notifikasi',
-                      style: TextStyle(color: Color(0xFF94A3B8)),
+            child: RefreshIndicator(
+              color: const Color(0xFF24487A),
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              onRefresh: () async {
+                await Future.delayed(const Duration(milliseconds: 750));
+                if (mounted) setState(() {});
+              },
+              child: filteredNotifications.isEmpty
+                  ? const SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 80),
+                          child: Text(
+                            'Belum ada notifikasi',
+                            style: TextStyle(color: Color(0xFF94A3B8)),
+                          ),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(16, 2, 16, 20),
+                      itemCount: filteredNotifications.length,
+                      itemBuilder: (context, index) {
+                        final item = filteredNotifications[index];
+                        return _buildNotificationCard(item);
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 2, 16, 20),
-                    itemCount: filteredNotifications.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredNotifications[index];
-                      return _buildNotificationCard(item);
-                    },
-                  ),
+            ),
           ),
         ],
       ),

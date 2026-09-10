@@ -301,11 +301,19 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
           ),
         ),
       ),
-      body: Form(
-        key: _formKey,
-        onChanged: () => setState(() {}),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 90),
+      body: RefreshIndicator(
+        color: const Color(0xFF24487A),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 750));
+          if (mounted) setState(() {});
+        },
+        child: Form(
+          key: _formKey,
+          onChanged: () => setState(() {}),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 90),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -738,6 +746,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
             ],
           ),
         ),
+      ),
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
