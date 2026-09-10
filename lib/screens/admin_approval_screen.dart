@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
+import 'package:simodis_jatim/screens/admin/tabs/admin_calendar_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_dashboard_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_loans_tab.dart';
+import 'package:simodis_jatim/screens/admin/tabs/admin_reports_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_users_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_vehicles_tab.dart';
 import 'package:simodis_jatim/screens/admin/widgets/admin_mobile_drawer.dart';
@@ -55,7 +57,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
   void initState() {
     super.initState();
     _mainTabController = TabController(
-      length: _isSuperAdmin ? 5 : 3,
+      length: _isSuperAdmin ? 7 : 4,
       vsync: this,
     );
     _mainTabController.addListener(() {
@@ -232,6 +234,10 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                         onVerify: widget.onVerify,
                         onReturn: widget.onReturn,
                       ),
+                      AdminCalendarTab(
+                        requests: widget.requests,
+                        vehicles: allVehicles,
+                      ),
                       if (_isSuperAdmin)
                         AdminVehiclesTab(
                           vehicles: allVehicles,
@@ -260,6 +266,12 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                         onUpdateUser: widget.onUpdateUser,
                         onDeleteUser: widget.onDeleteUser,
                       ),
+                      if (_isSuperAdmin)
+                        AdminReportsTab(
+                          requests: widget.requests,
+                          vehicles: allVehicles,
+                          users: allUsers,
+                        ),
                     ],
                   ),
                 ),

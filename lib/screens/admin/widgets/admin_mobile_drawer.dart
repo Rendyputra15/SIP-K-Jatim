@@ -51,9 +51,11 @@ class AdminMobileDrawer extends StatelessWidget {
     final items = <(int, IconData, String)>[
       (0, Icons.grid_view_rounded, 'Dashboard'),
       (1, Icons.description_rounded, 'Berkas Loan'),
-      if (isSuperAdmin) (2, Icons.directions_car_rounded, 'Katalog Armada'),
-      if (isSuperAdmin) (3, Icons.manage_accounts_rounded, 'Kelola Admin'),
-      (isSuperAdmin ? 4 : 2, Icons.people_alt_rounded, 'Daftar Pegawai'),
+      (2, Icons.calendar_month_rounded, 'Jadwal Kalender'),
+      if (isSuperAdmin) (3, Icons.directions_car_rounded, 'Katalog Armada'),
+      if (isSuperAdmin) (4, Icons.manage_accounts_rounded, 'Kelola Admin'),
+      (isSuperAdmin ? 5 : 3, Icons.people_alt_rounded, 'Daftar Pegawai'),
+      if (isSuperAdmin) (6, Icons.bar_chart_rounded, 'Laporan'),
     ];
 
     return SafeArea(

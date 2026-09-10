@@ -22,7 +22,15 @@ class CatalogScreen extends StatefulWidget {
 }
 
 class _CatalogScreenState extends State<CatalogScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
   String _wheelFilter = 'Semua';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Widget _buildVehicleImage(String imageUrl, VehicleType type) {
     return AppImage(
@@ -44,12 +52,130 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
+  // Chip Indikator Sisa BBM (Bahan Bakar)
+  Widget _buildFuelChip(Vehicle item, bool isDark) {
+    Color bg;
+    Color fg;
+    Color border;
+
+    if (item.fuelPercent >= 75) {
+      bg = isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7);
+      fg = isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D);
+      border = isDark ? const Color(0xFF047857) : const Color(0xFF86EFAC);
+    } else if (item.fuelPercent >= 40) {
+      bg = isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7);
+      fg = isDark ? const Color(0xFFFDE68A) : const Color(0xFFB45309);
+      border = isDark ? const Color(0xFFB45309) : const Color(0xFFFCD34D);
+    } else {
+      bg = isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2);
+      fg = isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C);
+      border = isDark ? const Color(0xFFB91C1C) : const Color(0xFFFCA5A5);
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.local_gas_station_rounded, size: 12, color: fg),
+          const SizedBox(width: 4),
+          Text(
+            '${item.fuelDisplay} • ${item.fuelType}',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: fg,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Chip Indikator Transmisi (Matic / Manual)
+  Widget _buildTransmissionChip(String transmission, bool isDark) {
+    final bg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+    final fg = isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8);
+    final border = isDark ? const Color(0xFF2563EB) : const Color(0xFFBFDBFE);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.tune_rounded, size: 12, color: fg),
+          const SizedBox(width: 4),
+          Text(
+            transmission,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: fg,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Chip Indikator Odometer
+  Widget _buildOdometerChip(int odo, bool isDark) {
+    final bg = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final fg = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569);
+    final border = isDark ? const Color(0xFF475569) : const Color(0xFFE2E8F0);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.speed_rounded, size: 12, color: fg),
+          const SizedBox(width: 4),
+          Text(
+            '$odo KM',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: fg,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.isDarkMode;
+
+    // Filter Armada berdasarkan tipe roda dan pencarian langsung (nama / nomor plat)
     final filteredList = widget.vehicles.where((v) {
       if (_wheelFilter == 'Roda 4' && v.type != VehicleType.mobil) return false;
       if (_wheelFilter == 'Roda 2' && v.type != VehicleType.motor) return false;
+
+      if (_searchQuery.isNotEmpty) {
+        final q = _searchQuery.toLowerCase();
+        final matchName = v.name.toLowerCase().contains(q);
+        final matchPlate = v.plateNumber.toLowerCase().contains(q);
+        final matchBrand = v.brand.toLowerCase().contains(q);
+        if (!matchName && !matchPlate && !matchBrand) return false;
+      }
+
       return true;
     }).toList();
 
@@ -102,14 +228,81 @@ class _CatalogScreenState extends State<CatalogScreen> {
       // 2. KONTEN BODY
       body: Column(
         children: [
-          // Filter Dropdown Ringkas tepat di bawah header
+          // Bilah Pencarian Langsung (Nama Unit / Nomor Plat)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Cari nama armada atau plat nomor (cth. Innova, L 1023 SP)...',
+                  hintStyle: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
+                    size: 20,
+                  ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.clear_rounded,
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                ),
+              ),
+            ),
+          ),
+
+          // Baris Info Hasil & Dropdown Filter Tipe Roda
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Info Jumlah Armada yang Ditemukan
+                Text(
+                  '${filteredList.length} unit armada tersedia',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+
+                // Dropdown Filter Roda
                 Container(
-                  height: 34,
+                  height: 32,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF1E293B) : Colors.white,
@@ -119,7 +312,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
+                        color: Colors.black.withValues(alpha: 0.02),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),
@@ -132,10 +325,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       icon: Icon(
                         Icons.filter_list_rounded,
                         color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
-                        size: 18,
+                        size: 16,
                       ),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
                       ),
@@ -146,6 +339,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               child: Text(
                                 item,
                                 style: TextStyle(
+                                  fontSize: 11,
                                   color: isDark ? Colors.white : const Color(0xFF1E293B),
                                 ),
                               ),
@@ -165,14 +359,67 @@ class _CatalogScreenState extends State<CatalogScreen> {
           // Daftar Card Kendaraan
           Expanded(
             child: filteredList.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Tidak ada kendaraan yang sesuai',
-                      style: TextStyle(color: Color(0xFF94A3B8)),
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.search_off_rounded,
+                              size: 40,
+                              color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Armada Tidak Ditemukan',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _searchQuery.isNotEmpty
+                                ? 'Tidak ada kendaraan dengan kata kunci "$_searchQuery".'
+                                : 'Tidak ada kendaraan pada filter "$_wheelFilter".',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
+                          ),
+                          if (_searchQuery.isNotEmpty || _wheelFilter != 'Semua') ...[
+                            const SizedBox(height: 12),
+                            TextButton.icon(
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                  _wheelFilter = 'Semua';
+                                });
+                              },
+                              icon: const Icon(Icons.refresh_rounded, size: 16),
+                              label: const Text('Reset Pencarian & Filter'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: const Color(0xFF24487A),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                     itemCount: filteredList.length,
                     itemBuilder: (context, index) {
                       final item = filteredList[index];
@@ -201,11 +448,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Gambar Thumbnail Armada
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: Container(
-                                      width: 84,
-                                      height: 74,
+                                      width: 88,
+                                      height: 84,
                                       color: isDark ? const Color(0xFF0F172A) : const Color(0xFFEFF6FF),
                                       child: _buildVehicleImage(
                                         item.imageUrl,
@@ -214,52 +462,72 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 14),
+
+                                  // Info Detail & Chip Indikator
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          item.name,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                            color: isDark ? Colors.white : const Color(0xFF1E293B),
-                                          ),
+                                        // Baris Nama & Status Badge
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                item.name,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13,
+                                                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: isAvailable
+                                                    ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7))
+                                                    : (isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2)),
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                isAvailable ? 'TERSEDIA' : 'DIPAKAI',
+                                                style: TextStyle(
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isAvailable
+                                                      ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D))
+                                                      : (isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C)),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         const SizedBox(height: 2),
+
+                                        // Nomor Plat
                                         Text(
                                           item.plateNumber,
                                           style: TextStyle(
                                             fontSize: 11,
+                                            fontWeight: FontWeight.w600,
                                             color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                             fontFamily: 'monospace',
                                           ),
                                         ),
                                         const SizedBox(height: 8),
-                                        Row(
+
+                                        // CHIP KECIL INDIKATOR: Sisa BBM, Transmisi, dan Odometer
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 6,
                                           children: [
-                                            Text(
-                                              '${item.fuelDisplay} • ${item.fuelType}',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0369A1),
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            Text(
-                                              ' • ',
-                                              style: TextStyle(
-                                                color: isDark ? const Color(0xFF64748B) : Colors.grey,
-                                              ),
-                                            ),
-                                            Text(
-                                              '${item.currentOdometer} KM',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                              ),
-                                            ),
+                                            _buildFuelChip(item, isDark),
+                                            _buildTransmissionChip(item.transmission, isDark),
+                                            _buildOdometerChip(item.currentOdometer, isDark),
                                           ],
                                         ),
                                       ],
@@ -268,6 +536,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 ],
                               ),
                             ),
+
+                            // Tombol Aksi Bawah (Detail & Pinjam)
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 14,
@@ -302,9 +572,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(8),
                                         ),
+                                        padding: const EdgeInsets.symmetric(vertical: 9),
                                       ),
                                       child: const Text(
-                                        'Detail',
+                                        'Detail Unit',
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
@@ -320,17 +591,24 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           : null,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: const Color(0xFF24487A),
+                                        disabledBackgroundColor: isDark
+                                            ? const Color(0xFF334155)
+                                            : const Color(0xFFE2E8F0),
                                         foregroundColor: Colors.white,
                                         elevation: 0,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(8),
                                         ),
+                                        padding: const EdgeInsets.symmetric(vertical: 9),
                                       ),
-                                      child: const Text(
-                                        'Pinjam',
+                                      child: Text(
+                                        isAvailable ? 'Ajukan Pinjam' : 'Sedang Dinas',
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
+                                          color: isAvailable
+                                              ? Colors.white
+                                              : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF94A3B8)),
                                         ),
                                       ),
                                     ),
@@ -349,4 +627,3 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 }
-

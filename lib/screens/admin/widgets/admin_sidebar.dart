@@ -148,23 +148,34 @@ class AdminSidebar extends StatelessWidget {
             // Menu Items
             _buildSidebarItem(0, Icons.grid_view_rounded, 'Dashboard'),
             _buildSidebarItem(1, Icons.description_rounded, 'Berkas Loan'),
+            _buildSidebarItem(
+              2,
+              Icons.calendar_month_rounded,
+              'Jadwal Kalender',
+            ),
             if (isSuperAdmin)
               _buildSidebarItem(
-                2,
+                3,
                 Icons.directions_car_rounded,
                 'Katalog Armada',
               ),
             if (isSuperAdmin)
               _buildSidebarItem(
-                3,
+                4,
                 Icons.manage_accounts_rounded,
                 'Kelola Admin',
               ),
             _buildSidebarItem(
-              isSuperAdmin ? 4 : 2,
+              isSuperAdmin ? 5 : 3,
               Icons.people_alt_rounded,
               'Daftar Pegawai',
             ),
+            if (isSuperAdmin)
+              _buildSidebarItem(
+                6,
+                Icons.bar_chart_rounded,
+                'Laporan',
+              ),
 
             const Spacer(),
             // User Profile Mini
