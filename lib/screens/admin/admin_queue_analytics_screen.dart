@@ -586,13 +586,14 @@ class _AdminQueueAnalyticsScreenState extends State<AdminQueueAnalyticsScreen> {
     bool isTap = false,
   }) {
     if (count <= 1 || chartWidth <= 0) return;
-    final horizontalPadding = count > 8 ? 16.0 : 24.0;
-    final drawableWidth = chartWidth - horizontalPadding * 2;
+    const leftPadding = 42.0;
+    const rightPadding = 16.0;
+    final drawableWidth = chartWidth - leftPadding - rightPadding;
     if (drawableWidth <= 0) return;
 
     final stepX = drawableWidth / (count - 1);
     final relativeX =
-        (localPosition.dx - horizontalPadding).clamp(0.0, drawableWidth);
+        (localPosition.dx - leftPadding).clamp(0.0, drawableWidth);
     final index = (relativeX / stepX).round().clamp(0, count - 1);
 
     setState(() {
@@ -645,7 +646,7 @@ class _AdminQueueAnalyticsScreenState extends State<AdminQueueAnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Grafik
+          // Header Grafik & Legenda Garis (Gambar 2)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -669,7 +670,7 @@ class _AdminQueueAnalyticsScreenState extends State<AdminQueueAnalyticsScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Ketuk garis atau titik untuk melihat jumlah berkas dan rincian.',
+                      'Ketuk titik atau garis untuk melihat rincian permohonan.',
                       style: TextStyle(
                         fontSize: 11,
                         color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -681,27 +682,34 @@ class _AdminQueueAnalyticsScreenState extends State<AdminQueueAnalyticsScreen> {
                 ),
               ),
               const SizedBox(width: 8),
+              // Indicator Legenda Tipe Garis (Gambar 2)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.show_chart_rounded,
-                      size: 13,
-                      color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF2563EB),
+                    Container(
+                      width: 16,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 6),
                     Text(
-                      'Grafik Garis',
+                      _onlyPending ? 'Permohonan' : 'Total Berkas',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF2563EB),
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                       ),
                     ),
                   ],
@@ -1293,10 +1301,9 @@ class _AdminQueueAnalyticsScreenState extends State<AdminQueueAnalyticsScreen> {
   }
 }
 
-/// Custom painter untuk grafik garis tren antrean interaktif.
-/// Desain rapi tanpa angka di atas titik saat kondisi normal (clean minimalist).
-/// Saat titik atau garis disentuh/diklik, muncul efek glow, garis pandu vertikal,
-/// dan floating tooltip pill dengan angka berkas yang presisi.
+/// Custom painter untuk grafik garis tren antrean statistik (Model Gambar 2).
+/// Menampilkan skala angka vertikal (Y-axis) di sebelah kiri, garis kisi horizontal,
+/// segmen garis lurus presisi tanpa bezier curvature/area fill, serta label X-axis di bagian bawah.
 class _LineChartPainter extends CustomPainter {
   final List<int> data;
   final int maxVal;
@@ -1323,160 +1330,64 @@ class _LineChartPainter extends CustomPainter {
     if (data.isEmpty) return;
 
     final count = data.length;
-    final horizontalPadding = count > 8 ? 16.0 : 24.0;
-    const topPadding = 38.0;
-    const bottomPadding = 28.0; // Ruang untuk label X-axis di bagian bawah
-    final drawableWidth = size.width - (horizontalPadding * 2);
+    const leftPadding = 42.0; // Ruang untuk skala angka Y-Axis di sebelah kiri (Gambar 2)
+    const rightPadding = 16.0;
+    const topPadding = 20.0;
+    const bottomPadding = 32.0; // Ruang untuk tick & label X-Axis di bagian bawah
+
+    final drawableWidth = size.width - leftPadding - rightPadding;
     final drawableHeight = size.height - topPadding - bottomPadding;
 
     if (drawableWidth <= 0 || drawableHeight <= 0) return;
 
-    final safeMax = maxVal <= 0 ? 1 : maxVal;
+    // 1. Hitung Skala Y-Axis (Angka & Kisi Horizontal)
+    final rawMax = maxVal <= 0 ? 5 : maxVal;
+    int step;
+    if (rawMax <= 5) {
+      step = 1;
+    } else if (rawMax <= 15) {
+      step = 3;
+    } else if (rawMax <= 30) {
+      step = 5;
+    } else if (rawMax <= 60) {
+      step = 10;
+    } else {
+      step = (rawMax / 5).ceil();
+      if (step % 5 != 0) {
+        step = ((step / 5).ceil()) * 5;
+      }
+    }
+
+    final numTicks = (rawMax / step).ceil();
+    final safeMax = (numTicks * step).clamp(1, 999999);
     final baselineY = size.height - bottomPadding;
 
-    // 1. Garis Kisi Horizontal (Subtle Gridlines)
-    const gridLineCount = 4;
-    final gridPaint = Paint()
-      ..color = (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))
-          .withValues(alpha: 0.7)
-      ..strokeWidth = 1.0;
+    final gridLineColor = isDark ? const Color(0xFF334155) : const Color(0xFFD1D5DB);
+    final textColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569);
 
-    for (int i = 0; i <= gridLineCount; i++) {
-      final y = topPadding + (drawableHeight * i / gridLineCount);
-      double startX = horizontalPadding;
-      const dashWidth = 4.0;
-      const dashSpace = 4.0;
-      while (startX < size.width - horizontalPadding) {
-        final endX =
-            (startX + dashWidth).clamp(startX, size.width - horizontalPadding);
-        canvas.drawLine(Offset(startX, y), Offset(endX, y), gridPaint);
-        startX += dashWidth + dashSpace;
-      }
-    }
+    // 2. Gambar Garis Kisi Horizontal & Label Skala Y-Axis (Kiri - Gambar 2)
+    for (int i = 0; i <= numTicks; i++) {
+      final val = i * step;
+      final y = baselineY - ((val / safeMax) * drawableHeight);
 
-    // 2. Hitung Posisi Titik-titik (Points)
-    final stepX = count > 1 ? drawableWidth / (count - 1) : drawableWidth;
-    final points = <Offset>[];
-    for (int i = 0; i < count; i++) {
-      final x = horizontalPadding + (i * stepX);
-      final normalizedValue = (data[i] / safeMax).clamp(0.0, 1.0);
-      final y =
-          baselineY - (normalizedValue * drawableHeight * animationProgress);
-      points.add(Offset(x, y));
-    }
+      // Garis Kisi Horizontal
+      final gridPaint = Paint()
+        ..color = gridLineColor.withValues(alpha: 0.75)
+        ..strokeWidth = 1.0;
+      canvas.drawLine(
+        Offset(leftPadding, y),
+        Offset(size.width - rightPadding, y),
+        gridPaint,
+      );
 
-    // 3. Bangun Kurva Bezier Mulus (Catmull-Rom to Cubic Bezier)
-    final path = Path();
-    if (points.isNotEmpty) {
-      path.moveTo(points[0].dx, points[0].dy);
-      if (points.length == 1) {
-        path.lineTo(size.width - horizontalPadding, points[0].dy);
-      } else {
-        for (int i = 0; i < points.length - 1; i++) {
-          final p0 = i > 0 ? points[i - 1] : points[i];
-          final p1 = points[i];
-          final p2 = points[i + 1];
-          final p3 = i < points.length - 2 ? points[i + 2] : p2;
-
-          final cp1x = p1.dx + (p2.dx - p0.dx) / 5.5;
-          final cp1y = p1.dy + (p2.dy - p0.dy) / 5.5;
-          final cp2x = p2.dx - (p3.dx - p1.dx) / 5.5;
-          final cp2y = p2.dy - (p3.dy - p1.dy) / 5.5;
-
-          path.cubicTo(cp1x, cp1y, cp2x, cp2y, p2.dx, p2.dy);
-        }
-      }
-    }
-
-    // 4. Area Gradient Fill di Bawah Garis
-    if (points.length > 1) {
-      final fillPath = Path.from(path);
-      fillPath.lineTo(points.last.dx, baselineY);
-      fillPath.lineTo(points.first.dx, baselineY);
-      fillPath.close();
-
-      final fillPaint = Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            primaryColor.withValues(alpha: isDark ? 0.35 : 0.22),
-            secondaryColor.withValues(alpha: isDark ? 0.15 : 0.08),
-            primaryColor.withValues(alpha: 0.0),
-          ],
-          stops: const [0.0, 0.65, 1.0],
-        ).createShader(
-            Rect.fromLTWH(0, topPadding, size.width, drawableHeight));
-
-      canvas.drawPath(fillPath, fillPaint);
-    }
-
-    // 5. Garis Stroke Bergradasi (Glow & Main Line)
-    final strokeShader = LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-      colors: [primaryColor, secondaryColor],
-    ).createShader(
-      Rect.fromLTWH(horizontalPadding, 0, drawableWidth, size.height),
-    );
-
-    // Efek glowing tipis di bawah garis
-    final glowPaint = Paint()
-      ..shader = strokeShader
-      ..strokeWidth = 6.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-    canvas.drawPath(path, glowPaint);
-
-    // Garis utama
-    final linePaint = Paint()
-      ..shader = strokeShader
-      ..strokeWidth = 3.2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    canvas.drawPath(path, linePaint);
-
-    // 6. Titik-titik Node Biasa (Bersih tanpa angka)
-    for (int i = 0; i < points.length; i++) {
-      if (i == selectedIndex) continue;
-      final pt = points[i];
-
-      final backPaint = Paint()
-        ..color = isDark ? const Color(0xFF1E293B) : Colors.white
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(pt, 4.5, backPaint);
-
-      final ringPaint = Paint()
-        ..color = primaryColor.withValues(alpha: 0.85)
-        ..strokeWidth = 2.0
-        ..style = PaintingStyle.stroke;
-      canvas.drawCircle(pt, 4.0, ringPaint);
-
-      final corePaint = Paint()
-        ..color = primaryColor
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(pt, 2.0, corePaint);
-    }
-
-    // 7. Label X-Axis (Tanggal/Hari/Bulan tepat di bawah node)
-    final labelY = size.height - 18;
-    for (int i = 0; i < points.length; i++) {
-      final isSelected = i == selectedIndex;
-      final label = labels[i];
-      final labelColor = isSelected
-          ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8))
-          : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B));
-
+      // Teks Angka Skala Y-Axis (Rata Kanan ke Sisi Kiri)
+      final valText = val >= 1000 ? '${(val / 1000).toStringAsFixed(0)}.000' : '$val';
       final textSpan = TextSpan(
-        text: label,
+        text: valText,
         style: TextStyle(
-          fontSize: count > 8 ? 9.5 : 10.5,
-          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-          color: labelColor,
-          letterSpacing: count > 8 ? -0.2 : 0.0,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: textColor,
         ),
       );
       final textPainter = TextPainter(
@@ -1484,39 +1395,110 @@ class _LineChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
       );
       textPainter.layout();
-
-      final labelX = points[i].dx - (textPainter.width / 2);
-
-      if (isSelected) {
-        final pillRect = RRect.fromRectAndRadius(
-          Rect.fromCenter(
-            center: Offset(points[i].dx, labelY + (textPainter.height / 2)),
-            width: textPainter.width + 12,
-            height: textPainter.height + 4,
-          ),
-          const Radius.circular(6),
-        );
-        canvas.drawRRect(
-          pillRect,
-          Paint()
-            ..color =
-                (isDark ? const Color(0xFF2563EB) : const Color(0xFFDBEAFE))
-                    .withValues(alpha: 0.5),
-        );
-      }
-
-      textPainter.paint(canvas, Offset(labelX, labelY));
+      textPainter.paint(
+        canvas,
+        Offset(leftPadding - 6 - textPainter.width, y - (textPainter.height / 2)),
+      );
     }
 
-    // 8. Titik Terpilih yang Diklik: Guideline, Glow Rings, & Floating Tooltip Angka
+    // 3. Hitung Posisi Titik Data X-Y
+    final stepX = count > 1 ? drawableWidth / (count - 1) : drawableWidth;
+    final points = <Offset>[];
+    for (int i = 0; i < count; i++) {
+      final x = leftPadding + (i * stepX);
+      final normalizedValue = (data[i] / safeMax).clamp(0.0, 1.0);
+      final y = baselineY - (normalizedValue * drawableHeight * animationProgress);
+      points.add(Offset(x, y));
+    }
+
+    // 4. Gambar Baseline & Tick Marks Vertikal X-Axis (Bawah - Gambar 2)
+    final axisPaint = Paint()
+      ..color = gridLineColor
+      ..strokeWidth = 1.2;
+    canvas.drawLine(
+      Offset(leftPadding, baselineY),
+      Offset(size.width - rightPadding, baselineY),
+      axisPaint,
+    );
+
+    final labelY = baselineY + 6;
+    for (int i = 0; i < points.length; i++) {
+      final pt = points[i];
+      final isSelected = i == selectedIndex;
+
+      // Tick vertikal kecil tepat di setiap posisi titik
+      canvas.drawLine(
+        Offset(pt.dx, baselineY),
+        Offset(pt.dx, baselineY + 4),
+        axisPaint,
+      );
+
+      final label = labels[i];
+      final textSpan = TextSpan(
+        text: label,
+        style: TextStyle(
+          fontSize: count > 8 ? 9.5 : 10.5,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+          color: isSelected
+              ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8))
+              : textColor,
+        ),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(pt.dx - (textPainter.width / 2), labelY + 2),
+      );
+    }
+
+    // 5. Gambar Segmen Garis Lurus Tegas (Model Gambar 2)
+    if (points.isNotEmpty) {
+      final linePath = Path();
+      linePath.moveTo(points[0].dx, points[0].dy);
+
+      for (int i = 1; i < points.length; i++) {
+        linePath.lineTo(points[i].dx, points[i].dy);
+      }
+
+      final linePaint = Paint()
+        ..color = primaryColor
+        ..strokeWidth = 2.8
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.miter;
+
+      canvas.drawPath(linePath, linePaint);
+    }
+
+    // 6. Gambar Titik Node (Vertices)
+    for (int i = 0; i < points.length; i++) {
+      if (i == selectedIndex) continue;
+      final pt = points[i];
+
+      final dotPaint = Paint()
+        ..color = primaryColor
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(pt, 3.5, dotPaint);
+
+      final innerDotPaint = Paint()
+        ..color = isDark ? const Color(0xFF1E293B) : Colors.white
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(pt, 1.8, innerDotPaint);
+    }
+
+    // 7. Garis Pandu & Tooltip Interaktif Saat Titik Dipilih
     if (selectedIndex >= 0 && selectedIndex < points.length) {
       final selPt = points[selectedIndex];
       final val = data[selectedIndex];
 
-      // 8a. Garis Pandu Vertikal Putus-putus
+      // Garis Pandu Vertikal Putus-putus
       final guidePaint = Paint()
-        ..color = primaryColor.withValues(alpha: isDark ? 0.55 : 0.45)
-        ..strokeWidth = 1.5;
+        ..color = primaryColor.withValues(alpha: isDark ? 0.6 : 0.45)
+        ..strokeWidth = 1.2;
 
       double gStartY = topPadding;
       const gDashHeight = 4.0;
@@ -1531,33 +1513,19 @@ class _LineChartPainter extends CustomPainter {
         gStartY += gDashHeight + gDashSpace;
       }
 
-      // 8b. Cincin Efek Glow pada Titik Terpilih
+      // Highlight Node Terpilih
       canvas.drawCircle(
         selPt,
-        14.0,
-        Paint()..color = primaryColor.withValues(alpha: isDark ? 0.28 : 0.20),
+        6.5,
+        Paint()..color = primaryColor,
       );
       canvas.drawCircle(
         selPt,
-        8.5,
-        Paint()..color = primaryColor.withValues(alpha: isDark ? 0.5 : 0.35),
-      );
-      canvas.drawCircle(
-        selPt,
-        6.0,
-        Paint()
-          ..color = isDark ? const Color(0xFF0F172A) : Colors.white
-          ..style = PaintingStyle.fill,
-      );
-      canvas.drawCircle(
-        selPt,
-        4.0,
-        Paint()
-          ..color = primaryColor
-          ..style = PaintingStyle.fill,
+        3.0,
+        Paint()..color = isDark ? const Color(0xFF0F172A) : Colors.white,
       );
 
-      // 8c. Tooltip Pill Menampilkan Angka
+      // Tooltip Floating Badge
       final tooltipTextSpan = TextSpan(
         children: [
           TextSpan(
@@ -1590,21 +1558,15 @@ class _LineChartPainter extends CustomPainter {
       final pillWidth = tooltipPainter.width + (pillPaddingH * 2);
       final pillHeight = tooltipPainter.height + (pillPaddingV * 2);
 
-      // Tentukan posisi vertikal tooltip (di atas jika muat, atau di bawah)
       final showAbove = (selPt.dy - pillHeight - 12) >= 4.0;
-      final pillY =
-          showAbove ? (selPt.dy - pillHeight - 10) : (selPt.dy + 12);
-
-      // Pastikan tooltip tidak terpotong di tepi layar
-      final pillX =
-          (selPt.dx - (pillWidth / 2)).clamp(6.0, size.width - pillWidth - 6.0);
+      final pillY = showAbove ? (selPt.dy - pillHeight - 10) : (selPt.dy + 12);
+      final pillX = (selPt.dx - (pillWidth / 2)).clamp(6.0, size.width - pillWidth - 6.0);
 
       final pillRRect = RRect.fromRectAndRadius(
         Rect.fromLTWH(pillX, pillY, pillWidth, pillHeight),
         const Radius.circular(8),
       );
 
-      // Shadow bayangan tooltip
       canvas.drawRRect(
         pillRRect.shift(const Offset(0, 3)),
         Paint()
@@ -1612,20 +1574,17 @@ class _LineChartPainter extends CustomPainter {
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
       );
 
-      // Latar belakang tooltip
       final pillBgPaint = Paint()
         ..color = isDark ? const Color(0xFF0F172A) : const Color(0xFF1E293B)
         ..style = PaintingStyle.fill;
       canvas.drawRRect(pillRRect, pillBgPaint);
 
-      // Border tooltip
       final pillBorderPaint = Paint()
         ..color = primaryColor.withValues(alpha: 0.75)
         ..strokeWidth = 1.2
         ..style = PaintingStyle.stroke;
       canvas.drawRRect(pillRRect, pillBorderPaint);
 
-      // Segitiga penunjuk (pointer arrow)
       final arrowX = selPt.dx.clamp(pillX + 8.0, pillX + pillWidth - 8.0);
       final arrowPath = Path();
       if (showAbove) {
@@ -1642,7 +1601,6 @@ class _LineChartPainter extends CustomPainter {
       canvas.drawPath(arrowPath, pillBgPaint);
       canvas.drawPath(arrowPath, pillBorderPaint);
 
-      // Gambar teks angka di dalam tooltip
       tooltipPainter.paint(
         canvas,
         Offset(

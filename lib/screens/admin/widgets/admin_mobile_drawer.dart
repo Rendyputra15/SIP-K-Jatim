@@ -65,6 +65,7 @@ class AdminMobileDrawer extends StatelessWidget {
       if (isSuperAdmin) (4, Icons.manage_accounts_rounded, 'Kelola Admin'),
       (isSuperAdmin ? 5 : 3, Icons.people_alt_rounded, 'Kelola Pegawai'),
       if (isSuperAdmin) (6, Icons.bar_chart_rounded, 'Laporan'),
+      (isSuperAdmin ? 7 : 4, Icons.insights_rounded, 'Performa'),
     ];
 
     return SafeArea(

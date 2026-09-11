@@ -307,6 +307,12 @@ class AdminSidebar extends StatelessWidget {
                 'Laporan',
                 isDark,
               ),
+            _buildSidebarItem(
+              isSuperAdmin ? 7 : 4,
+              Icons.insights_rounded,
+              'Performa',
+              isDark,
+            ),
 
             const Spacer(),
             // User Profile Mini (Klik untuk logout)

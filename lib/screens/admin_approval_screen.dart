@@ -6,6 +6,7 @@ import 'package:simodis_jatim/models/vehicle_model.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_calendar_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_dashboard_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_loans_tab.dart';
+import 'package:simodis_jatim/screens/admin/tabs/admin_performance_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_reports_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_users_tab.dart';
 import 'package:simodis_jatim/screens/admin/tabs/admin_vehicles_tab.dart';
@@ -14,7 +15,6 @@ import 'package:simodis_jatim/screens/admin/widgets/admin_sidebar.dart';
 import 'package:simodis_jatim/screens/login_screen.dart';
 import 'package:simodis_jatim/screens/notification_screen.dart';
 import 'package:simodis_jatim/services/theme_service.dart';
-import 'package:simodis_jatim/widgets/day_night_switch.dart';
 
 class AdminApprovalScreen extends StatefulWidget {
   final List<LoanRequest> requests;
@@ -71,7 +71,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
   void initState() {
     super.initState();
     _mainTabController = TabController(
-      length: _isSuperAdmin ? 7 : 4,
+      length: _isSuperAdmin ? 8 : 5,
       vsync: this,
     );
     _mainTabController.addListener(() {
@@ -1102,6 +1102,10 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                               vehicles: allVehicles,
                               users: allUsers,
                             ),
+                          AdminPerformanceTab(
+                            requests: widget.requests,
+                            vehicles: allVehicles,
+                          ),
                         ],
                       ),
                     ),
