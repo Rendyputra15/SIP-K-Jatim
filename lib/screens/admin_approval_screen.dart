@@ -206,7 +206,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
         final screenWidth = MediaQuery.sizeOf(context).width;
         final isMobile = screenWidth < 700;
         final popupWidth = isMobile
-            ? (screenWidth - 24).clamp(280.0, 340.0)
+            ? (screenWidth - 24).clamp(200.0, 340.0)
             : 340.0;
 
         return Stack(
@@ -401,7 +401,7 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
                           shrinkWrap: true,
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           itemCount: _notifications.take(5).length,
-                          separatorBuilder: (_, __) => Divider(
+                          separatorBuilder: (_, index) => Divider(
                             height: 1,
                             thickness: 0.8,
                             color: isDark
@@ -509,7 +509,6 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
         iconData = Icons.warning_amber_rounded;
         break;
       case NotificationType.welcome:
-      default:
         iconColor = const Color(0xFF6366F1);
         iconBg = isDark
             ? const Color(0xFF312E81).withOpacity(0.3)
@@ -655,139 +654,148 @@ class _AdminApprovalScreenState extends State<AdminApprovalScreen>
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: const EdgeInsets.all(24),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 36,
-              backgroundColor: _isSuperAdmin
-                  ? (isDark
-                      ? const Color(0xFF78350F)
-                      : const Color(0xFFFEF3C7))
-                  : (isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0)),
-              child: Icon(
-                Icons.person,
-                size: 40,
-                color: _isSuperAdmin
+        contentPadding: const EdgeInsets.all(20),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 36,
+                backgroundColor: _isSuperAdmin
                     ? (isDark
-                        ? const Color(0xFFFBBF24)
-                        : const Color(0xFFD97706))
+                        ? const Color(0xFF78350F)
+                        : const Color(0xFFFEF3C7))
                     : (isDark
-                        ? Colors.white
-                        : const Color(0xFF1E293B)),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              widget.currentUser?.name ?? 'Administrator SIP-K',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _isSuperAdmin
-                    ? const Color(0xFFFEF3C7)
-                    : const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                _isSuperAdmin
-                    ? 'Superadmin (Akses Penuh)'
-                    : 'Kasubag / Admin TU & Aset',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFE2E8F0)),
+                child: Icon(
+                  Icons.person,
+                  size: 40,
                   color: _isSuperAdmin
-                      ? const Color(0xFFB45309)
-                      : const Color(0xFF1E40AF),
+                      ? (isDark
+                          ? const Color(0xFFFBBF24)
+                          : const Color(0xFFD97706))
+                      : (isDark
+                          ? Colors.white
+                          : const Color(0xFF1E293B)),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Apakah Anda yakin ingin keluar dari sesi akun ini?',
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF64748B),
+              const SizedBox(height: 16),
+              Text(
+                widget.currentUser?.name ?? 'Administrator SIP-K',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(
-                        color: isDark
-                            ? const Color(0xFF475569)
-                            : const Color(0xFFCBD5E1),
+              const SizedBox(height: 4),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _isSuperAdmin
+                      ? const Color(0xFFFEF3C7)
+                      : const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  _isSuperAdmin
+                      ? 'Superadmin (Akses Penuh)'
+                      : 'Kasubag / Admin TU & Aset',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: _isSuperAdmin
+                        ? const Color(0xFFB45309)
+                        : const Color(0xFF1E40AF),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Apakah Anda yakin ingin keluar dari sesi akun ini?',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        side: BorderSide(
+                          color: isDark
+                              ? const Color(0xFF475569)
+                              : const Color(0xFFCBD5E1),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      'Batal',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? Colors.white70
-                            : const Color(0xFF475569),
+                      child: Text(
+                        'Batal',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? Colors.white70
+                              : const Color(0xFF475569),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      if (widget.onLogout != null) {
-                        widget.onLogout!();
-                      } else {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        if (widget.onLogout != null) {
+                          widget.onLogout!();
+                        } else {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LoginScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFDC2626),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.logout_rounded, size: 15),
+                          SizedBox(width: 4),
+                          Text(
+                            'Logout',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          (route) => false,
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.logout_rounded, size: 16),
-                    label: const Text(
-                      'Logout',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFDC2626),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        ],
                       ),
-                      elevation: 0,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

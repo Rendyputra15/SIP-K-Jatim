@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/models/loan_model.dart';
 import 'package:simodis_jatim/models/vehicle_model.dart';
+import 'package:simodis_jatim/screens/admin/department_loans_analytics_screen.dart';
 import 'package:simodis_jatim/screens/admin/top_vehicle_analytics_screen.dart';
 import 'package:simodis_jatim/screens/admin/total_borrowed_cars_analytics_screen.dart';
 import 'package:simodis_jatim/services/theme_service.dart';
@@ -1560,53 +1561,176 @@ class _AdminPerformanceTabState extends State<AdminPerformanceTab> {
   }
 
   Widget _buildDepartmentBreakdownCard(bool isDark) {
-    final deptData = {
-      'Subbag Penyusunan Program & Anggaran': 28,
-      'Bidang Perlindungan & Jaminan Sosial (Linjamsos)': 35,
-      'Bidang Rehabilitasi Sosial (Rehsos)': 26,
-      'Bidang Penanganan Fakir Miskin (PFM)': 20,
-      'Subbag Keuangan & Aset': 16,
+    final Map<String, int> deptData = switch (_selectedPeriod) {
+      PerformancePeriod.harian => {
+          'Subbag Penyusunan Program & Anggaran': 6,
+          'Bidang Perlindungan & Jaminan Sosial (Linjamsos)': 8,
+          'Bidang Rehabilitasi Sosial (Rehsos)': 5,
+          'Bidang Penanganan Fakir Miskin (PFM)': 4,
+          'Subbag Keuangan & Aset': 3,
+        },
+      PerformancePeriod.mingguan => {
+          'Subbag Penyusunan Program & Anggaran': 14,
+          'Bidang Perlindungan & Jaminan Sosial (Linjamsos)': 18,
+          'Bidang Rehabilitasi Sosial (Rehsos)': 12,
+          'Bidang Penanganan Fakir Miskin (PFM)': 9,
+          'Subbag Keuangan & Aset': 7,
+        },
+      PerformancePeriod.bulanan => {
+          'Subbag Penyusunan Program & Anggaran': 28,
+          'Bidang Perlindungan & Jaminan Sosial (Linjamsos)': 35,
+          'Bidang Rehabilitasi Sosial (Rehsos)': 26,
+          'Bidang Penanganan Fakir Miskin (PFM)': 20,
+          'Subbag Keuangan & Aset': 16,
+        },
     };
     final total = deptData.values.fold<int>(0, (a, b) => a + b);
 
+    void openDepartmentAnalytics() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DepartmentLoansAnalyticsScreen(
+            requests: widget.requests,
+            vehicles: widget.vehicles,
+            initialPeriod: _selectedPeriod,
+          ),
+        ),
+      );
+    }
+
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Peminjaman Berdasarkan Bidang',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
-              ),
-              Text(
-                'Frekuensi',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                ),
-              ),
-            ],
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF24487A).withValues(alpha: isDark ? 0.2 : 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
-          const SizedBox(height: 14),
-          for (final entry in deptData.entries) ...[
-            _buildBarRow(entry.key, entry.value, total, isDark),
-            if (entry.key != deptData.keys.last) const SizedBox(height: 10),
-          ],
         ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: openDepartmentAnalytics,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF24487A).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Icon(
+                              Icons.apartment_rounded,
+                              color: Color(0xFF24487A),
+                              size: 15,
+                            ),
+                          ),
+                          const SizedBox(width: 7),
+                          Expanded(
+                            child: Text(
+                              'Peminjaman per Bidang',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    InkWell(
+                      onTap: openDepartmentAnalytics,
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.25 : 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.4 : 0.25),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Lihat Grafik ➔',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF2563EB),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                for (final entry in deptData.entries) ...[
+                  _buildBarRow(entry.key, entry.value, total, isDark),
+                  if (entry.key != deptData.keys.last) const SizedBox(height: 10),
+                ],
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.touch_app_rounded,
+                        size: 13,
+                        color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                      ),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          'Ketuk kartu untuk melihat grafik lengkap & data per bidang',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1630,10 +1754,11 @@ class _AdminPerformanceTabState extends State<AdminPerformanceTab> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               '$val Pinjaman (${(pct * 100).toStringAsFixed(0)}%)',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: FontWeight.bold,
                 color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A),
               ),

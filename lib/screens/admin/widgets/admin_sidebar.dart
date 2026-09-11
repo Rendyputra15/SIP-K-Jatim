@@ -271,50 +271,57 @@ class AdminSidebar extends StatelessWidget {
                 ),
               ),
 
-            // Menu Items
-            _buildSidebarItem(0, Icons.grid_view_rounded, 'Dashboard', isDark),
-            _buildSidebarItem(1, Icons.description_rounded, 'Berkas Loan', isDark),
-            _buildSidebarItem(
-              2,
-              Icons.calendar_month_rounded,
-              'Jadwal Kalender',
-              isDark,
-            ),
-            if (isSuperAdmin)
-              _buildSidebarItem(
-                3,
-                Icons.directions_car_rounded,
-                'Katalog Armada',
-                isDark,
+            // Menu Items (Scrollable jika tinggi layar terbatas)
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    _buildSidebarItem(0, Icons.grid_view_rounded, 'Dashboard', isDark),
+                    _buildSidebarItem(1, Icons.description_rounded, 'Berkas Loan', isDark),
+                    _buildSidebarItem(
+                      2,
+                      Icons.calendar_month_rounded,
+                      'Jadwal Kalender',
+                      isDark,
+                    ),
+                    if (isSuperAdmin)
+                      _buildSidebarItem(
+                        3,
+                        Icons.directions_car_rounded,
+                        'Katalog Armada',
+                        isDark,
+                      ),
+                    if (isSuperAdmin)
+                      _buildSidebarItem(
+                        4,
+                        Icons.manage_accounts_rounded,
+                        'Kelola Admin',
+                        isDark,
+                      ),
+                    _buildSidebarItem(
+                      isSuperAdmin ? 5 : 3,
+                      Icons.people_alt_rounded,
+                      'Kelola Pegawai',
+                      isDark,
+                    ),
+                    if (isSuperAdmin)
+                      _buildSidebarItem(
+                        6,
+                        Icons.bar_chart_rounded,
+                        'Laporan',
+                        isDark,
+                      ),
+                    _buildSidebarItem(
+                      isSuperAdmin ? 7 : 4,
+                      Icons.insights_rounded,
+                      'Performa',
+                      isDark,
+                    ),
+                  ],
+                ),
               ),
-            if (isSuperAdmin)
-              _buildSidebarItem(
-                4,
-                Icons.manage_accounts_rounded,
-                'Kelola Admin',
-                isDark,
-              ),
-            _buildSidebarItem(
-              isSuperAdmin ? 5 : 3,
-              Icons.people_alt_rounded,
-              'Kelola Pegawai',
-              isDark,
             ),
-            if (isSuperAdmin)
-              _buildSidebarItem(
-                6,
-                Icons.bar_chart_rounded,
-                'Laporan',
-                isDark,
-              ),
-            _buildSidebarItem(
-              isSuperAdmin ? 7 : 4,
-              Icons.insights_rounded,
-              'Performa',
-              isDark,
-            ),
-
-            const Spacer(),
             // User Profile Mini (Klik untuk logout)
             Tooltip(
               message: 'Profil & Logout (${currentUser?.name ?? "Admin"})',

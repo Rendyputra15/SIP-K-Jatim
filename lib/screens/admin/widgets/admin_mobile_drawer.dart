@@ -28,11 +28,15 @@ class AdminMobileDrawer extends StatelessWidget {
   ) {
     final isSelected = tabController.index == index;
     return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
       selected: isSelected,
       selectedTileColor:
           isDark ? const Color(0xFF334155) : const Color(0xFFEFF6FF),
       leading: Icon(
         icon,
+        size: 19,
         color: isSelected
             ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF24487A))
             : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
@@ -40,10 +44,11 @@ class AdminMobileDrawer extends StatelessWidget {
       title: Text(
         label,
         style: TextStyle(
+          fontSize: 12.5,
           color: isSelected
               ? (isDark ? Colors.white : const Color(0xFF1E40AF))
               : (isDark ? Colors.white70 : const Color(0xFF1E293B)),
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
         ),
       ),
       onTap: () {
@@ -74,25 +79,26 @@ class AdminMobileDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header: Logo, Nama, dan Tombol Tutup
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 12, 24),
+              padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
               child: Row(
                 children: [
                   Image.asset(
                     'assets/images/logo_sipk.png',
-                    width: 52,
-                    height: 52,
+                    width: 36,
+                    height: 36,
                     fit: BoxFit.contain,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'SIP-K DINSOS',
                       style: TextStyle(
                         color: isDark ? Colors.white : const Color(0xFF1E293B),
                         fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                        letterSpacing: 1,
+                        fontSize: 15,
+                        letterSpacing: 0.8,
                       ),
                     ),
                   ),
@@ -111,68 +117,81 @@ class AdminMobileDrawer extends StatelessWidget {
               height: 1,
               color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
-            // Switch Mode Terang / Gelap (Di atas Dashboard)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF0F172A)
-                      : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF334155)
-                        : const Color(0xFFE2E8F0),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // Daftar Menu yang Aman dari Overflow (Scrollable)
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          isDark
-                              ? Icons.dark_mode_rounded
-                              : Icons.light_mode_rounded,
-                          size: 18,
+                    // Switch Mode Terang / Gelap
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFFFBBF24)
-                              : const Color(0xFFD97706),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isDark ? 'Mode Gelap' : 'Mode Terang',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                              ? const Color(0xFF0F172A)
+                              : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
                             color: isDark
-                                ? Colors.white
-                                : const Color(0xFF1E293B),
+                                ? const Color(0xFF334155)
+                                : const Color(0xFFE2E8F0),
                           ),
                         ),
-                      ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  isDark
+                                      ? Icons.dark_mode_rounded
+                                      : Icons.light_mode_rounded,
+                                  size: 16,
+                                  color: isDark
+                                      ? const Color(0xFFFBBF24)
+                                      : const Color(0xFFD97706),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  isDark ? 'Mode Gelap' : 'Mode Terang',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF1E293B),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const DayNightSwitch(),
+                          ],
+                        ),
+                      ),
                     ),
-                    const DayNightSwitch(),
+                    const SizedBox(height: 4),
+
+                    // Menu-menu Superadmin
+                    for (final item in items)
+                      _buildMobileDrawerItem(
+                        context,
+                        item.$1,
+                        item.$2,
+                        item.$3,
+                        isDark,
+                      ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 6),
-            for (final item in items)
-              _buildMobileDrawerItem(
-                context,
-                item.$1,
-                item.$2,
-                item.$3,
-                isDark,
-              ),
-            const Spacer(),
+
+            // Profile Card User di Bagian Bawah
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(14, 6, 14, 10),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
@@ -184,7 +203,7 @@ class AdminMobileDrawer extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
-                      vertical: 10,
+                      vertical: 9,
                     ),
                     decoration: BoxDecoration(
                       color: isDark
@@ -200,7 +219,7 @@ class AdminMobileDrawer extends StatelessWidget {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          radius: 16,
+                          radius: 15,
                           backgroundColor: isSuperAdmin
                               ? (isDark
                                   ? const Color(0xFF78350F)
@@ -210,7 +229,7 @@ class AdminMobileDrawer extends StatelessWidget {
                                   : const Color(0xFFE2E8F0)),
                           child: Icon(
                             Icons.person,
-                            size: 18,
+                            size: 16,
                             color: isSuperAdmin
                                 ? (isDark
                                     ? const Color(0xFFFBBF24)
@@ -220,7 +239,7 @@ class AdminMobileDrawer extends StatelessWidget {
                                     : const Color(0xFF1E293B)),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +252,7 @@ class AdminMobileDrawer extends StatelessWidget {
                                       ? Colors.white
                                       : const Color(0xFF1E293B),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -245,7 +264,7 @@ class AdminMobileDrawer extends StatelessWidget {
                                   color: isDark
                                       ? const Color(0xFF94A3B8)
                                       : const Color(0xFF64748B),
-                                  fontSize: 10,
+                                  fontSize: 9.5,
                                 ),
                               ),
                             ],
@@ -253,7 +272,7 @@ class AdminMobileDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.logout_rounded,
-                          size: 18,
+                          size: 16,
                           color: isDark
                               ? const Color(0xFFF87171)
                               : const Color(0xFFDC2626),
