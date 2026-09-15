@@ -13,10 +13,19 @@ import 'package:simodis_jatim/models/user_model.dart';
 import 'package:simodis_jatim/screens/login_screen.dart';
 import 'package:simodis_jatim/screens/profile_screen.dart';
 import 'package:simodis_jatim/services/theme_service.dart';
+import 'package:simodis_jatim/widgets/notification_permission_dialog.dart';
+import 'package:simodis_jatim/services/notification_permission_service.dart';
+import 'package:simodis_jatim/widgets/app_loading_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
   final String role;
   final bool showLoading;
+
+  static bool hasPromptedNotification = false;
+
+  static void resetPermissionSession() {
+    hasPromptedNotification = false;
+  }
 
   const HomeScreen({super.key, this.role = 'user', this.showLoading = true});
 
@@ -45,11 +54,68 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.delayed(const Duration(milliseconds: 700), () {
         if (mounted) {
           setState(() => _isLoadingDashboard = false);
+          _checkAndShowNotificationPermission();
         }
       });
     } else {
       _isLoadingDashboard = false;
+      _checkAndShowNotificationPermission();
     }
+  }
+
+  void _checkAndShowNotificationPermission() {
+    if (HomeScreen.hasPromptedNotification) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+
+      // Jeda halus agar halaman beranda sudah tampil sepenuhnya di layar
+      await Future.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+
+      // Jika role user, pastikan pengguna sedang berada di tab Beranda (index 0)
+      if (widget.role == 'user' && _currentIndex != 0) return;
+
+      final isGranted = await NotificationPermissionService.isGranted();
+      if (isGranted) return;
+
+      HomeScreen.hasPromptedNotification = true;
+
+      if (!mounted) return;
+      NotificationPermissionDialog.show(
+        context,
+        onGranted: () {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: const Color(0xFF16A34A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              content: const Row(
+                children: [
+                  Icon(
+                    Icons.notifications_active_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Notifikasi aktif. Anda akan menerima pembaruan berkas secara real-time.',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        onDismissed: () {
+          // Tetap berada di halaman beranda
+        },
+      );
+    });
   }
 
   final List<Vehicle> _vehicles = [
@@ -99,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
       currentOdometer: 89400,
       fuelPercent: 50,
       fuelType: 'Solar Subsidi / Dexlite',
+      status: VehicleStatus.digunakan,
       conditionNote:
           'Khusus penugasan rombongan satgas linjamsos & dropping logistik sosial.',
       imageUrl: 'assets/images/logo_sipk.png',
@@ -200,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
       startDate: DateTime(2026, 9, 1),
       endDate: DateTime(2026, 9, 4),
       officialNoteNumber: '005/1398/107.3/2026',
-      status: LoanStatus.disetujui,
+      status: LoanStatus.digunakan,
       submittedAt: DateTime(2026, 8, 31, 10, 0),
       spkNumber: 'ND-5512/DINSOS/2026',
     ),
@@ -552,6 +619,16 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (_) => LoanHistoryScreen(
             loans: _loans,
             onLoanCancelled: (_) => setState(() {}),
+            onLoanCompleted: (loan) {
+              final vehicle = _vehicles.firstWhere((v) => v.id == loan.vehicleId);
+              vehicle.status = VehicleStatus.tersedia;
+              setState(() {});
+            },
+            onLoanStarted: (loan) {
+              final vehicle = _vehicles.firstWhere((v) => v.id == loan.vehicleId);
+              vehicle.status = VehicleStatus.digunakan;
+              setState(() {});
+            },
           ),
         ),
       );
@@ -620,94 +697,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildLoadingDashboard() {
-    final bool isSuper = widget.role == 'superadmin';
-    final bool isAdmin = widget.role == 'admin' || isSuper;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 88,
-                  height: 88,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF24487A).withValues(alpha: 0.12),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Image.asset(
-                    'assets/images/logo_sipk.png',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.directions_car_rounded,
-                      size: 46,
-                      color: Color(0xFF24487A),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFF24487A),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  isAdmin
-                      ? (isSuper
-                            ? 'Menyiapkan Panel Superadministrator...'
-                            : 'Menyiapkan Panel Kasubag Admin...')
-                      : 'Memuat Dashboard SIP-K Jatim...',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1E293B),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Sinkronisasi armada dinas & status peminjaman...',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: 140,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: const LinearProgressIndicator(
-                      minHeight: 4,
-                      backgroundColor: Color(0xFFE2E8F0),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xFFF59E0B),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    return DashboardLoadingView(role: widget.role);
   }
 
   @override
@@ -760,6 +750,16 @@ class _HomeScreenState extends State<HomeScreen> {
         initialProfile: _currentUserProfile,
         onProfileUpdated: (up) => setState(() => _currentUserProfile = up),
         onNavigateTab: (idx) => setState(() => _currentIndex = idx),
+        onLoanCompleted: (loan) {
+          final vehicle = _vehicles.firstWhere((v) => v.id == loan.vehicleId);
+          vehicle.status = VehicleStatus.tersedia;
+          setState(() {});
+        },
+        onLoanStarted: (loan) {
+          final vehicle = _vehicles.firstWhere((v) => v.id == loan.vehicleId);
+          vehicle.status = VehicleStatus.digunakan;
+          setState(() {});
+        },
       ),
     ];
 
@@ -794,6 +794,7 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() => _vehicles.removeWhere((v) => v.id == id)),
         notifications: _adminNotifications,
         onLogout: () {
+          HomeScreen.resetPermissionSession();
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const LoginScreen()),

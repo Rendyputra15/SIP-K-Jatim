@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/services/notification_permission_service.dart';
 import 'package:simodis_jatim/services/theme_service.dart';
+import 'package:simodis_jatim/widgets/day_night_pill_switch.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -75,18 +76,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
             borderColor: borderColor,
             titleColor: titleColor,
             children: [
-              _buildSwitchTile(
-                icon: isDark ? Icons.dark_mode_rounded : Icons.dark_mode_outlined,
-                title: 'Mode Gelap',
-                subtitle: 'Tampilan warna gelap khusus untuk antarmuka pengguna (user).',
-                value: isDark,
-                titleColor: titleColor,
-                subtitleColor: subtitleColor,
-                onChanged: (value) {
-                  setState(() {
-                    ThemeService.setDarkMode(value);
-                  });
+              InkWell(
+                onTap: () {
+                  ThemeService.toggleTheme();
+                  setState(() {});
                 },
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF334155)
+                              : const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          isDark ? Icons.dark_mode_rounded : Icons.wb_sunny_rounded,
+                          color: isDark
+                              ? const Color(0xFF60A5FA)
+                              : const Color(0xFFF59E0B),
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Tema Tampilan',
+                              style: TextStyle(
+                                fontSize: isLarge ? 14 : 13,
+                                fontWeight: FontWeight.w700,
+                                color: titleColor,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isDark
+                                  ? 'Mode Gelap (Dark Mode) aktif'
+                                  : 'Mode Terang (Light Mode) aktif',
+                              style: TextStyle(
+                                fontSize: isLarge ? 12 : 11,
+                                color: subtitleColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      DayNightPillSwitch(
+                        onToggled: () => setState(() {}),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               Divider(height: 1, indent: 16, endIndent: 16, color: dividerColor),
               _buildSwitchTile(

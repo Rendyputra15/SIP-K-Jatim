@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simodis_jatim/screens/home_screen.dart';
-import 'package:simodis_jatim/widgets/notification_permission_dialog.dart';
+import 'package:simodis_jatim/widgets/app_loading_widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -83,131 +83,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showLoginSuccessLoading(String targetRole, String roleLabel) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => PopScope(
-        canPop: false,
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 26),
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.16),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Animated Spinner with Checkmark Icon
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      const SizedBox(
-                        width: 64,
-                        height: 64,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3.5,
-                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5B9E)),
-                          backgroundColor: Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFEFF6FF),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.check_circle_rounded,
-                          color: Color(0xFF16A34A),
-                          size: 28,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Login Berhasil!',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Menyiapkan dashboard $roleLabel...',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF64748B),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: const SizedBox(
-                      width: 140,
-                      child: LinearProgressIndicator(
-                        minHeight: 4,
-                        backgroundColor: Color(0xFFF1F5F9),
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    LoginSuccessDialog.show(context, roleLabel: roleLabel);
 
-    Future.delayed(const Duration(milliseconds: 900), () {
+    Future.delayed(const Duration(milliseconds: 950), () {
       if (!mounted) return;
       setState(() => _isLoading = false);
       Navigator.of(context, rootNavigator: true).pop(); // Tutup loading dialog
 
-      // Munculkan dialog perizinan notifikasi
-      NotificationPermissionDialog.show(
-        context,
-        onGranted: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: const Color(0xFF16A34A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              content: const Row(
-                children: [
-                  Icon(Icons.notifications_active_rounded, color: Colors.white, size: 20),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text('Notifikasi aktif. Anda akan menerima pembaruan berkas secara real-time.'),
-                  ),
-                ],
-              ),
-            ),
-          );
-          _navigateToHome(targetRole);
-        },
-        onDismissed: () {
-          _navigateToHome(targetRole);
-        },
-      );
+      HomeScreen.resetPermissionSession();
+      _navigateToHome(targetRole);
     });
   }
 

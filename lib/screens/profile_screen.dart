@@ -15,6 +15,8 @@ class ProfileScreen extends StatefulWidget {
   final Function(int) onNavigateTab;
   final UserProfile? initialProfile;
   final Function(UserProfile)? onProfileUpdated;
+  final ValueChanged<LoanRequest>? onLoanCompleted;
+  final ValueChanged<LoanRequest>? onLoanStarted;
 
   const ProfileScreen({
     super.key,
@@ -22,6 +24,8 @@ class ProfileScreen extends StatefulWidget {
     required this.onNavigateTab,
     this.initialProfile,
     this.onProfileUpdated,
+    this.onLoanCompleted,
+    this.onLoanStarted,
   });
 
   @override
@@ -308,6 +312,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         statusTextColor = isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D);
         statusText = 'DISETUJUI';
         break;
+      case LoanStatus.digunakan:
+        statusBg = isDark ? const Color(0xFF075985) : const Color(0xFFE0F2FE);
+        statusTextColor = isDark ? const Color(0xFF7DD3FC) : const Color(0xFF0284C7);
+        statusText = 'DIGUNAKAN';
+        break;
       case LoanStatus.ditolak:
       case LoanStatus.rejected:
         statusBg = isDark ? const Color(0xFF991B1B) : const Color(0xFFFEE2E2);
@@ -503,9 +512,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ],
-                // Tombol Buka & Cetak Softfile Nota Dinas (Hanya muncul jika status Disetujui)
+                // Tombol Buka & Cetak Softfile Nota Dinas (Hanya muncul jika status Disetujui atau Digunakan)
                 if (item.status == LoanStatus.disetujui ||
-                    item.status == LoanStatus.approved) ...[
+                    item.status == LoanStatus.approved ||
+                    item.status == LoanStatus.digunakan) ...[
                   const SizedBox(height: 14),
                   SizedBox(
                     width: double.infinity,
@@ -612,8 +622,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       MaterialPageRoute(
         builder: (_) => LoanHistoryScreen(
           loans: widget.loans,
-          onLoanTap: (loan) => _showLoanDetailDialog(context, loan),
           onLoanCancelled: (_) => setState(() {}),
+          onLoanCompleted: (loan) {
+            widget.onLoanCompleted?.call(loan);
+            setState(() {});
+          },
+          onLoanStarted: (loan) {
+            widget.onLoanStarted?.call(loan);
+            setState(() {});
+          },
         ),
       ),
     );
@@ -720,7 +737,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ? const Color(0xFFDCFCE7)
                                             : (isDitolak
                                                   ? const Color(0xFFFEE2E2)
-                                                  : const Color(0xFFFEF3C7)),
+                                                  : (item.status == LoanStatus.digunakan
+                                                        ? const Color(0xFFE0F2FE)
+                                                        : const Color(0xFFFEF3C7))),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
@@ -732,7 +751,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               ? const Color(0xFF15803D)
                                               : (isDitolak
                                                     ? const Color(0xFFB91C1C)
-                                                    : const Color(0xFFB45309)),
+                                                    : (item.status == LoanStatus.digunakan
+                                                          ? const Color(0xFF0284C7)
+                                                          : const Color(0xFFB45309))),
                                         ),
                                       ),
                                     ),

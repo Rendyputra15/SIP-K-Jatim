@@ -24,7 +24,8 @@ class ReportExportService {
         .where((r) =>
             r.status == LoanStatus.selesai ||
             r.status == LoanStatus.disetujui ||
-            r.status == LoanStatus.approved)
+            r.status == LoanStatus.approved ||
+            r.status == LoanStatus.digunakan)
         .toList();
     final rejected = requests
         .where((r) =>
@@ -69,6 +70,8 @@ class ReportExportService {
         case LoanStatus.disetujui:
         case LoanStatus.approved:
           return successColor;
+        case LoanStatus.digunakan:
+          return PdfColor.fromHex('0284C7');
         case LoanStatus.selesai:
           return accentColor;
         case LoanStatus.ditolak:
@@ -84,6 +87,8 @@ class ReportExportService {
         case LoanStatus.disetujui:
         case LoanStatus.approved:
           return 'DISETUJUI';
+        case LoanStatus.digunakan:
+          return 'DIGUNAKAN';
         case LoanStatus.selesai:
           return 'SELESAI (BAST)';
         case LoanStatus.ditolak:
@@ -466,7 +471,8 @@ class ReportExportService {
         .where((r) =>
             r.status == LoanStatus.selesai ||
             r.status == LoanStatus.disetujui ||
-            r.status == LoanStatus.approved)
+            r.status == LoanStatus.approved ||
+            r.status == LoanStatus.digunakan)
         .length;
     final rejected = requests
         .where((r) =>
@@ -682,6 +688,8 @@ class ReportExportService {
         case LoanStatus.disetujui:
         case LoanStatus.approved:
           return 'Disetujui';
+        case LoanStatus.digunakan:
+          return 'Digunakan';
         case LoanStatus.selesai:
           return 'Selesai (BAST)';
         case LoanStatus.ditolak:

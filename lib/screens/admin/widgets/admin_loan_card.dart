@@ -88,6 +88,11 @@ class AdminLoanCard extends StatelessWidget {
         badgeText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
         statusTitle = 'DISETUJUI (NOTA DINAS TERBIT)';
         break;
+      case LoanStatus.digunakan:
+        badgeBg = isDark ? const Color(0xFF075985) : const Color(0xFFE0F2FE);
+        badgeText = isDark ? const Color(0xFF7DD3FC) : const Color(0xFF0284C7);
+        statusTitle = 'SEDANG DIGUNAKAN';
+        break;
       case LoanStatus.ditolak:
       case LoanStatus.rejected:
         badgeBg = isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2);
@@ -109,7 +114,8 @@ class AdminLoanCard extends StatelessWidget {
         item.status == LoanStatus.menunggu || item.status == LoanStatus.pending;
     final isActive =
         item.status == LoanStatus.disetujui ||
-        item.status == LoanStatus.approved;
+        item.status == LoanStatus.approved ||
+        item.status == LoanStatus.digunakan;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

@@ -79,7 +79,8 @@ class _AdminLoansTabState extends State<AdminLoansTab> {
             .where(
               (r) =>
                   r.status == LoanStatus.disetujui ||
-                  r.status == LoanStatus.approved,
+                  r.status == LoanStatus.approved ||
+                  r.status == LoanStatus.digunakan,
             )
             .toList();
     final history =

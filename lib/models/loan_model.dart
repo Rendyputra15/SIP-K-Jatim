@@ -3,6 +3,7 @@ enum LoanStatus {
   pending, // Alias untuk menunggu
   disetujui,
   approved, // Alias untuk disetujui
+  digunakan, // Sedang digunakan dalam penugasan dinas
   ditolak,
   rejected, // Alias untuk ditolak
   dibatalkan,
